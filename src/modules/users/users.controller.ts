@@ -67,7 +67,7 @@ export class UsersController {
       }),
     };
 
-    const response = await fetch(`https://${Config.auth0.backend.DOMAIN}/oauth/token`, options)
+    const response = await fetch(`https://${Config.auth0.backend.DOMAIN}/oauth/token`, options);
     const json = await response.json();
 
     return json;
@@ -77,11 +77,11 @@ export class UsersController {
   async getUserProfile(accessToken, userID) {
     const options = {
       headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    }
-    
-    const response = await fetch(`https://${Config.auth0.backend.DOMAIN}/api/v2/users/${userID}`, options)
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+
+    const response = await fetch(`https://${Config.auth0.backend.DOMAIN}/api/v2/users/${userID}`, options);
     const json = await response.json();
 
     return json;

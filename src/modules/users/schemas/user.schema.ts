@@ -9,5 +9,5 @@ export const UserSchema = new mongoose.Schema({
   description: String,
   country: String,
   spokenLanguages: Array,
-  tags: Array
+  tags: Array,
 });

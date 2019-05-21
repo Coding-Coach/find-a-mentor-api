@@ -8,6 +8,6 @@ export interface User extends Document {
   readonly title: string;
   readonly description: string;
   readonly country: string;
-  readonly spokenLanguages: Array<string>;
-  readonly tags: Array<string>;
+  readonly spokenLanguages: string[];
+  readonly tags: string[];
 }

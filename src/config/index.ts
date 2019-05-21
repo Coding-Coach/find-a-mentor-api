@@ -12,7 +12,7 @@ const config = {
       CLIENT_ID: process.env.BACKEND_CLIENT_ID,
       CLIENT_SECRET: process.env.BACKEND_CLIENT_SECRET,
       DOMAIN: process.env.DOMAIN,
-    }
+    },
   },
 };
 

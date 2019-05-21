@@ -9,10 +9,10 @@ const middleware = jwt({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: `https://${Config.auth0.frontend.DOMAIN}/.well-known/jwks.json`
+    jwksUri: `https://${Config.auth0.frontend.DOMAIN}/.well-known/jwks.json`,
   }),
   issuer: `https://${Config.auth0.frontend.DOMAIN}/`,
-  algorithm: 'RS256'
+  algorithm: 'RS256',
 });
 
 @Injectable()

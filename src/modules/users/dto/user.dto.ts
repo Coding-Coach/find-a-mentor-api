@@ -7,8 +7,8 @@ export class UserDto {
   readonly title: string;
   readonly description: string;
   readonly country: string;
-  readonly spokenLanguages: Array<string>;
-  readonly tags: Array<string>;
+  readonly spokenLanguages: string[];
+  readonly tags: string[];
 
   constructor(values) {
     Object.assign(this, values);
