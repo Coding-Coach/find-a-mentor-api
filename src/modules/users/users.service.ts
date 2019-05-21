@@ -12,6 +12,16 @@ export class UsersService {
     return await user.save();
   }
 
+  async find(id: string): Promise<User[]> {
+    const users = await this.userModel.find({ id }).exec();
+
+    if (users.length > 0) {
+      return users[0];
+    }
+
+    return undefined;
+  }
+  
   async findAll(): Promise<User[]> {
     return await this.userModel.find().exec();
   }

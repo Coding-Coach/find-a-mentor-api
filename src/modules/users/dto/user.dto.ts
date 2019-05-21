@@ -1,5 +1,6 @@
 
 export class UserDto {
+  readonly id: string;
   readonly email: string;
   readonly name: string;
   readonly avatar: string;
@@ -8,4 +9,8 @@ export class UserDto {
   readonly country: string;
   readonly spokenLanguages: Array<string>;
   readonly tags: Array<string>;
+
+  constructor(values) {
+    Object.assign(this, values);
+  }
 }
