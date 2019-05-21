@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Req } from '@nestjs/common';
+import { Controller, Get, Put, Body, Param, Req, BadRequestException } from '@nestjs/common';
 import { Request } from 'express';
 import fetch from 'node-fetch';
 import Config from '../../config';
@@ -13,6 +13,20 @@ export class UsersController {
   @Get()
   index(@Req() request: Request) {
     return this.usersService.findAll();
+  }
+
+  @Get(':id')
+  async show(@Param() params) {
+    const user = await this.usersService.find(params.id);
+
+    if (user === undefined) {
+      throw new BadRequestException('User not found');
+    }
+
+    return {
+      success: true,
+      user,
+    };
   }
 
   @Get('current')
