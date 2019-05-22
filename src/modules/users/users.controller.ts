@@ -11,21 +11,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Get()
-  index(@Req() request: Request) {
-    return this.usersService.findAll();
-  }
-
-  @Get(':id')
-  async show(@Param() params) {
-    const user = await this.usersService.find(params.id);
-
-    if (user === undefined) {
-      throw new BadRequestException('User not found');
-    }
+  async index() {
+    const users = await this.usersService.findAll();
 
     return {
       success: true,
-      user,
+      users,
     };
   }
 
@@ -65,6 +56,40 @@ export class UsersController {
     return {
       success: true,
       user: currentUser,
+    };
+  }
+
+  @Get(':id')
+  async show(@Param() params) {
+    const user = await this.usersService.find(params.id);
+
+    if (user === undefined) {
+      throw new BadRequestException('User not found');
+    }
+
+    return {
+      success: true,
+      user,
+    };
+  }
+
+  @Put(':id')
+  async update(@Req() request: Request, @Param() params, @Body() data: UserDto) {
+    const user = await this.usersService.find(params.id);
+
+    // Users should only update their own data
+    if (user === undefined || user.id !== request.user.id) {
+      throw new BadRequestException('User not found');
+    }
+
+    const userDto = new UserDto({
+      id: user.id,
+      ...data,
+    });
+    const res = await this.usersService.update(userDto);
+
+    return {
+      success: res.ok === 1,
     };
   }
 
