@@ -1,17 +1,20 @@
 
 const config = {
+  mongo: {
+    url: process.env.MONGO_DATABASE_URL,
+  },
   auth0: {
     // to decode the token
     frontend: {
-      CLIENT_ID: process.env.FRONTEND_CLIENT_ID,
-      CLIENT_SECRET: process.env.FRONTEND_CLIENT_SECRET,
-      DOMAIN: process.env.DOMAIN,
+      CLIENT_ID: process.env.AUTH0_FRONTEND_CLIENT_ID,
+      CLIENT_SECRET: process.env.AUTH0_FRONTEND_CLIENT_SECRET,
+      DOMAIN: process.env.AUTH0_DOMAIN,
     },
     // To get access to auth0 admin features
     backend: {
-      CLIENT_ID: process.env.BACKEND_CLIENT_ID,
-      CLIENT_SECRET: process.env.BACKEND_CLIENT_SECRET,
-      DOMAIN: process.env.DOMAIN,
+      CLIENT_ID: process.env.AUTH0_BACKEND_CLIENT_ID,
+      CLIENT_SECRET: process.env.AUTH0_BACKEND_CLIENT_SECRET,
+      DOMAIN: process.env.AUTH0_DOMAIN,
     },
   },
 };
