@@ -48,6 +48,13 @@
     express "4.17.0"
     multer "1.4.1"
 
+"@nestjs/swagger@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-3.0.2.tgz#b15b3354050757f648e7ebc6ae8d15a929220804"
+  dependencies:
+    lodash "4.17.11"
+    path-to-regexp "3.0.0"
+
 "@nestjs/testing@^6.0.0":
   version "6.2.3"
   resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-6.2.3.tgz#5e36d49b9c55bf7bd6b1430bbc41f152c0001031"
@@ -2712,7 +2719,7 @@ lodash.sortby@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
 
-lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.4:
+lodash@4.17.11, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.4:
   version "4.17.11"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
 
@@ -3417,6 +3424,10 @@ path-parse@^1.0.5, path-parse@^1.0.6:
 path-to-regexp@0.1.7:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-0.1.7.tgz#df604178005f522f15eb4490e7247a1bfaa67f8c"
+
+path-to-regexp@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-3.0.0.tgz#c981a218f3df543fa28696be2f88e0c58d2e012a"
 
 path-type@^1.0.0:
   version "1.1.0"
@@ -4174,6 +4185,16 @@ supports-color@^5.2.0, supports-color@^5.3.0:
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-5.5.0.tgz#e2e69a44ac8772f78a1ec0b35b689df6530efc8f"
   dependencies:
     has-flag "^3.0.0"
+
+swagger-ui-dist@^3.18.1:
+  version "3.22.2"
+  resolved "https://registry.yarnpkg.com/swagger-ui-dist/-/swagger-ui-dist-3.22.2.tgz#450e9627ddfc634b3ef8dac98da7c92b952afdca"
+
+swagger-ui-express@^4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/swagger-ui-express/-/swagger-ui-express-4.0.4.tgz#dd2fcbc841718a9eed07c6d8990fefa25e7a4a3d"
+  dependencies:
+    swagger-ui-dist "^3.18.1"
 
 symbol-tree@^3.2.2:
   version "3.2.2"

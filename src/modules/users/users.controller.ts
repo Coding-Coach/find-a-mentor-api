@@ -1,15 +1,19 @@
 import { Controller, Get, Put, Body, Param, Req, BadRequestException } from '@nestjs/common';
+import { ApiBearerAuth, ApiImplicitParam, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import fetch from 'node-fetch';
 import Config from '../../config';
 import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 
+@ApiUseTags('/users')
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
 
   constructor(private readonly usersService: UsersService) { }
 
+  @ApiOperation({ title: 'Return all registered users' })
   @Get()
   async index() {
     const users = await this.usersService.findAll();
@@ -20,6 +24,7 @@ export class UsersController {
     };
   }
 
+  @ApiOperation({ title: 'Returns the current user' })
   @Get('current')
   async currentUser(@Req() request: Request) {
     const userId = request.user.sub;
@@ -59,6 +64,8 @@ export class UsersController {
     };
   }
 
+  @ApiOperation({ title: 'Returns a single user by ID' })
+  @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
   @Get(':id')
   async show(@Param() params) {
     const user = await this.usersService.find(params.id);
@@ -73,6 +80,8 @@ export class UsersController {
     };
   }
 
+  @ApiOperation({ title: 'Updates an existing user' })
+  @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
   @Put(':id')
   async update(@Req() request: Request, @Param() params, @Body() data: UserDto) {
     const user = await this.usersService.find(params.id);
