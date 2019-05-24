@@ -1,5 +1,5 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsUrl, IsOptional, Length } from 'class-validator';
+import { IsEmail, IsUrl, IsIn, IsOptional, Length } from 'class-validator';
 import { Role } from '../interfaces/user.interface';
 
 export class UserDto {
@@ -43,6 +43,9 @@ export class UserDto {
   
   @ApiModelPropertyOptional()
   @IsOptional()
+  @IsIn([Role.ADMIN, Role.MENTOR, Role.MEMBER], {
+    each: true
+  })
   readonly roles: Role[];
 
   constructor(values) {
