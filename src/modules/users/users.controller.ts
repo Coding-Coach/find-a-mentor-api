@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Body, Param, Req, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Put, Body, Param, Req, BadRequestException, ValidationPipe, UsePipes } from '@nestjs/common';
 import { ApiBearerAuth, ApiImplicitParam, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import fetch from 'node-fetch';
@@ -85,6 +85,7 @@ export class UsersController {
   @ApiOperation({ title: 'Updates an existing user' })
   @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
   @Put(':id')
+  @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true }))
   async update(@Req() request: Request, @Param() params, @Body() data: UserDto) {
     const user = await this.usersService.find(params.id);
 
