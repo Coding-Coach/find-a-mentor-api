@@ -5,6 +5,7 @@ import fetch from 'node-fetch';
 import Config from '../../config';
 import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
+import { Role } from './interfaces/user.interface';
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -42,6 +43,7 @@ export class UsersController {
           email: user.email,
           name: user.nickname,
           avatar: user.picture,
+          roles: [Role.MEMBER],
         });
 
         this.usersService.create(userDto);

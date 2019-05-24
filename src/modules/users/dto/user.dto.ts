@@ -1,4 +1,5 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { Role } from '../interfaces/user.interface';
 
 export class UserDto {
   @ApiModelProperty()
@@ -27,6 +28,9 @@ export class UserDto {
 
   @ApiModelPropertyOptional()
   readonly tags: string[];
+  
+  @ApiModelPropertyOptional()
+  readonly roles: Role[];
 
   constructor(values) {
     Object.assign(this, values);

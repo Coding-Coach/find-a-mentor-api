@@ -1,5 +1,11 @@
 import { Document } from 'mongoose';
 
+export enum Role {
+  ADMIN = 'Admin',
+  MENTOR = 'Mentor',
+  MEMBER = 'Member',
+};
+
 export interface User extends Document {
   readonly id: string;
   readonly email: string;
@@ -10,4 +16,5 @@ export interface User extends Document {
   readonly country: string;
   readonly spokenLanguages: string[];
   readonly tags: string[];
+  readonly roles: Role[];
 }

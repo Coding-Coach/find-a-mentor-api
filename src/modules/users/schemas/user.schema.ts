@@ -10,4 +10,5 @@ export const UserSchema = new mongoose.Schema({
   country: String,
   spokenLanguages: Array,
   tags: Array,
+  roles: Array,
 });
