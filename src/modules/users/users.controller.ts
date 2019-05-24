@@ -101,14 +101,14 @@ export class UsersController {
     }
 
     // Only an admin can update the roles
-    // let roles = user.roles;
-    // if (data.roles && current.roles.includes(Role.ADMIN)) {
-    //   roles = data.roles;
-    // }
+    let roles = user.roles;
+    if (data.roles && current.roles.includes(Role.ADMIN)) {
+      roles = data.roles;
+    }
 
     const userDto = new UserDto({
       ...data,
-      // roles,
+      roles,
       id: user.id,
     });
     const res = await this.usersService.update(userDto);
