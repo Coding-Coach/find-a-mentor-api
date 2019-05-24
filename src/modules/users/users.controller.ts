@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Body, Param, Req, UnauthorizedException, BadRequestException, ValidationPipe, UsePipes } from '@nestjs/common';
+import { Controller, Get, Delete, Put, Body, Param, Req, UnauthorizedException, BadRequestException, ValidationPipe, UsePipes } from '@nestjs/common';
 import { ApiBearerAuth, ApiImplicitParam, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import fetch from 'node-fetch';
@@ -115,6 +115,29 @@ export class UsersController {
 
     return {
       success: res.ok === 1,
+    };
+  }
+
+  @ApiOperation({ title: 'Deletes the given user' })
+  @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
+  @Delete(':id')
+  async remove(@Req() request: Request, @Param() params) {
+    const current = await this.usersService.find(request.user.id);
+    const user = await this.usersService.find(params.id);
+
+    if (user === undefined) {
+      throw new BadRequestException('User not found');
+    }
+
+    // Only own user or admins can remove the given user
+    // if (user.id !== current.id && !current.roles.includes(Role.ADMIN)) {
+    //   throw new UnauthorizedException('Not authorized to perform this operation');
+    // }
+
+    const res = this.usersService.remove(params.id)
+    console.log(res);
+    return {
+      success: true,
     };
   }
 

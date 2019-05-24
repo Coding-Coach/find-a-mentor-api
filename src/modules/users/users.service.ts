@@ -29,4 +29,8 @@ export class UsersService {
   async update(userDto: UserDto): Promise<Query<any>> {
     return await this.userModel.updateOne({ id: userDto.id }, userDto);
   }
+
+  async remove(id: string): Promise<Query<any>> {
+    return await this.userModel.deleteOne({ id });
+  }
 }
