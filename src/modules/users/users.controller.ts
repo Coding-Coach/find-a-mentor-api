@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Body, Param, Req, BadRequestException, ValidationPipe, UsePipes } from '@nestjs/common';
+import { Controller, Get, Put, Body, Param, Req, UnauthorizedException, BadRequestException, ValidationPipe, UsePipes } from '@nestjs/common';
 import { ApiBearerAuth, ApiImplicitParam, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import fetch from 'node-fetch';
@@ -87,7 +87,7 @@ export class UsersController {
   @Put(':id')
   @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true }))
   async update(@Req() request: Request, @Param() params, @Body() data: UserDto) {
-    const currentUser = request.user;
+    const current = await this.usersService.find(request.user.id);
     const user = await this.usersService.find(params.id);
 
     // Users should only update their own data
@@ -95,11 +95,13 @@ export class UsersController {
       throw new BadRequestException('User not found');
     }
 
-    if (user.id !== request.user.id && )
+    if (user.id !== current.id && !current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException('Not authorized to perform this operation');
+    }
 
     const userDto = new UserDto({
-      id: user.id,
       ...data,
+      id: user.id,
     });
     const res = await this.usersService.update(userDto);
 

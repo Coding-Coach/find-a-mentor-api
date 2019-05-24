@@ -2,7 +2,6 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'express-jwt';
 import { expressJwtSecret } from 'jwks-rsa';
-import { UsersService } from '../modules/users/users.service';
 import Config from '../config';
 
 const middleware = jwt({
@@ -18,8 +17,6 @@ const middleware = jwt({
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
-  constructor(private readonly usersService: UsersService) { }
-
   use(req: Request, res: Response, next: NextFunction) {
     middleware(req, res, (error) => {
       if (error) {
@@ -34,12 +31,6 @@ export class AuthMiddleware implements NestMiddleware {
 
       // Adding the user id
       req.user.id = req.user.sub;
-
-      // Looking up the current user from the database
-      const current = this.usersService.find(req.user.sub);
-      if (current) {
-        req.user = current;
-      }
 
       next();
     });
