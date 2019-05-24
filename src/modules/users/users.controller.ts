@@ -95,12 +95,20 @@ export class UsersController {
       throw new BadRequestException('User not found');
     }
 
+    // Only admins can update other users
     if (user.id !== current.id && !current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
+    // Only an admin can update the roles
+    let roles = user.roles;
+    if (data.roles && current.roles.includes(Role.ADMIN)) {
+      roles = data.roles;
+    }
+
     const userDto = new UserDto({
       ...data,
+      roles,
       id: user.id,
     });
     const res = await this.usersService.update(userDto);
