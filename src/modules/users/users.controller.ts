@@ -101,14 +101,14 @@ export class UsersController {
     }
 
     // Only an admin can update the roles
-    let roles = user.roles;
+    // let roles = user.roles;
     // if (data.roles && current.roles.includes(Role.ADMIN)) {
     //   roles = data.roles;
     // }
 
     const userDto = new UserDto({
       ...data,
-      roles,
+      // roles,
       id: user.id,
     });
     const res = await this.usersService.update(userDto);
@@ -130,14 +130,14 @@ export class UsersController {
     }
 
     // Only own user or admins can remove the given user
-    // if (user.id !== current.id && !current.roles.includes(Role.ADMIN)) {
-    //   throw new UnauthorizedException('Not authorized to perform this operation');
-    // }
+    if (user.id !== current.id && !current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException('Not authorized to perform this operation');
+    }
 
-    const res = this.usersService.remove(params.id)
-    console.log(res);
+    const res = await this.usersService.remove(params.id)
+
     return {
-      success: true,
+      success: res.ok === 1,
     };
   }
 
