@@ -102,9 +102,9 @@ export class UsersController {
 
     // Only an admin can update the roles
     let roles = user.roles;
-    if (data.roles && current.roles.includes(Role.ADMIN)) {
-      roles = data.roles;
-    }
+    // if (data.roles && current.roles.includes(Role.ADMIN)) {
+    //   roles = data.roles;
+    // }
 
     const userDto = new UserDto({
       ...data,
