@@ -28,7 +28,7 @@ export class UsersController {
   @ApiOperation({ title: 'Returns the current user' })
   @Get('current')
   async currentUser(@Req() request: Request) {
-    const userId = request.user.sub;
+    const userId = request.user.id;
     const currentUser = await this.usersService.find(userId);
 
     if (!currentUser) {
@@ -87,12 +87,15 @@ export class UsersController {
   @Put(':id')
   @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true }))
   async update(@Req() request: Request, @Param() params, @Body() data: UserDto) {
+    const currentUser = request.user;
     const user = await this.usersService.find(params.id);
 
     // Users should only update their own data
-    if (user === undefined || user.id !== request.user.id) {
+    if (user === undefined) {
       throw new BadRequestException('User not found');
     }
+
+    if (user.id !== request.user.id && )
 
     const userDto = new UserDto({
       id: user.id,
