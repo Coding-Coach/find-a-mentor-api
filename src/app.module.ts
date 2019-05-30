@@ -1,9 +1,10 @@
 import { Module, MiddlewareConsumer, NestModule, RequestMethod } from '@nestjs/common';
 import { AuthMiddleware } from './middlewares/auth.middleware';
+import { MentorsModule } from './modules/mentors/mentors.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
-  imports: [UsersModule],
+  imports: [MentorsModule, UsersModule],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
