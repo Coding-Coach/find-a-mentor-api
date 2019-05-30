@@ -31,21 +31,24 @@
 ## Installation
 
 ```bash
-$ npm install
+$ yarn install
 ```
 
 ## Running the app
 
 ```bash
 # development
-$ npm run start
+$ yarn start
 
 # watch mode
-$ npm run start:dev
+$ yarn start:dev
 
 # production mode
-$ npm run start:prod
+$ yarn start:prod
 ```
+
+## Endpoints
+We are using swagger to document the endpoints, after running the project just open your browser and go to http://localhost:3000/docs/
 
 ## Test
 
