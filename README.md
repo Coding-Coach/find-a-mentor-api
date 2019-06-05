@@ -9,6 +9,11 @@ A simple REST API to support [Coding Coach (alpha)](https://mentors.codingcoach.
 $ yarn install
 ```
 
+```bash
+cp .env.example
+```
+Make sure to set the new `.env` file up with the appropriate variables
+
 ## Running the app
 
 ```bash
