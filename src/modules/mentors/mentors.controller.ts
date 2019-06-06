@@ -59,7 +59,6 @@ export class MentorsController {
 
     return {
       success: true,
-      application,
     };
   }
 }
