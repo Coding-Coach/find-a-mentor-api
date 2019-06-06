@@ -134,7 +134,7 @@ export class UsersController {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
-    const res = await this.usersService.remove(params.id)
+    const res = await this.usersService.remove(params.id);
 
     return {
       success: res.ok === 1,

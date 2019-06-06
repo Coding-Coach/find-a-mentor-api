@@ -40,11 +40,11 @@ export class UserDto {
   @ApiModelPropertyOptional()
   @IsOptional()
   readonly tags: string[];
-  
+
   @ApiModelPropertyOptional()
   @IsOptional()
   @IsIn([Role.ADMIN, Role.MENTOR, Role.MEMBER], {
-    each: true
+    each: true,
   })
   readonly roles: Role[];
 

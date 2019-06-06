@@ -12,3 +12,5 @@ export const UserSchema = new mongoose.Schema({
   tags: Array,
   roles: Array,
 });
+
+UserSchema.set('timestamps', true);
