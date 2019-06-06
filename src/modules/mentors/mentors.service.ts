@@ -4,6 +4,7 @@ import { MentorFiltersDto } from './dto/mentorfilters.dto';
 import { ApplicationDto } from './dto/application.dto';
 import { User } from '../users/interfaces/user.interface';
 import { Application } from './interfaces/application.interface';
+import { Status } from 'dist/modules/mentors/interfaces/application.interface';
 
 @Injectable()
 export class MentorsService {
@@ -40,6 +41,10 @@ export class MentorsService {
     return await this.userModel.find(onlyMentors).exec();
   }
 
+  async findApplications(filters): Promise<Application> {
+    return await this.applicationModel.find(filters).populate({ path: 'user', select: ['_id', 'name', 'avatar'] }).exec();
+  }
+
   /**
    * Creates a new application for a user to become a mentor
    * @param applicationDto user's application
@@ -49,6 +54,10 @@ export class MentorsService {
     return await application.save();
   }
 
+  /**
+   * Find a single application by the given user
+   * @param user 
+   */
   async findApplicationByUser(user: User): Promise<Application> {
     return await this.applicationModel.findOne({ user: user._id }).exec();
   }

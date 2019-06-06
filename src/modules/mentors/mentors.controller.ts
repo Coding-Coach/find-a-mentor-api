@@ -38,9 +38,11 @@ export class MentorsController {
       throw new UnauthorizedException('Access denied');
     }
 
+    const applications = await this.mentorsService.findApplications({ status: Status.PENDING });
+
     return {
       success: true,
-      requests: [{ test: 123 }],
+      applications,
     };
   }
 
