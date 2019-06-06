@@ -1,13 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Query, Model } from 'mongoose';
 import { MentorFiltersDto } from './dto/mentorfilters.dto';
-import { UserDto } from '../users/dto/user.dto';
+import { ApplicationDto } from './dto/application.dto';
 import { User } from '../users/interfaces/user.interface';
+import { Application } from './interfaces/application.interface';
 
 @Injectable()
 export class MentorsService {
-  constructor(@Inject('USER_MODEL') private readonly userModel: Model<User>) { }
+  constructor(
+    @Inject('USER_MODEL') private readonly userModel: Model<User>,
+    @Inject('APPLICATION_MODEL') private readonly applicationModel: Model<Application>,
+  ) { }
 
+  /**
+   * Search for mentors by the given filters
+   * @param filters filters to apply
+   */
   async findAll(filters: MentorFiltersDto): Promise<User[]> {
     const onlyMentors:any = {
       roles: 'Mentor',
@@ -30,5 +38,18 @@ export class MentorsService {
     }
 
     return await this.userModel.find(onlyMentors).exec();
+  }
+
+  /**
+   * Creates a new application for a user to become a mentor
+   * @param applicationDto user's application
+   */
+  async createApplication(applicationDto: ApplicationDto): Promise<Query<any>> {
+    const application = new this.applicationModel(applicationDto);
+    return await application.save();
+  }
+
+  async findApplicationByUser(user: User): Promise<Application> {
+    return await this.applicationModel.findOne({ user: user._id }).exec();
   }
 }
