@@ -48,8 +48,7 @@ export class MentorsController {
       status: Status.PENDING,
       user,
     });
-    
-    
+
     // Users can only apply once
     if (application) {
       throw new BadRequestException('You already applied, your application is in review.');

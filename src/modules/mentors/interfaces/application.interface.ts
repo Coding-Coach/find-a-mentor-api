@@ -4,7 +4,7 @@ export enum Status {
   ACCEPTED = 'Accepted',
   PENDING = 'Pending',
   REJECTED = 'Rejected',
-};
+}
 
 export interface Application extends Document {
   readonly _id: string;
