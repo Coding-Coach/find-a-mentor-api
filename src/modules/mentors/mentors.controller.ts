@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Query, Req, Body, UsePipes, ValidationPipe, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Query, Req, Body, UsePipes, ValidationPipe, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { MentorsService } from './mentors.service';
 import { UsersService } from '../users/users.service';
 import { MentorFiltersDto } from './dto/mentorfilters.dto';
 import { ApplicationDto } from './dto/application.dto';
-import { User } from '../users/interfaces/user.interface';
+import { User, Role } from '../users/interfaces/user.interface';
 import { Status } from './interfaces/application.interface';
 
 @ApiUseTags('/mentors')
@@ -30,10 +30,17 @@ export class MentorsController {
   }
 
   @Get('applications')
-  async requests() {
+  @ApiOperation({ title: 'Creates a new request to become a mentor, pending for Admin to approve' })
+  async requests(@Req() request: Request) {
+    const current = await this.usersService.find(request.user.id);
+
+    if (!current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException('Access denied');
+    }
+
     return {
       success: true,
-      requests: [],
+      requests: [{ test: 123 }],
     };
   }
 
