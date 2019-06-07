@@ -41,7 +41,7 @@ export class MentorsService {
     return await this.userModel.find(onlyMentors).exec();
   }
 
-  async findApplications(filters): Promise<Application> {
+  async findApplications(filters): Promise<Application[]> {
     return await this.applicationModel.find(filters).populate({ path: 'user', select: ['_id', 'name', 'avatar'] }).exec();
   }
 
@@ -56,7 +56,7 @@ export class MentorsService {
 
   /**
    * Find a single application by the given user
-   * @param user 
+   * @param user
    */
   async findApplicationByUser(user: User): Promise<Application> {
     return await this.applicationModel.findOne({ user: user._id }).exec();

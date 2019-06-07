@@ -6,7 +6,7 @@ import { UsersService } from '../users/users.service';
 import { MentorFiltersDto } from './dto/mentorfilters.dto';
 import { ApplicationDto } from './dto/application.dto';
 import { User, Role } from '../users/interfaces/user.interface';
-import { Status } from './interfaces/application.interface';
+import { Application, Status } from './interfaces/application.interface';
 
 @ApiUseTags('/mentors')
 @ApiBearerAuth()
@@ -30,19 +30,28 @@ export class MentorsController {
   }
 
   @Get('applications')
-  @ApiOperation({ title: 'Creates a new request to become a mentor, pending for Admin to approve' })
-  async requests(@Req() request: Request) {
-    const current = await this.usersService.find(request.user.id);
+  @ApiOperation({ title: 'Retrieve applications filter by the given status' })
+  async requests(@Req() request: Request, @Query('status') status: string) {
+    const current: User = await this.usersService.find(request.user.id);
 
     if (!current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException('Access denied');
     }
 
-    const applications = await this.mentorsService.findApplications({ status: Status.PENDING });
+    const filters: any = {};
+
+    if (status) {
+      const key: string = Status[status.toUpperCase()];
+      if (key) {
+        filters.status = key;
+      }
+    }
+
+    const data: Application[] = await this.mentorsService.findApplications(filters);
 
     return {
       success: true,
-      applications,
+      data,
     };
   }
 
