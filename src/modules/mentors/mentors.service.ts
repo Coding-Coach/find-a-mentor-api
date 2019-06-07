@@ -4,7 +4,6 @@ import { MentorFiltersDto } from './dto/mentorfilters.dto';
 import { ApplicationDto } from './dto/application.dto';
 import { User } from '../users/interfaces/user.interface';
 import { Application } from './interfaces/application.interface';
-import { Status } from 'dist/modules/mentors/interfaces/application.interface';
 
 @Injectable()
 export class MentorsService {
