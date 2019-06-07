@@ -17,7 +17,7 @@ export class UsersController {
   @ApiOperation({ title: 'Return all registered users' })
   @Get()
   async index() {
-    const data: Array<User> = await this.usersService.findAll();
+    const data: User[] = await this.usersService.findAll();
 
     return {
       success: true,
@@ -101,7 +101,7 @@ export class UsersController {
     }
 
     // Only an admin can update the roles
-    let roles: Array<Role> = user.roles;
+    let roles: Role[] = user.roles;
     if (data.roles && current.roles.includes(Role.ADMIN)) {
       roles = data.roles;
     }
