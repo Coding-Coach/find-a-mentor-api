@@ -5,7 +5,7 @@ import fetch from 'node-fetch';
 import Config from '../../config';
 import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
-import { Role } from './interfaces/user.interface';
+import { Role, User } from './interfaces/user.interface';
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -17,28 +17,28 @@ export class UsersController {
   @ApiOperation({ title: 'Return all registered users' })
   @Get()
   async index() {
-    const users = await this.usersService.findAll();
+    const data: Array<User> = await this.usersService.findAll();
 
     return {
       success: true,
-      users,
+      data,
     };
   }
 
   @ApiOperation({ title: 'Returns the current user' })
   @Get('current')
   async currentUser(@Req() request: Request) {
-    const userId = request.user.id;
-    const currentUser = await this.usersService.find(userId);
+    const userId: string = request.user.id;
+    const currentUser: User = await this.usersService.find(userId);
 
     if (!currentUser) {
       // If the user doesn't exist in the database we need
       // to add it because this is a new user. The initial
       // information is coming from auth0
       try {
-        const data = await this.getAdminAccessToken();
-        const user = await this.getUserProfile(data.access_token, userId);
-        const userDto = new UserDto({
+        const data: any = await this.getAdminAccessToken();
+        const user: any = await this.getUserProfile(data.access_token, userId);
+        const userDto: UserDto = new UserDto({
           id: userId,
           email: user.email,
           name: user.nickname,
@@ -50,7 +50,7 @@ export class UsersController {
 
         return {
           success: true,
-          user: userDto,
+          data: userDto,
         };
       } catch (error) {
         return {
@@ -62,7 +62,7 @@ export class UsersController {
 
     return {
       success: true,
-      user: currentUser,
+      data: currentUser,
     };
   }
 
@@ -70,7 +70,7 @@ export class UsersController {
   @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
   @Get(':id')
   async show(@Param() params) {
-    const user = await this.usersService.find(params.id);
+    const user: User = await this.usersService.find(params.id);
 
     if (user === undefined) {
       throw new BadRequestException('User not found');
@@ -78,7 +78,7 @@ export class UsersController {
 
     return {
       success: true,
-      user,
+      data: user,
     };
   }
 
@@ -87,8 +87,8 @@ export class UsersController {
   @Put(':id')
   @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true }))
   async update(@Req() request: Request, @Param() params, @Body() data: UserDto) {
-    const current = await this.usersService.find(request.user.id);
-    const user = await this.usersService.find(params.id);
+    const current: User = await this.usersService.find(request.user.id);
+    const user: User = await this.usersService.find(params.id);
 
     // Users should only update their own data
     if (user === undefined) {
@@ -101,17 +101,17 @@ export class UsersController {
     }
 
     // Only an admin can update the roles
-    let roles = user.roles;
+    let roles: Array<Role> = user.roles;
     if (data.roles && current.roles.includes(Role.ADMIN)) {
       roles = data.roles;
     }
 
-    const userDto = new UserDto({
+    const userDto: UserDto = new UserDto({
       ...data,
       roles,
       id: user.id,
     });
-    const res = await this.usersService.update(userDto);
+    const res: any = await this.usersService.update(userDto);
 
     return {
       success: res.ok === 1,
@@ -122,8 +122,8 @@ export class UsersController {
   @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
   @Delete(':id')
   async remove(@Req() request: Request, @Param() params) {
-    const current = await this.usersService.find(request.user.id);
-    const user = await this.usersService.find(params.id);
+    const current: User = await this.usersService.find(request.user.id);
+    const user: User = await this.usersService.find(params.id);
 
     if (user === undefined) {
       throw new BadRequestException('User not found');
@@ -134,7 +134,7 @@ export class UsersController {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
-    const res = await this.usersService.remove(params.id);
+    const res: any = await this.usersService.remove(params.id);
 
     return {
       success: res.ok === 1,

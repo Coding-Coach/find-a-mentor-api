@@ -21,11 +21,11 @@ export class MentorsController {
   @ApiOperation({ title: 'Return all mentors in the platform by the given filters' })
   @Get()
   async index(@Query() filters: MentorFiltersDto) {
-    const mentors: User[] = await this.mentorsService.findAll(filters);
+    const data: User[] = await this.mentorsService.findAll(filters);
 
     return {
       success: true,
-      data: mentors,
+      data,
     };
   }
 
@@ -59,8 +59,8 @@ export class MentorsController {
   @Post('applications')
   @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true }))
   async request(@Req() request: Request, @Body() data: ApplicationDto) {
-    const user = await this.usersService.find(request.user.id);
-    let application = await this.mentorsService.findApplicationByUser(user);
+    const user: User = await this.usersService.find(request.user.id);
+    const application: Application = await this.mentorsService.findApplicationByUser(user);
     const applicationDto = new ApplicationDto({
       ...data,
       status: Status.PENDING,
@@ -72,7 +72,7 @@ export class MentorsController {
       throw new BadRequestException('You already applied, your application is in review.');
     }
 
-    application = await this.mentorsService.createApplication(applicationDto);
+    await this.mentorsService.createApplication(applicationDto);
 
     return {
       success: true,
