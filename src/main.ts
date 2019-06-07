@@ -7,7 +7,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({origin: process.env.CORS_ORIGIN || 'https://codingcoach.io'});
+  app.enableCors({origin: process.env.CORS_ORIGIN || 'https://mentors.codingcoach.io'});
   const options = new DocumentBuilder()
     .setTitle('Coding Coach')
     .setDescription('A REST API to serve the content for the alpha site')
