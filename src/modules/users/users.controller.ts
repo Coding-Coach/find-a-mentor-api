@@ -28,8 +28,8 @@ export class UsersController {
   @ApiOperation({ title: 'Returns the current user' })
   @Get('current')
   async currentUser(@Req() request: Request) {
-    const userId: string = request.user.id;
-    const currentUser: User = await this.usersService.find(userId);
+    const userId: string = request.user.auth0Id;
+    const currentUser: User = await this.usersService.findByAuth0Id(userId);
 
     if (!currentUser) {
       // If the user doesn't exist in the database we need
@@ -39,18 +39,18 @@ export class UsersController {
         const data: any = await this.getAdminAccessToken();
         const user: any = await this.getUserProfile(data.access_token, userId);
         const userDto: UserDto = new UserDto({
-          id: userId,
+          auth0Id: userId,
           email: user.email,
           name: user.nickname,
           avatar: user.picture,
           roles: [Role.MEMBER],
         });
 
-        this.usersService.create(userDto);
+        const newUser: User = await this.usersService.create(userDto);
 
         return {
           success: true,
-          data: userDto,
+          data: newUser,
         };
       } catch (error) {
         return {
@@ -70,15 +70,15 @@ export class UsersController {
   @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
   @Get(':id')
   async show(@Param() params) {
-    const user: User = await this.usersService.find(params.id);
+    const data: User = await this.usersService.findById(params.id);
 
-    if (user === undefined) {
+    if (data === undefined) {
       throw new BadRequestException('User not found');
     }
 
     return {
       success: true,
-      data: user,
+      data,
     };
   }
 
@@ -87,8 +87,8 @@ export class UsersController {
   @Put(':id')
   @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true }))
   async update(@Req() request: Request, @Param() params, @Body() data: UserDto) {
-    const current: User = await this.usersService.find(request.user.id);
-    const user: User = await this.usersService.find(params.id);
+    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+    const user: User = await this.usersService.findById(params.id);
 
     // Users should only update their own data
     if (user === undefined) {
@@ -96,7 +96,7 @@ export class UsersController {
     }
 
     // Only admins can update other users
-    if (user.id !== current.id && !current.roles.includes(Role.ADMIN)) {
+    if (!user._id.equals(current._id) && !current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
@@ -109,7 +109,7 @@ export class UsersController {
     const userDto: UserDto = new UserDto({
       ...data,
       roles,
-      id: user.id,
+      _id: user._id,
     });
     const res: any = await this.usersService.update(userDto);
 
@@ -122,15 +122,15 @@ export class UsersController {
   @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
   @Delete(':id')
   async remove(@Req() request: Request, @Param() params) {
-    const current: User = await this.usersService.find(request.user.id);
-    const user: User = await this.usersService.find(params.id);
+    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+    const user: User = await this.usersService.findById(params.id);
 
     if (user === undefined) {
       throw new BadRequestException('User not found');
     }
 
     // Only own user or admins can remove the given user
-    if (user.id !== current.id && !current.roles.includes(Role.ADMIN)) {
+    if (user._id !== current._id && !current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
