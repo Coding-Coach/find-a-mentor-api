@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query, Req, Body, UsePipes, ValidationPipe, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Query, Req, Body, Param, UsePipes, ValidationPipe, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { MentorsService } from './mentors.service';
@@ -7,6 +7,7 @@ import { MentorFiltersDto } from './dto/mentorfilters.dto';
 import { ApplicationDto } from './dto/application.dto';
 import { User, Role } from '../users/interfaces/user.interface';
 import { Application, Status } from './interfaces/application.interface';
+import { UserDto } from '../users/dto/user.dto';
 
 @ApiUseTags('/mentors')
 @ApiBearerAuth()
@@ -31,7 +32,7 @@ export class MentorsController {
 
   @Get('applications')
   @ApiOperation({ title: 'Retrieve applications filter by the given status' })
-  async requests(@Req() request: Request, @Query('status') status: string) {
+  async applications(@Req() request: Request, @Query('status') status: string) {
     const current: User = await this.usersService.find(request.user.id);
 
     if (!current.roles.includes(Role.ADMIN)) {
@@ -58,7 +59,7 @@ export class MentorsController {
   @ApiOperation({ title: 'Creates a new request to become a mentor, pending for Admin to approve' })
   @Post('applications')
   @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true }))
-  async request(@Req() request: Request, @Body() data: ApplicationDto) {
+  async applyToBecomeMentor(@Req() request: Request, @Body() data: ApplicationDto) {
     const user: User = await this.usersService.find(request.user.id);
     const application: Application = await this.mentorsService.findApplicationByUser(user);
     const applicationDto = new ApplicationDto({
@@ -76,6 +77,43 @@ export class MentorsController {
 
     return {
       success: true,
+    };
+  }
+
+  @ApiOperation({ title: 'Approves an application after review' })
+  @Post(':id/approve')
+  async approveApplication(@Req() request: Request, @Param('id') applicationId: string) {
+    const current: User = await this.usersService.find(request.user.id);
+
+    if (!current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException('Access denied');
+    }
+
+    const application: Application = await this.mentorsService.findApplicationById(applicationId);
+
+    if (!application) {
+      throw new BadRequestException('Application not found');
+    }
+
+    if (application.status === Status.APPROVED) {
+      throw new BadRequestException('This Application is already approved');
+    }
+
+    const user: User = await this.usersService.find(application.userId);
+    const applicationDto: ApplicationDto = new ApplicationDto({
+      _id: application._id,
+      status: Status.APPROVED,
+    });
+    const userDto: UserDto = new UserDto({
+      _id: application.userId,
+      roles: [...user.roles, Role.MENTOR],
+    });
+    
+    this.usersService.update(userDto);
+    const res: any = await this.mentorsService.updateApplication(applicationDto);
+
+    return {
+      success: res.ok === 1,
     };
   }
 }

@@ -53,11 +53,19 @@ export class MentorsService {
     return await application.save();
   }
 
+  async updateApplication(application: ApplicationDto): Promise<Query<any>> {
+    return await this.applicationModel.updateOne({ _id: application._id }, application);
+  }
+
   /**
    * Find a single application by the given user
    * @param user
    */
   async findApplicationByUser(user: User): Promise<Application> {
     return await this.applicationModel.findOne({ user: user._id }).exec();
+  }
+  
+  async findApplicationById(id: string): Promise<Application> {
+    return await this.applicationModel.findOne({ _id: id }).exec();
   }
 }

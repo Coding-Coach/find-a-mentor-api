@@ -3,6 +3,8 @@ import { Length } from 'class-validator';
 
 export class ApplicationDto {
 
+  readonly _id: string;
+
   @ApiModelProperty()
   @Length(3, 200)
   readonly reason: string;
