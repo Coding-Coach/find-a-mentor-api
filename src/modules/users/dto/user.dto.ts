@@ -4,7 +4,7 @@ import { Role } from '../interfaces/user.interface';
 
 export class UserDto {
   @ApiModelProperty()
-  readonly id: string;
+  readonly _id: string;
 
   @ApiModelProperty()
   @IsEmail()

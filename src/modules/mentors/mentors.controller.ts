@@ -33,7 +33,7 @@ export class MentorsController {
   @Get('applications')
   @ApiOperation({ title: 'Retrieve applications filter by the given status' })
   async applications(@Req() request: Request, @Query('status') status: string) {
-    const current: User = await this.usersService.find(request.user.id);
+    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
 
     if (!current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException('Access denied');
@@ -60,7 +60,7 @@ export class MentorsController {
   @Post('applications')
   @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true }))
   async applyToBecomeMentor(@Req() request: Request, @Body() data: ApplicationDto) {
-    const user: User = await this.usersService.find(request.user.id);
+    const user: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
     const application: Application = await this.mentorsService.findApplicationByUser(user);
     const applicationDto = new ApplicationDto({
       ...data,
@@ -83,7 +83,7 @@ export class MentorsController {
   @ApiOperation({ title: 'Approves an application after review' })
   @Post(':id/approve')
   async approveApplication(@Req() request: Request, @Param('id') applicationId: string) {
-    const current: User = await this.usersService.find(request.user.id);
+    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
 
     if (!current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException('Access denied');
@@ -99,7 +99,7 @@ export class MentorsController {
       throw new BadRequestException('This Application is already approved');
     }
 
-    const user: User = await this.usersService.find(application.userId);
+    const user: User = await this.usersService.findById(application.userId);
     const applicationDto: ApplicationDto = new ApplicationDto({
       _id: application._id,
       status: Status.APPROVED,

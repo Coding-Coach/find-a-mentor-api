@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, ObjectID } from 'mongoose';
 
 export enum Role {
   ADMIN = 'Admin',
@@ -7,8 +7,8 @@ export enum Role {
 }
 
 export interface User extends Document {
-  readonly _id: string;
-  readonly id: string;
+  readonly _id: ObjectID;
+  readonly auth0Id: string;
   readonly email: string;
   readonly name: string;
   readonly avatar: string;

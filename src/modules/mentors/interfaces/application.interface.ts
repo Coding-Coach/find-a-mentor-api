@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, ObjectID } from 'mongoose';
 
 export enum Status {
   APPROVED = 'Approved',
@@ -7,7 +7,7 @@ export enum Status {
 }
 
 export interface Application extends Document {
-  readonly _id: string;
+  readonly _id: ObjectID;
   readonly status: Status;
   readonly userId: string;
   readonly reason: string;
