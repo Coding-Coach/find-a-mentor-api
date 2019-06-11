@@ -9,7 +9,7 @@ export enum Status {
 export interface Application extends Document {
   readonly _id: ObjectID;
   readonly status: Status;
-  readonly userId: string;
+  readonly user: ObjectID;
   readonly reason: string;
   readonly createdAt: Date;
   readonly updatedAt: Date;

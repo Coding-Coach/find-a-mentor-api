@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query, Req, Body, Param, UsePipes, ValidationPipe, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Put, Post, Query, Req, Body, Param, UsePipes, ValidationPipe, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { MentorsService } from './mentors.service';
@@ -81,7 +81,7 @@ export class MentorsController {
   }
 
   @ApiOperation({ title: 'Approves an application after review' })
-  @Post(':id/approve')
+  @Put('applications/:id')
   async approveApplication(@Req() request: Request, @Param('id') applicationId: string) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
 
@@ -99,13 +99,13 @@ export class MentorsController {
       throw new BadRequestException('This Application is already approved');
     }
 
-    const user: User = await this.usersService.findById(application.userId);
+    const user: User = await this.usersService.findById(application.user);
     const applicationDto: ApplicationDto = new ApplicationDto({
       _id: application._id,
       status: Status.APPROVED,
     });
     const userDto: UserDto = new UserDto({
-      _id: application.userId,
+      _id: application.user,
       roles: [...user.roles, Role.MENTOR],
     });
     
