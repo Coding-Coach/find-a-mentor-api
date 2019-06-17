@@ -6,6 +6,16 @@ export enum Role {
   MEMBER = 'Member',
 };
 
+export enum Channel {
+  EMAIL = 'email', 
+  SLACK = 'slack',
+  LINKED = 'linkedin', 
+  FACEBOOK = 'facebook',
+  TWITTER = 'twitter',
+  GITHUB = 'github', 
+  WEBSITE = 'website',
+}
+
 export interface User extends Document {
   readonly id: string;
   readonly email: string;
@@ -17,4 +27,5 @@ export interface User extends Document {
   readonly spokenLanguages: string[];
   readonly tags: string[];
   readonly roles: Role[];
+  readonly channels: Channel[];
 }
