@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 
 export const UserSchema = new mongoose.Schema({
-  id: String,
+  auth0Id: String,
   email: String,
   name: String,
   avatar: String,
@@ -13,3 +13,5 @@ export const UserSchema = new mongoose.Schema({
   roles: Array,
   channels: [String],
 });
+
+UserSchema.set('timestamps', true);

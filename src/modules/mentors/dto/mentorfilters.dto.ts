@@ -5,19 +5,19 @@ export class MentorFiltersDto {
 
   @ApiModelPropertyOptional()
   @IsOptional()
-  readonly tags:string;
+  readonly tags: string;
 
   @ApiModelPropertyOptional()
   @IsOptional()
-  readonly country:string;
+  readonly country: string;
 
   @ApiModelPropertyOptional()
   @IsOptional()
-  readonly spokenLanguages:string;
+  readonly spokenLanguages: string;
 
   @ApiModelPropertyOptional()
   @IsOptional()
-  readonly name:string;
+  readonly name: string;
 
   constructor(values) {
     Object.assign(this, values);
