@@ -4,7 +4,7 @@ import { Role } from '../interfaces/user.interface';
 
 export class UserDto {
   @ApiModelProperty()
-  readonly id: string;
+  readonly _id: string;
 
   @ApiModelProperty()
   @IsEmail()
@@ -40,11 +40,11 @@ export class UserDto {
   @ApiModelPropertyOptional()
   @IsOptional()
   readonly tags: string[];
-  
+
   @ApiModelPropertyOptional()
   @IsOptional()
   @IsIn([Role.ADMIN, Role.MENTOR, Role.MEMBER], {
-    each: true
+    each: true,
   })
   readonly roles: Role[];
 

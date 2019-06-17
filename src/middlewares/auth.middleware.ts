@@ -30,7 +30,7 @@ export class AuthMiddleware implements NestMiddleware {
       }
 
       // Adding the user id
-      req.user.id = req.user.sub;
+      req.user.auth0Id = req.user.sub;
 
       next();
     });
