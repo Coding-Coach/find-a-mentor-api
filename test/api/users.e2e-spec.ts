@@ -25,7 +25,7 @@ describe('Users', () => {
     await app.close();
   });
 
-  it(`/GET users`, () => {
+  it(`GET /users`, () => {
     return request(app.getHttpServer())
       .get('/users')
       .expect(200)
