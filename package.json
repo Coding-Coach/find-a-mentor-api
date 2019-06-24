@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "user:roles": "node ./scripts/addroles"
   },
   "dependencies": {
     "@nestjs/common": "^6.0.0",
@@ -46,6 +47,7 @@
     "@types/supertest": "^2.0.7",
     "concurrently": "^4.1.0",
     "jest": "^23.6.0",
+    "minimist": "^1.2.0",
     "nodemon": "^1.18.9",
     "prettier": "^1.15.3",
     "supertest": "^3.4.1",
