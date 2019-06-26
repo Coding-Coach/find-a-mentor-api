@@ -1,0 +1,11 @@
+version: "3.7"
+
+services:
+  find-a-mentor-mongo:
+    image: mongo:4
+    container_name: find-a-mengor-mongo
+    hostname: find-a-mentor-mongo
+    volumes:
+      - "./local-mongo:/data/db"
+    ports:
+      - 27017:27017
