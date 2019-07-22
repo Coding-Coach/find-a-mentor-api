@@ -10,7 +10,6 @@ import { Application, Status } from './interfaces/application.interface';
 import { UserDto } from '../users/dto/user.dto';
 
 @ApiUseTags('/mentors')
-@ApiBearerAuth()
 @Controller('mentors')
 export class MentorsController {
 
@@ -21,8 +20,13 @@ export class MentorsController {
 
   @ApiOperation({ title: 'Return all mentors in the platform by the given filters' })
   @Get()
-  async index(@Query() filters: MentorFiltersDto) {
+  async index(@Req() request: Request, @Query() filters: MentorFiltersDto) {
     const data: User[] = await this.mentorsService.findAll(filters);
+
+    if (!request.user) {
+      // @TODO: Once channels is implemented, we need to remove them
+      // here for non-authenticated users, along with any other private data
+    }
 
     return {
       success: true,
@@ -32,6 +36,7 @@ export class MentorsController {
 
   @Get('applications')
   @ApiOperation({ title: 'Retrieve applications filter by the given status' })
+  @ApiBearerAuth()
   async applications(@Req() request: Request, @Query('status') status: string) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
 
@@ -57,6 +62,7 @@ export class MentorsController {
   }
 
   @ApiOperation({ title: 'Creates a new request to become a mentor, pending for Admin to approve' })
+  @ApiBearerAuth()
   @Post('applications')
   @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true }))
   async applyToBecomeMentor(@Req() request: Request, @Body() data: ApplicationDto) {
@@ -81,6 +87,7 @@ export class MentorsController {
   }
 
   @ApiOperation({ title: 'Approves an application after review' })
+  @ApiBearerAuth()
   @Put('applications/:id')
   async approveApplication(@Req() request: Request, @Param('id') applicationId: string) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
