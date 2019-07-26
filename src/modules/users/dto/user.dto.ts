@@ -8,33 +8,42 @@ export class UserDto {
 
   @ApiModelProperty()
   @IsEmail()
+  @IsString()
   readonly email: string;
 
   @ApiModelProperty()
   @Length(3, 50)
+  @IsString()
   readonly name: string;
 
   @ApiModelPropertyOptional()
+  @IsString()
   @IsUrl()
   @IsOptional()
   readonly avatar: string;
 
   @ApiModelPropertyOptional()
   @Length(3, 50)
+  @IsString()
   @IsOptional()
   readonly title: string;
 
   @ApiModelPropertyOptional()
   @Length(3, 140)
+  @IsString()
   @IsOptional()
   readonly description: string;
 
   @ApiModelPropertyOptional()
   @IsOptional()
+  @IsString()
   readonly country: string;
 
   @ApiModelPropertyOptional()
   @IsOptional()
+  @IsString({
+    each: true
+  })
   readonly spokenLanguages: string[];
 
   @ApiModelPropertyOptional()
