@@ -1,5 +1,5 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsUrl, IsIn, IsOptional, Length } from 'class-validator';
+import { IsEmail, IsUrl, IsIn, IsOptional, Length, IsString } from 'class-validator';
 import { Role } from '../interfaces/user.interface';
 
 export class UserDto {
@@ -39,6 +39,9 @@ export class UserDto {
 
   @ApiModelPropertyOptional()
   @IsOptional()
+  @IsString({
+    each: true
+  })
   readonly tags: string[];
 
   @ApiModelPropertyOptional()
