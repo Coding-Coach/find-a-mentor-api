@@ -3,7 +3,7 @@ import { Query, Model } from 'mongoose';
 import { MentorFiltersDto } from './dto/mentorfilters.dto';
 import { ApplicationDto } from './dto/application.dto';
 import { User } from '../users/interfaces/user.interface';
-import { Application } from './interfaces/application.interface';
+import { Application, Status } from './interfaces/application.interface';
 
 @Injectable()
 export class MentorsService {
@@ -58,11 +58,11 @@ export class MentorsService {
   }
 
   /**
-   * Find a single application by the given user
+   * Find a single application by the given user and status
    * @param user
    */
-  async findApplicationByUser(user: User): Promise<Application> {
-    return await this.applicationModel.findOne({ user: user._id }).exec();
+  async findActiveApplicationByUser(user: User): Promise<Application> {
+    return await this.applicationModel.findOne({ user: user._id, status: { $in: [Status.PENDING, Status.APPROVED]} }).exec();
   }
   
   async findApplicationById(id: string): Promise<Application> {
