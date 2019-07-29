@@ -72,7 +72,7 @@ export class UsersController {
   async show(@Param() params) {
     const data: User = await this.usersService.findById(params.id);
 
-    if (data === undefined) {
+    if (!data) {
       throw new BadRequestException('User not found');
     }
 
@@ -91,7 +91,7 @@ export class UsersController {
     const user: User = await this.usersService.findById(params.id);
 
     // Users should only update their own data
-    if (user === undefined) {
+    if (!user) {
       throw new BadRequestException('User not found');
     }
 
@@ -125,7 +125,7 @@ export class UsersController {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
     const user: User = await this.usersService.findById(params.id);
 
-    if (user === undefined) {
+    if (!user) {
       throw new BadRequestException('User not found');
     }
 

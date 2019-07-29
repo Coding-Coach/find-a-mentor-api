@@ -55,9 +55,9 @@
     lodash "4.17.11"
     path-to-regexp "3.0.0"
 
-"@nestjs/testing@^6.0.0":
-  version "6.2.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-6.2.3.tgz#5e36d49b9c55bf7bd6b1430bbc41f152c0001031"
+"@nestjs/testing@^6.3.1":
+  version "6.3.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-6.3.1.tgz#7f7cc67c9798a4632cb7d8b9cf19b23c52c9197b"
   dependencies:
     optional "0.1.4"
 
