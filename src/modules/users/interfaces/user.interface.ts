@@ -6,7 +6,7 @@ export enum Role {
   MEMBER = 'Member',
 }
 
-export enum Channel {
+export enum ChannelName {
   EMAIL = 'email', 
   SLACK = 'slack',
   LINKED = 'linkedin', 
@@ -14,6 +14,11 @@ export enum Channel {
   TWITTER = 'twitter',
   GITHUB = 'github', 
   WEBSITE = 'website',
+}
+
+export interface Channel extends Document {
+  readonly type: ChannelName,
+  readonly id: string,
 }
 
 export interface User extends Document {

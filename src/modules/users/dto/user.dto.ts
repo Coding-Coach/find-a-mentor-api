@@ -1,6 +1,6 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsUrl, IsIn, IsOptional, Length, IsArray, ArrayMinSize, ArrayMaxSize } from 'class-validator';
-import { Role, Channel } from '../interfaces/user.interface';
+import { Role, ChannelName, Channel } from '../interfaces/user.interface';
 
 export class UserDto {
   @ApiModelProperty()
@@ -50,9 +50,6 @@ export class UserDto {
 
   @ApiModelPropertyOptional()
   @IsOptional()
-  @IsIn(Object.keys(Channel), {
-    each: true,
-  })
   @IsArray()
   @ArrayMinSize(1)
   @ArrayMaxSize(3)

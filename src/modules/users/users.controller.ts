@@ -94,7 +94,7 @@ export class UsersController {
     if (user === undefined) {
       throw new BadRequestException('User not found');
     }
-
+    
     // Only admins can update other users
     if (!user._id.equals(current._id) && !current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException('Not authorized to perform this operation');

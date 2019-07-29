@@ -25,7 +25,7 @@ export class UsersService {
   }
 
   async update(userDto: UserDto): Promise<Query<any>> {
-    return await this.userModel.updateOne({ _id: userDto._id }, userDto);
+    return await this.userModel.updateOne({ _id: userDto._id }, userDto, {runValidators: true});
   }
 
   async remove(_id: string): Promise<Query<any>> {
