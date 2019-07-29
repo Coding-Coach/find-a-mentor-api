@@ -1,6 +1,16 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsUrl, IsIn, IsOptional, Length, IsString } from 'class-validator';
-import { Role } from '../interfaces/user.interface';
+import { 
+  IsEmail,
+  IsUrl,
+  IsIn,
+  IsOptional,
+  Length,
+  IsString,
+  IsArray,
+  ArrayMinSize,
+  ArrayMaxSize,
+} from 'class-validator';
+import { Role, Channel } from '../interfaces/user.interface';
 
 export class UserDto {
   @ApiModelProperty()
@@ -59,6 +69,13 @@ export class UserDto {
     each: true,
   })
   readonly roles: Role[];
+
+  @ApiModelPropertyOptional()
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(3)
+  readonly channels: Channel[];
 
   constructor(values) {
     Object.assign(this, values);
