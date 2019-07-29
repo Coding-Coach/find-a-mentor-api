@@ -5,6 +5,7 @@ import * as mongoose from 'mongoose';
  */
 export const ApplicationSchema = new mongoose.Schema({
   status: String,
+  description: String,
   reason: String,
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 });

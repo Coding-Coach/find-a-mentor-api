@@ -10,6 +10,7 @@ export interface Application extends Document {
   readonly _id: ObjectID;
   readonly status: Status;
   readonly user: ObjectID;
+  readonly description: string;
   readonly reason: string;
   readonly createdAt: Date;
   readonly updatedAt: Date;

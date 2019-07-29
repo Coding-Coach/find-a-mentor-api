@@ -85,7 +85,7 @@ export class UsersController {
   @ApiOperation({ title: 'Updates an existing user' })
   @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
   @Put(':id')
-  @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true }))
+  @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true, whitelist: true }))
   async update(@Req() request: Request, @Param() params, @Body() data: UserDto) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
     const user: User = await this.usersService.findById(params.id);

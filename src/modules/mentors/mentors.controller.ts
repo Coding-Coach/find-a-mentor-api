@@ -64,19 +64,23 @@ export class MentorsController {
   @ApiOperation({ title: 'Creates a new request to become a mentor, pending for Admin to approve' })
   @ApiBearerAuth()
   @Post('applications')
-  @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true }))
+  @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true, whitelist: true }))
   async applyToBecomeMentor(@Req() request: Request, @Body() data: ApplicationDto) {
     const user: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
-    const application: Application = await this.mentorsService.findApplicationByUser(user);
+    const application: Application = await this.mentorsService.findActiveApplicationByUser(user);
     const applicationDto = new ApplicationDto({
-      ...data,
+      description: data.description,
       status: Status.PENDING,
       user,
     });
 
     // Users can only apply once
-    if (application) {
+    if (application && application.status === Status.PENDING) {
       throw new BadRequestException('You already applied, your application is in review.');
+    }
+
+    if (application && application.status === Status.APPROVED) {
+      throw new BadRequestException('You already applied, your application has been approved');
     }
 
     await this.mentorsService.createApplication(applicationDto);
@@ -86,10 +90,11 @@ export class MentorsController {
     };
   }
 
-  @ApiOperation({ title: 'Approves an application after review' })
+  @ApiOperation({ title: 'Approves or rejects an application after review' })
   @ApiBearerAuth()
   @Put('applications/:id')
-  async approveApplication(@Req() request: Request, @Param('id') applicationId: string) {
+  @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true, whitelist: true }))
+  async reviewApplication(@Req() request: Request, @Param('id') applicationId: string, @Body() data: ApplicationDto) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
 
     if (!current.roles.includes(Role.ADMIN)) {
@@ -109,7 +114,8 @@ export class MentorsController {
     const user: User = await this.usersService.findById(application.user);
     const applicationDto: ApplicationDto = new ApplicationDto({
       _id: application._id,
-      status: Status.APPROVED,
+      reason: data.reason,
+      status: data.status,
     });
     const userDto: UserDto = new UserDto({
       _id: application.user,
