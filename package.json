@@ -21,11 +21,11 @@
     "user:roles": "node ./scripts/addroles"
   },
   "dependencies": {
-    "@nestjs/common": "^6.0.0",
+    "@nestjs/common": "^6.5.3",
     "@nestjs/core": "^6.0.0",
     "@nestjs/mongoose": "^6.1.2",
     "@nestjs/platform-express": "^6.0.0",
-    "@nestjs/swagger": "^3.0.2",
+    "@nestjs/swagger": "^3.1.0",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.9.1",
     "dotenv": "^8.0.0",
