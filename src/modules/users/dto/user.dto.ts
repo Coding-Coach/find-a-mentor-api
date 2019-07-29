@@ -1,6 +1,16 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsUrl, IsIn, IsOptional, Length, IsArray, ArrayMinSize, ArrayMaxSize } from 'class-validator';
-import { Role, ChannelName, Channel } from '../interfaces/user.interface';
+import { 
+  IsEmail,
+  IsUrl,
+  IsIn,
+  IsOptional,
+  Length,
+  IsString,
+  IsArray,
+  ArrayMinSize,
+  ArrayMaxSize,
+} from 'class-validator';
+import { Role, Channel } from '../interfaces/user.interface';
 
 export class UserDto {
   @ApiModelProperty()
@@ -8,37 +18,49 @@ export class UserDto {
 
   @ApiModelProperty()
   @IsEmail()
+  @IsString()
   readonly email: string;
 
   @ApiModelProperty()
   @Length(3, 50)
+  @IsString()
   readonly name: string;
 
   @ApiModelPropertyOptional()
+  @IsString()
   @IsUrl()
   @IsOptional()
   readonly avatar: string;
 
   @ApiModelPropertyOptional()
   @Length(3, 50)
+  @IsString()
   @IsOptional()
   readonly title: string;
 
   @ApiModelPropertyOptional()
   @Length(3, 140)
+  @IsString()
   @IsOptional()
   readonly description: string;
 
   @ApiModelPropertyOptional()
   @IsOptional()
+  @IsString()
   readonly country: string;
 
   @ApiModelPropertyOptional()
   @IsOptional()
+  @IsString({
+    each: true
+  })
   readonly spokenLanguages: string[];
 
   @ApiModelPropertyOptional()
   @IsOptional()
+  @IsString({
+    each: true
+  })
   readonly tags: string[];
 
   @ApiModelPropertyOptional()
