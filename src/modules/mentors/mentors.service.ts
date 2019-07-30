@@ -30,7 +30,7 @@ export class MentorsService {
       country: true,
       spokenLanguages: true,
     };
-    console.log('loggedIn', loggedIn);
+
     // We need to return channels for logged in users only
     if (loggedIn) {
       projections = {

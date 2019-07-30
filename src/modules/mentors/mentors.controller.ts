@@ -21,7 +21,6 @@ export class MentorsController {
   @ApiOperation({ title: 'Return all mentors in the platform by the given filters' })
   @Get()
   async index(@Req() request: Request, @Query() filters: MentorFiltersDto) {
-    console.log('request.user', request.user);
     const data: User[] = await this.mentorsService.findAll(filters, !!request.user);
 
     return {
