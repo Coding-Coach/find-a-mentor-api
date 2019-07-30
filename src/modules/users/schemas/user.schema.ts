@@ -14,10 +14,22 @@ export const ChannelSchema = new mongoose.Schema({
 })
 
 export const UserSchema = new mongoose.Schema({
-  auth0Id: String,
-  email: String,
-  name: String,
-  avatar: String,
+  auth0Id: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  avatar: {
+    type: String,
+    required: true,
+  },
   title: String,
   description: String,
   country: String,
