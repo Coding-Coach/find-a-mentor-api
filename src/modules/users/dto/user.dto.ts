@@ -58,6 +58,8 @@ export class UserDto {
 
   @ApiModelPropertyOptional()
   @IsOptional()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(3)
   @IsString({
     each: true
   })

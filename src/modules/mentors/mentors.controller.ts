@@ -21,12 +21,7 @@ export class MentorsController {
   @ApiOperation({ title: 'Return all mentors in the platform by the given filters' })
   @Get()
   async index(@Req() request: Request, @Query() filters: MentorFiltersDto) {
-    const data: User[] = await this.mentorsService.findAll(filters);
-
-    if (!request.user) {
-      // @TODO: Once channels is implemented, we need to remove them
-      // here for non-authenticated users, along with any other private data
-    }
+    const data: User[] = await this.mentorsService.findAll(filters, !!request.user);
 
     return {
       success: true,
