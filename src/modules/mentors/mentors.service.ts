@@ -16,10 +16,29 @@ export class MentorsService {
    * Search for mentors by the given filters
    * @param filters filters to apply
    */
-  async findAll(filters: MentorFiltersDto): Promise<User[]> {
+  async findAll(filters: MentorFiltersDto, loggedIn: Boolean): Promise<User[]> {
     const onlyMentors: any = {
       roles: 'Mentor',
     };
+    let projections: any = {
+      name: true,
+      avatar: true,
+      title: true,
+      description: true,
+      createdAt: true,
+      tags: true,
+      country: true,
+      spokenLanguages: true,
+    };
+    console.log('loggedIn', loggedIn);
+    // We need to return channels for logged in users only
+    if (loggedIn) {
+      projections = {
+        ...projections,
+        email: true,
+        channels: true,
+      };
+    }
 
     if (filters.name) {
       onlyMentors.name = { $regex: filters.name, $options: 'i' };
@@ -37,7 +56,9 @@ export class MentorsService {
       onlyMentors.spokenLanguages = filters.spokenLanguages;
     }
 
-    return await this.userModel.find(onlyMentors).exec();
+    return await this.userModel.find(onlyMentors)
+      .select(projections)
+      .exec();
   }
 
   async findApplications(filters): Promise<Application[]> {
