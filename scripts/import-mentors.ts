@@ -11,7 +11,7 @@ import * as fetch from 'node-fetch';
 import * as mongoose from 'mongoose';
 
 import { Role } from 'src/modules/users/interfaces/user.interface';
-import { UserSchema } from 'src/modules/users/schemas/user.schema';
+import { ChannelSchema } from 'src/modules/users/schemas/user.schema';
 
 const fetchMentors = async (request: RequestInfo): Promise<any> => {
   return new Promise(resolve => {
@@ -30,6 +30,20 @@ async function importMentors() {
 
   console.log("Connect to database")
   mongoose.connect(process.env.MONGO_DATABASE_URL, { useNewUrlParser: true });
+
+  const UserSchema = new mongoose.Schema({
+    auth0Id: String,
+    email: String,
+    name: String,
+    avatar: String,
+    title: String,
+    description: String,
+    country: String,
+    spokenLanguages: Array,
+    tags: Array,
+    roles: Array,
+    channels: [ChannelSchema],
+  });
 
   var User = mongoose.model('User', UserSchema);
 
