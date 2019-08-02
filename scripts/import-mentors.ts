@@ -62,7 +62,7 @@ async function importMentors() {
         country: mentor.country,
         spokenLanguages: mentor.spokenLanguages,
         tags: mentor.tags,
-        roles: [Role.MENTOR],
+        roles: [Role.MEMBER, Role.MENTOR],
         channels: mentor.channels,
       })
 

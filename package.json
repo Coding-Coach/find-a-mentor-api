@@ -18,8 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "user:roles": "node ./scripts/addroles",
-    "import:mentors": "ts-node -r tsconfig-paths/register ./scripts/import-mentors.ts"
+    "user:import": "ts-node -r tsconfig-paths/register ./scripts/import-mentors.ts",
+    "user:roles": "node ./scripts/addroles"
   },
   "dependencies": {
     "@nestjs/common": "^6.5.3",
