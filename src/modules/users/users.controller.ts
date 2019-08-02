@@ -6,6 +6,7 @@ import Config from '../../config';
 import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 import { Role, User } from './interfaces/user.interface';
+import EmailClient from '../../utils/email-client'
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -47,6 +48,21 @@ export class UsersController {
         });
 
         const newUser: User = await this.usersService.create(userDto);
+
+        // TODO: Move this HTML into SendGrid's templating system
+        const emailData = {
+          to: userDto.email,
+          subject: 'Welcome to Coding Coach!',
+          html: `<div style="font-family:Verdana,sans-serif;">
+            <h1>Welcome to Coding Coach!</h1>
+            <p style="margin:0 0 32px">Where we are connecting developers with mentors worldwide.</p>
+            <a href="https://mentors.codingcoach.io/" style="border-radius:4px;color:#fff;background:#00bc89;padding:12px 16px;text-decoration:none;">
+              FIND A MENTOR
+            </a>
+            </div>`
+        };
+        
+        EmailClient.send(emailData)
 
         return {
           success: true,

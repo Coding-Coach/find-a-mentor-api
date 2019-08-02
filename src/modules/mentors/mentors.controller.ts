@@ -8,6 +8,7 @@ import { ApplicationDto } from './dto/application.dto';
 import { User, Role } from '../users/interfaces/user.interface';
 import { Application, Status } from './interfaces/application.interface';
 import { UserDto } from '../users/dto/user.dto';
+import EmailClient from '../../utils/email-client'
 
 @ApiUseTags('/mentors')
 @Controller('mentors')
@@ -123,6 +124,22 @@ export class MentorsController {
     });
     
     this.usersService.update(userDto);
+    
+    // TODO: Move this HTML into SendGrid's templating system
+    const emailData = {
+      to: userDto.email,
+      subject: 'Welcome Aboard, Mentor!',
+      html: `<div style="font-family:Verdana,sans-serif;">
+        <h1>Welcome Aboard, Mentor!</h1>
+        <p style="margin:0 0 32px">Your request to become a mentor has been approved.</p>
+        <a href="https://mentors.codingcoach.io/" style="border-radius:4px;color:#fff;background:#00bc89;padding:12px 16px;text-decoration:none;">
+          SEE ALL MENTORS
+        </a>
+        </div>`
+    };
+    
+    EmailClient.send(emailData)
+
     const res: any = await this.mentorsService.updateApplication(applicationDto);
 
     return {
