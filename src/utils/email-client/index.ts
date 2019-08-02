@@ -19,7 +19,9 @@ class EmailFacade {
     
 }
 
-
+// No point in instantiating this thing more than once, 
+// so it's safe to use a singleton here.  Also freeze the object
+// so it can't be abused later.  👀
 const emailClient = new EmailFacade()
 Object.freeze(emailClient)
 
