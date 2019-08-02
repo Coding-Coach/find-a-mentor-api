@@ -17,6 +17,9 @@ const config = {
       DOMAIN: process.env.AUTH0_DOMAIN,
     },
   },
+  sendGrid: {
+    API_KEY: process.env.SENDGRID_API_KEY,
+  }
 };
 
 export default config;
