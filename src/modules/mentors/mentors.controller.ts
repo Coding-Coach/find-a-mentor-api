@@ -86,6 +86,14 @@ export class MentorsController {
 
     await this.mentorsService.createApplication(applicationDto);
 
+    // TODO: Move this templateId into a constant
+    const emailData = {
+      to: user.email,
+      templateId: `d-bf78306901e747a7b3f92761b9884f2e`
+    };
+    
+    EmailClient.send(emailData)
+
     return {
       success: true,
     };
@@ -123,24 +131,18 @@ export class MentorsController {
       roles: [...user.roles, Role.MENTOR],
     });
     
-    this.usersService.update(userDto);
     
-    // TODO: Move this HTML into SendGrid's templating system
+    const res: any = await this.mentorsService.updateApplication(applicationDto);
+
+    this.usersService.update(userDto);
+
+    // TODO: Move these templateIds into a constant
     const emailData = {
       to: userDto.email,
-      subject: 'Welcome Aboard, Mentor!',
-      html: `<div style="font-family:Verdana,sans-serif;">
-        <h1>Welcome Aboard, Mentor!</h1>
-        <p style="margin:0 0 32px">Your request to become a mentor has been approved.</p>
-        <a href="https://mentors.codingcoach.io/" style="border-radius:4px;color:#fff;background:#00bc89;padding:12px 16px;text-decoration:none;">
-          SEE ALL MENTORS
-        </a>
-        </div>`
+      templateId: applicationDto.status === Status.REJECTED ? `d-ad08366d02654587916a41bb3270afed` : `d-88dc20e5dd164510a32f659f9347824e`
     };
     
     EmailClient.send(emailData)
-
-    const res: any = await this.mentorsService.updateApplication(applicationDto);
 
     return {
       success: res.ok === 1,

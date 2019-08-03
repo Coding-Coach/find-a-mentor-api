@@ -49,6 +49,7 @@ export class UsersController {
 
         const newUser: User = await this.usersService.create(userDto);
 
+        // // TODO: Move this templateId into a constant
         const emailData = {
           to: userDto.email,
           templateId: 'd-1434be390e1b4288b8011507f1c8d786',

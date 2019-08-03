@@ -6,7 +6,7 @@ const defaults = {
     from: 'Coding Coach <no-reply@mail.codingcoach.io>',
 };
 
-
+// TODO: Convert this to a service.
 class EmailFacade {
     constructor() {
         sgMail.setApiKey(Config.sendGrid.API_KEY);
