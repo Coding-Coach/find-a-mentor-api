@@ -1,29 +1,24 @@
 import Config from '../../config';
 import * as sgMail from '@sendgrid/mail';
+import {SendData} from './interfaces/email.interface'
+import { Injectable } from '@nestjs/common';
 
 
 const defaults = {
     from: 'Coding Coach <no-reply@mail.codingcoach.io>',
 };
 
-// TODO: Convert this to a service.
-class EmailFacade {
+
+@Injectable
+class EmailProvider {
     constructor() {
         sgMail.setApiKey(Config.sendGrid.API_KEY);
     }
     
-    send(data: any) {
+    send(data: SendData) {
         const newData = Object.assign({}, defaults, data)
         return sgMail.send(newData);
     }
-    
 }
 
-// No point in instantiating this thing more than once, 
-// so it's safe to use a singleton here.  Also freeze the object
-// so it can't be abused later.  👀
-const emailClient = new EmailFacade()
-Object.freeze(emailClient)
-
-
-export default emailClient
+export default EmailProvider

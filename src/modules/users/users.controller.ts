@@ -6,14 +6,17 @@ import Config from '../../config';
 import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 import { Role, User } from './interfaces/user.interface';
-import EmailClient from '../../utils/email-client'
+import EmailService from "../email/email.service";
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
 
-  constructor(private readonly usersService: UsersService) { }
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly emailService: EmailService,
+  ) { }
 
   @ApiOperation({ title: 'Return all registered users' })
   @Get()
@@ -55,7 +58,7 @@ export class UsersController {
           templateId: 'd-1434be390e1b4288b8011507f1c8d786',
         };
         
-        EmailClient.send(emailData)
+        this.emailService.send(emailData)
 
         return {
           success: true,

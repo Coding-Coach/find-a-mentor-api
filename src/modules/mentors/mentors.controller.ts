@@ -8,7 +8,7 @@ import { ApplicationDto } from './dto/application.dto';
 import { User, Role } from '../users/interfaces/user.interface';
 import { Application, Status } from './interfaces/application.interface';
 import { UserDto } from '../users/dto/user.dto';
-import EmailClient from '../../utils/email-client'
+import EmailService from "../email/email.service";
 
 @ApiUseTags('/mentors')
 @Controller('mentors')
@@ -17,6 +17,7 @@ export class MentorsController {
   constructor(
     private readonly mentorsService: MentorsService,
     private readonly usersService: UsersService,
+    private readonly emailService: EmailService,
   ) { }
 
   @ApiOperation({ title: 'Return all mentors in the platform by the given filters' })
@@ -92,7 +93,7 @@ export class MentorsController {
       templateId: `d-bf78306901e747a7b3f92761b9884f2e`
     };
     
-    EmailClient.send(emailData)
+    this.emailService.send(emailData)
 
     return {
       success: true,
@@ -142,7 +143,7 @@ export class MentorsController {
       templateId: applicationDto.status === Status.REJECTED ? `d-ad08366d02654587916a41bb3270afed` : `d-88dc20e5dd164510a32f659f9347824e`
     };
     
-    EmailClient.send(emailData)
+    this.emailService.send(emailData)
 
     return {
       success: res.ok === 1,
