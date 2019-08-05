@@ -8,7 +8,7 @@ import { ApplicationDto } from './dto/application.dto';
 import { User, Role } from '../users/interfaces/user.interface';
 import { Application, Status } from './interfaces/application.interface';
 import { UserDto } from '../users/dto/user.dto';
-import EmailService from "../email/email.service";
+import { EmailService } from "../email/email.service";
 
 @ApiUseTags('/mentors')
 @Controller('mentors')
@@ -87,10 +87,9 @@ export class MentorsController {
 
     await this.mentorsService.createApplication(applicationDto);
 
-    // TODO: Move this templateId into a constant
     const emailData = {
       to: user.email,
-      templateId: `d-bf78306901e747a7b3f92761b9884f2e`
+      templateId: EmailService.TEMPLATE_IDS.MENTOR_APPLICATION_RECEIVED,
     };
     
     this.emailService.send(emailData)
@@ -137,10 +136,16 @@ export class MentorsController {
 
     this.usersService.update(userDto);
 
-    // TODO: Move these templateIds into a constant
+    let templateId = null
+    if (applicationDto.status === Status.REJECTED) {
+      templateId = EmailService.TEMPLATE_IDS.MENTOR_APPLICATION_REJECTED
+    } else {
+      EmailService.TEMPLATE_IDS.MENTOR_APPLICATION_APPROVED
+    }
+
     const emailData = {
       to: userDto.email,
-      templateId: applicationDto.status === Status.REJECTED ? `d-ad08366d02654587916a41bb3270afed` : `d-88dc20e5dd164510a32f659f9347824e`
+      templateId,
     };
     
     this.emailService.send(emailData)

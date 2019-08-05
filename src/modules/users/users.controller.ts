@@ -6,7 +6,7 @@ import Config from '../../config';
 import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 import { Role, User } from './interfaces/user.interface';
-import EmailService from "../email/email.service";
+import { EmailService } from "../email/email.service";
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -52,10 +52,9 @@ export class UsersController {
 
         const newUser: User = await this.usersService.create(userDto);
 
-        // // TODO: Move this templateId into a constant
         const emailData = {
           to: userDto.email,
-          templateId: 'd-1434be390e1b4288b8011507f1c8d786',
+          templateId: EmailService.TEMPLATE_IDS.WELCOME_MESSAGE,
         };
         
         this.emailService.send(emailData)

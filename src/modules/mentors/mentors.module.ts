@@ -4,6 +4,7 @@ import { MentorsService } from './mentors.service';
 import { UsersModule } from '../users/users.module';
 import { DatabaseModule } from '../../database/database.module';
 import { applicationProviders } from './mentors.providers';
+import { EmailService } from '../email/email.service';
 
 /**
  * Become a mentor module, Endpoints in this module are
@@ -11,8 +12,8 @@ import { applicationProviders } from './mentors.providers';
  * by submiting their profiles for review
  */
 @Module({
-  imports: [DatabaseModule, UsersModule],
+  imports: [DatabaseModule, UsersModule, EmailService],
   controllers: [MentorsController],
-  providers: [MentorsService, ...applicationProviders],
+  providers: [MentorsService, EmailService, ...applicationProviders],
 })
 export class MentorsModule { }
