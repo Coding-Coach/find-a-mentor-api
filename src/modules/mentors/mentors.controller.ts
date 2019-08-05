@@ -140,7 +140,7 @@ export class MentorsController {
     if (applicationDto.status === Status.REJECTED) {
       templateId = EmailService.TEMPLATE_IDS.MENTOR_APPLICATION_REJECTED
     } else {
-      EmailService.TEMPLATE_IDS.MENTOR_APPLICATION_APPROVED
+templateId = EmailService.TEMPLATE_IDS.MENTOR_APPLICATION_APPROVED
     }
 
     const emailData = {
