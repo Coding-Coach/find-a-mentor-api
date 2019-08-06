@@ -29,7 +29,6 @@ export class UserDto {
   @ApiModelPropertyOptional()
   @IsString()
   @IsUrl()
-  @IsOptional()
   readonly avatar: string;
 
   @ApiModelPropertyOptional()
@@ -58,6 +57,8 @@ export class UserDto {
 
   @ApiModelPropertyOptional()
   @IsOptional()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(5)
   @IsString({
     each: true
   })
