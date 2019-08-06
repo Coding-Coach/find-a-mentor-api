@@ -6,13 +6,17 @@ import Config from '../../config';
 import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 import { Role, User } from './interfaces/user.interface';
+import { EmailService } from "../email/email.service";
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
 
-  constructor(private readonly usersService: UsersService) { }
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly emailService: EmailService,
+  ) { }
 
   @ApiOperation({ title: 'Return all registered users' })
   @Get()
@@ -47,6 +51,13 @@ export class UsersController {
         });
 
         const newUser: User = await this.usersService.create(userDto);
+
+        const emailData = {
+          to: userDto.email,
+          templateId: EmailService.TEMPLATE_IDS.WELCOME_MESSAGE,
+        };
+        
+        this.emailService.send(emailData)
 
         return {
           success: true,

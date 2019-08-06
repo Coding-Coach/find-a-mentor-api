@@ -8,6 +8,7 @@ import { ApplicationDto } from './dto/application.dto';
 import { User, Role } from '../users/interfaces/user.interface';
 import { Application, Status } from './interfaces/application.interface';
 import { UserDto } from '../users/dto/user.dto';
+import { EmailService } from "../email/email.service";
 
 @ApiUseTags('/mentors')
 @Controller('mentors')
@@ -16,6 +17,7 @@ export class MentorsController {
   constructor(
     private readonly mentorsService: MentorsService,
     private readonly usersService: UsersService,
+    private readonly emailService: EmailService,
   ) { }
 
   @ApiOperation({ title: 'Return all mentors in the platform by the given filters' })
@@ -80,6 +82,13 @@ export class MentorsController {
 
     await this.mentorsService.createApplication(applicationDto);
 
+    const emailData = {
+      to: user.email,
+      templateId: EmailService.TEMPLATE_IDS.MENTOR_APPLICATION_RECEIVED,
+    };
+    
+    this.emailService.send(emailData)
+
     return {
       success: true,
     };
@@ -117,8 +126,24 @@ export class MentorsController {
       roles: [...user.roles, Role.MENTOR],
     });
     
-    this.usersService.update(userDto);
+    
     const res: any = await this.mentorsService.updateApplication(applicationDto);
+
+    this.usersService.update(userDto);
+
+    let templateId = null
+    if (applicationDto.status === Status.REJECTED) {
+      templateId = EmailService.TEMPLATE_IDS.MENTOR_APPLICATION_REJECTED
+    } else {
+templateId = EmailService.TEMPLATE_IDS.MENTOR_APPLICATION_APPROVED
+    }
+
+    const emailData = {
+      to: userDto.email,
+      templateId,
+    };
+    
+    this.emailService.send(emailData)
 
     return {
       success: res.ok === 1,
