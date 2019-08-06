@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 
 
 const defaults = {
-    from: 'Coding Coach <no-reply@mail.codingcoach.io>',
+    from: Config.email.FROM,
 };
 
 
