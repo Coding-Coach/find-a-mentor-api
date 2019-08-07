@@ -7,6 +7,7 @@ import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 import { Role, User } from './interfaces/user.interface';
 import { EmailService } from "../email/email.service";
+import { Template } from "../email/interfaces/email.interface";
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -54,7 +55,7 @@ export class UsersController {
 
         const emailData = {
           to: userDto.email,
-          templateId: EmailService.TEMPLATE_IDS.WELCOME_MESSAGE,
+          templateId: Template.WELCOME_MESSAGE,
         };
         
         this.emailService.send(emailData)

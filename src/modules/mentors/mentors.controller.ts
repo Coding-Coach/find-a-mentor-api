@@ -9,6 +9,7 @@ import { User, Role } from '../users/interfaces/user.interface';
 import { Application, Status } from './interfaces/application.interface';
 import { UserDto } from '../users/dto/user.dto';
 import { EmailService } from "../email/email.service";
+import { Template } from "../email/interfaces/email.interface";
 
 @ApiUseTags('/mentors')
 @Controller('mentors')
@@ -84,7 +85,7 @@ export class MentorsController {
 
     const emailData = {
       to: user.email,
-      templateId: EmailService.TEMPLATE_IDS.MENTOR_APPLICATION_RECEIVED,
+      templateId: Template.MENTOR_APPLICATION_RECEIVED,
     };
     
     this.emailService.send(emailData)
@@ -133,9 +134,9 @@ export class MentorsController {
 
     let templateId = null
     if (applicationDto.status === Status.REJECTED) {
-      templateId = EmailService.TEMPLATE_IDS.MENTOR_APPLICATION_REJECTED
+      templateId = Template.MENTOR_APPLICATION_REJECTED
     } else {
-templateId = EmailService.TEMPLATE_IDS.MENTOR_APPLICATION_APPROVED
+      templateId = Template.MENTOR_APPLICATION_APPROVED
     }
 
     const emailData = {
