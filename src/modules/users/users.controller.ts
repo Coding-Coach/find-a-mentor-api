@@ -51,11 +51,11 @@ export class UsersController {
             auth0Id: userId,
           })
 
-          const updatedUser: User = await this.usersService.update(userDto);
+          await this.usersService.update(userDto);
 
           return {
             success: true,
-            data: updatedUser,
+            data: existingMentor,
           };
         } else {
           // If the user doesn't exist in the database we need
@@ -98,7 +98,7 @@ export class UsersController {
   }
 
   @ApiOperation({ title: 'Returns a single user by ID' })
-  @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Get(':id')
   async show(@Param() params) {
     const data: User = await this.usersService.findById(params.id);
@@ -114,7 +114,7 @@ export class UsersController {
   }
 
   @ApiOperation({ title: 'Updates an existing user' })
-  @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Put(':id')
   @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true, whitelist: true }))
   async update(@Req() request: Request, @Param() params, @Body() data: UserDto) {
@@ -150,7 +150,7 @@ export class UsersController {
   }
 
   @ApiOperation({ title: 'Deletes the given user' })
-  @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Delete(':id')
   async remove(@Req() request: Request, @Param() params) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
@@ -161,7 +161,7 @@ export class UsersController {
     }
 
     // Only own user or admins can remove the given user
-    if (user._id !== current._id && !current.roles.includes(Role.ADMIN)) {
+    if (!user._id.equals(current._id) && !current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
