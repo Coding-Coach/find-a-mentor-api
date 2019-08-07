@@ -43,6 +43,8 @@ export class UsersController {
       try {
         const data: any = await this.getAdminAccessToken();
         const user: any = await this.getUserProfile(data.access_token, userId);
+        console.log('userId', userId)
+        console.log('user', user)
         const userDto: UserDto = new UserDto({
           auth0Id: userId,
           email: user.email,
@@ -79,7 +81,7 @@ export class UsersController {
   }
 
   @ApiOperation({ title: 'Returns a single user by ID' })
-  @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Get(':id')
   async show(@Param() params) {
     const data: User = await this.usersService.findById(params.id);
@@ -95,7 +97,7 @@ export class UsersController {
   }
 
   @ApiOperation({ title: 'Updates an existing user' })
-  @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Put(':id')
   @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true, whitelist: true }))
   async update(@Req() request: Request, @Param() params, @Body() data: UserDto) {
@@ -131,7 +133,7 @@ export class UsersController {
   }
 
   @ApiOperation({ title: 'Deletes the given user' })
-  @ApiImplicitParam({ name: 'id', description: 'The auth0 `sub` value (eg: `auth0|abc12345`)' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Delete(':id')
   async remove(@Req() request: Request, @Param() params) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);

@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Query, Model } from 'mongoose';
 import { UserDto } from './dto/user.dto';
 import { User } from './interfaces/user.interface';
+import { isObjectId } from '../../utils/objectid';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +14,11 @@ export class UsersService {
   }
 
   async findById(_id: string): Promise<User> {
-    return await this.userModel.findOne({ _id }).exec();
+    if (isObjectId(_id)) {
+      return await this.userModel.findOne({ _id }).exec();
+    }
+
+    return Promise.resolve(null);
   }
 
   async findByAuth0Id(auth0Id: string): Promise<User> {
@@ -29,6 +34,12 @@ export class UsersService {
   }
 
   async remove(_id: string): Promise<Query<any>> {
-    return await this.userModel.deleteOne({ _id });
+    if (isObjectId(_id)) {
+      return await this.userModel.deleteOne({ _id });
+    }
+
+    return Promise.resolve({
+      ok: 0,
+    });
   }
 }
