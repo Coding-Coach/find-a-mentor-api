@@ -37,35 +37,52 @@ export class UsersController {
     const currentUser: User = await this.usersService.findByAuth0Id(userId);
 
     if (!currentUser) {
-      // If the user doesn't exist in the database we need
-      // to add it because this is a new user. The initial
-      // information is coming from auth0
       try {
         const data: any = await this.getAdminAccessToken();
         const user: any = await this.getUserProfile(data.access_token, userId);
-        console.log('userId', userId)
-        console.log('user', user)
-        const userDto: UserDto = new UserDto({
-          auth0Id: userId,
-          email: user.email,
-          name: user.nickname,
-          avatar: user.picture,
-          roles: [Role.MEMBER],
-        });
 
-        const newUser: User = await this.usersService.create(userDto);
+        // If the user couldn't be found by the auth0Id, try to see whether we
+        // can find one by the email. If so, we have a mentor that was imported
+        // for which we just need to add the auth0Id
+        const existingMentor = await this.usersService.findByEmail(user.email);
+        if (existingMentor) {
+          const userDto: UserDto = new UserDto({
+            _id: existingMentor._id,
+            auth0Id: userId,
+          })
 
-        const emailData = {
-          to: userDto.email,
-          templateId: Template.WELCOME_MESSAGE,
-        };
-        
-        this.emailService.send(emailData)
+          await this.usersService.update(userDto);
 
-        return {
-          success: true,
-          data: newUser,
-        };
+          return {
+            success: true,
+            data: existingMentor,
+          };
+        } else {
+          // If the user doesn't exist in the database we need
+          // to add it because this is a new user. The initial
+          // information is coming from auth0
+          const userDto: UserDto = new UserDto({
+            auth0Id: userId,
+            email: user.email,
+            name: user.nickname,
+            avatar: user.picture,
+            roles: [Role.MEMBER],
+          });
+
+          const newUser: User = await this.usersService.create(userDto);
+
+          const emailData = {
+            to: userDto.email,
+            templateId: Template.WELCOME_MESSAGE,
+          };
+
+          this.emailService.send(emailData)
+
+          return {
+            success: true,
+            data: newUser,
+          };
+        }
       } catch (error) {
         return {
           success: false,
@@ -144,7 +161,7 @@ export class UsersController {
     }
 
     // Only own user or admins can remove the given user
-    if (user._id !== current._id && !current.roles.includes(Role.ADMIN)) {
+    if (!user._id.equals(current._id) && !current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
