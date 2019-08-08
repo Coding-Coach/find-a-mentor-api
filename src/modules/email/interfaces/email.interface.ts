@@ -6,6 +6,6 @@ export enum Template {
 }
 
 export interface SendData {
-  to: String;
+  to: string;
   templateId: Template;
 }
