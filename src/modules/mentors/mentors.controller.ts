@@ -72,6 +72,30 @@ export class MentorsController {
     };
   }
 
+  @Get('myapplications')
+  @ApiOperation({ title: 'Retrieve applications for the current user' })
+  @ApiBearerAuth()
+  async myApplications(@Req() request: Request, @Query('status') status: string) {
+    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+    const filters: any = {
+      user: current._id,
+    };
+
+    if (status) {
+      const key: string = Status[status.toUpperCase()];
+      if (key) {
+        filters.status = key;
+      }
+    }
+
+    const data: Application[] = await this.mentorsService.findApplications(filters);
+
+    return {
+      success: true,
+      data,
+    };
+  }
+
   @ApiOperation({ title: 'Creates a new request to become a mentor, pending for Admin to approve' })
   @ApiBearerAuth()
   @Post('applications')
