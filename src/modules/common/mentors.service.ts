@@ -62,7 +62,25 @@ export class MentorsService {
   }
 
   async findApplications(filters): Promise<Application[]> {
-    return await this.applicationModel.find(filters).populate({ path: 'user', select: ['_id', 'name', 'avatar'] }).exec();
+    return await this.applicationModel
+      .find(filters)
+      .populate({
+        path: 'user', select: [
+          '_id',
+          'name',
+          'email',
+          'avatar',
+          'channels',
+          'country',
+          'createdAt',
+          'description',
+          'roles',
+          'spokenLanguages',
+          'tags',
+          'title',
+        ],
+      })
+      .exec();
   }
 
   /**
