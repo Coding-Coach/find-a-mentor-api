@@ -20,8 +20,8 @@ export class EmailService {
         MENTOR_APPLICATION_REJECTED: 'd-ad08366d02654587916a41bb3270afed',
     };
 
-    send(data: SendData) {
+    async send(data: SendData) {
         const newData = Object.assign({}, defaults, data);
-        return sgMail.send(newData);
+        return await sgMail.send(newData);
     }
 }

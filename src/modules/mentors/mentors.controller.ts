@@ -129,6 +129,7 @@ export class MentorsController {
       throw new BadRequestException('This Application is already approved');
     }
 
+    let templateId = null;
     const user: User = await this.usersService.findById(application.user);
     const applicationDto: ApplicationDto = new ApplicationDto({
       _id: application._id,
@@ -140,23 +141,20 @@ export class MentorsController {
       roles: [...user.roles, Role.MENTOR],
     });
 
-    const res: any = await this.mentorsService.updateApplication(applicationDto);
-
-    this.usersService.update(userDto);
-
-    let templateId = null;
     if (applicationDto.status === Status.REJECTED) {
       templateId = Template.MENTOR_APPLICATION_REJECTED;
     } else {
+      await this.usersService.update(userDto);
       templateId = Template.MENTOR_APPLICATION_APPROVED;
     }
 
     const emailData = {
-      to: userDto.email,
+      to: user.email,
       templateId,
     };
 
-    this.emailService.send(emailData);
+    const res: any = await this.mentorsService.updateApplication(applicationDto);
+    await this.emailService.send(emailData);
 
     return {
       success: res.ok === 1,
