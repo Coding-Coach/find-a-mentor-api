@@ -9,7 +9,7 @@ import { isObjectId } from '../../utils/objectid';
 export class UsersService {
   constructor(
     @Inject('USER_MODEL') private readonly userModel: Model<User>,
-    @Inject('APPLICATION_MODEL') private readonly applicationModel: Model<Application>
+    @Inject('APPLICATION_MODEL') private readonly applicationModel: Model<Application>,
   ) { }
 
   async create(userDto: UserDto): Promise<User> {

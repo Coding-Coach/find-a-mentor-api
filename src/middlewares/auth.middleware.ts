@@ -19,7 +19,7 @@ const middleware = jwt({
  * Public paths that doesn't require authentication
  */
 const publicUrls = [
-  '/mentors'
+  '/mentors',
 ];
 
 @Injectable()

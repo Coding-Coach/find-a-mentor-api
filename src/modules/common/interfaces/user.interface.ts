@@ -7,18 +7,18 @@ export enum Role {
 }
 
 export enum ChannelName {
-  EMAIL = 'email', 
+  EMAIL = 'email',
   SLACK = 'slack',
-  LINKED = 'linkedin', 
+  LINKED = 'linkedin',
   FACEBOOK = 'facebook',
   TWITTER = 'twitter',
-  GITHUB = 'github', 
+  GITHUB = 'github',
   WEBSITE = 'website',
 }
 
 export interface Channel extends Document {
-  readonly type: ChannelName,
-  readonly id: string,
+  readonly type: ChannelName;
+  readonly id: string;
 }
 
 export interface User extends Document {

@@ -2,7 +2,7 @@
  * Use this script to import the mentors from the
  * https://github.com/Coding-Coach/find-a-mentor repository to the mongo
  * database.
- * 
+ *
  * Usage:
  *  $ yarn import:mentors
  */
@@ -24,11 +24,11 @@ const fetchMentors = async (request: RequestInfo): Promise<any> => {
 };
 
 async function importMentors() {
-  console.log("Fetch the mentors")
+  console.log('Fetch the mentors');
   const mentors = await fetchMentors('https://raw.githubusercontent.com/Coding-Coach/find-a-mentor/master/src/mentors.json');
-  console.log(`Fetched ${mentors.length} mentors`)
+  console.log(`Fetched ${mentors.length} mentors`);
 
-  console.log("Connect to database")
+  console.log('Connect to database');
   mongoose.connect(process.env.MONGO_DATABASE_URL, { useNewUrlParser: true });
 
   const UserSchema = new mongoose.Schema({
@@ -45,15 +45,15 @@ async function importMentors() {
     channels: [ChannelSchema],
   });
 
-  var User = mongoose.model('User', UserSchema);
+  let User = mongoose.model('User', UserSchema);
 
-  console.log("Store mentors to database")
+  console.log('Store mentors to database');
   for (const mentor of mentors) {
     // only add the mentor, if there isn't already an entry
     const user = await User.findOne({ email: mentor.id }).exec();
     if (!user) {
       console.log(`Add mentor '${mentor.id}' to database`);
-      var newUser = new User({
+      let newUser = new User({
         name: mentor.name,
         email: mentor.id,
         avatar: mentor.avatar,
@@ -64,13 +64,13 @@ async function importMentors() {
         tags: mentor.tags,
         roles: [Role.MEMBER, Role.MENTOR],
         channels: mentor.channels,
-      })
+      });
 
       await newUser.save();
     }
   }
 
-  console.log("Finished adding new mentors to the database")
+  console.log('Finished adding new mentors to the database');
   process.exit(0);
 }
 

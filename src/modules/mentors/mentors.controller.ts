@@ -8,8 +8,8 @@ import { ApplicationDto } from '../common/dto/application.dto';
 import { User, Role } from '../common/interfaces/user.interface';
 import { Application, Status } from '../common/interfaces/application.interface';
 import { UserDto } from '../common/dto/user.dto';
-import { EmailService } from "../email/email.service";
-import { Template } from "../email/interfaces/email.interface";
+import { EmailService } from '../email/email.service';
+import { Template } from '../email/interfaces/email.interface';
 
 @ApiUseTags('/mentors')
 @Controller('mentors')
@@ -87,8 +87,8 @@ export class MentorsController {
       to: user.email,
       templateId: Template.MENTOR_APPLICATION_RECEIVED,
     };
-    
-    this.emailService.send(emailData)
+
+    this.emailService.send(emailData);
 
     return {
       success: true,
@@ -126,25 +126,24 @@ export class MentorsController {
       _id: application.user,
       roles: [...user.roles, Role.MENTOR],
     });
-    
-    
+
     const res: any = await this.mentorsService.updateApplication(applicationDto);
 
     this.usersService.update(userDto);
 
-    let templateId = null
+    let templateId = null;
     if (applicationDto.status === Status.REJECTED) {
-      templateId = Template.MENTOR_APPLICATION_REJECTED
+      templateId = Template.MENTOR_APPLICATION_REJECTED;
     } else {
-      templateId = Template.MENTOR_APPLICATION_APPROVED
+      templateId = Template.MENTOR_APPLICATION_APPROVED;
     }
 
     const emailData = {
       to: userDto.email,
       templateId,
     };
-    
-    this.emailService.send(emailData)
+
+    this.emailService.send(emailData);
 
     return {
       success: res.ok === 1,

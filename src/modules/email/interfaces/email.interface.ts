@@ -5,8 +5,7 @@ export enum Template {
   MENTOR_APPLICATION_REJECTED = 'd-ad08366d02654587916a41bb3270afed',
 }
 
-
 export interface SendData {
-  to: String,
-  templateId: Template,
+  to: String;
+  templateId: Template;
 }

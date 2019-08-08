@@ -7,8 +7,8 @@ import { UserDto } from '../common/dto/user.dto';
 import { UsersService } from '../common/users.service';
 import { MentorsService } from '../common/mentors.service';
 import { Role, User } from '../common/interfaces/user.interface';
-import { EmailService } from "../email/email.service";
-import { Template } from "../email/interfaces/email.interface";
+import { EmailService } from '../email/email.service';
+import { Template } from '../email/interfaces/email.interface';
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -51,7 +51,7 @@ export class UsersController {
           const userDto: UserDto = new UserDto({
             _id: existingMentor._id,
             auth0Id: userId,
-          })
+          });
 
           await this.usersService.update(userDto);
 
@@ -78,7 +78,7 @@ export class UsersController {
             templateId: Template.WELCOME_MESSAGE,
           };
 
-          this.emailService.send(emailData)
+          this.emailService.send(emailData);
 
           return {
             success: true,

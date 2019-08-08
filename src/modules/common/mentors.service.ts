@@ -85,7 +85,7 @@ export class MentorsService {
   async findActiveApplicationByUser(user: User): Promise<Application> {
     return await this.applicationModel.findOne({ user: user._id, status: { $in: [Status.PENDING, Status.APPROVED]} }).exec();
   }
-  
+
   async findApplicationById(id: string): Promise<Application> {
     return await this.applicationModel.findOne({ _id: id }).exec();
   }
