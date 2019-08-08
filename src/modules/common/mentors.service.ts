@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Query, Model } from 'mongoose';
 import { MentorFiltersDto } from './dto/mentorfilters.dto';
 import { ApplicationDto } from './dto/application.dto';
-import { User } from '../users/interfaces/user.interface';
+import { User } from './interfaces/user.interface';
 import { Application, Status } from './interfaces/application.interface';
 
 @Injectable()

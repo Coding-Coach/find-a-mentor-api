@@ -10,8 +10,8 @@ import * as dotenv from 'dotenv';
 import * as fetch from 'node-fetch';
 import * as mongoose from 'mongoose';
 
-import { Role } from 'src/modules/users/interfaces/user.interface';
-import { ChannelSchema } from 'src/modules/users/schemas/user.schema';
+import { Role } from 'src/modules/common/interfaces/user.interface';
+import { ChannelSchema } from 'src/modules/common/schemas/user.schema';
 
 const fetchMentors = async (request: RequestInfo): Promise<any> => {
   return new Promise(resolve => {

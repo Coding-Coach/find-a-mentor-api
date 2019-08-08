@@ -3,9 +3,9 @@ import { ApiBearerAuth, ApiImplicitParam, ApiOperation, ApiUseTags } from '@nest
 import { Request } from 'express';
 import fetch from 'node-fetch';
 import Config from '../../config';
-import { UserDto } from './dto/user.dto';
-import { UsersService } from './users.service';
-import { Role, User } from './interfaces/user.interface';
+import { UserDto } from '../common/dto/user.dto';
+import { UsersService } from '../common/users.service';
+import { Role, User } from '../common/interfaces/user.interface';
 import { EmailService } from "../email/email.service";
 import { Template } from "../email/interfaces/email.interface";
 

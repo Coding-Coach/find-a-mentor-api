@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MentorsController } from './mentors.controller';
-import { MentorsService } from './mentors.service';
-import { UsersModule } from '../users/users.module';
+import { CommonModule } from '../common/common.module';
+import { MentorsService } from '../common/mentors.service';
+import { UsersService } from '../common/users.service';
 import { DatabaseModule } from '../../database/database.module';
-import { applicationProviders } from './mentors.providers';
 import { EmailService } from '../email/email.service';
 
 /**
@@ -12,8 +12,8 @@ import { EmailService } from '../email/email.service';
  * by submiting their profiles for review
  */
 @Module({
-  imports: [DatabaseModule, UsersModule, EmailService],
+  imports: [DatabaseModule, CommonModule, EmailService],
   controllers: [MentorsController],
-  providers: [MentorsService, EmailService, ...applicationProviders],
+  providers: [MentorsService, EmailService, UsersService],
 })
 export class MentorsModule { }
