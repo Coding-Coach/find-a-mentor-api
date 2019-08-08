@@ -89,4 +89,8 @@ export class MentorsService {
   async findApplicationById(id: string): Promise<Application> {
     return await this.applicationModel.findOne({ _id: id }).exec();
   }
+
+  async removeAllApplicationsByUserId(user: string) {
+    return await this.applicationModel.deleteMany({ user }).exec();
+  }
 }

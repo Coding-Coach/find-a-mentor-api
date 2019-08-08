@@ -5,6 +5,7 @@ import fetch from 'node-fetch';
 import Config from '../../config';
 import { UserDto } from '../common/dto/user.dto';
 import { UsersService } from '../common/users.service';
+import { MentorsService } from '../common/mentors.service';
 import { Role, User } from '../common/interfaces/user.interface';
 import { EmailService } from "../email/email.service";
 import { Template } from "../email/interfaces/email.interface";
@@ -17,6 +18,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly emailService: EmailService,
+    private readonly mentorService: MentorsService,
   ) { }
 
   @ApiOperation({ title: 'Return all registered users' })
@@ -165,6 +167,7 @@ export class UsersController {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
+    await this.mentorService.removeAllApplicationsByUserId(params.id);
     const res: any = await this.usersService.remove(params.id);
 
     return {
