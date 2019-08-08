@@ -12,7 +12,7 @@
     "start:debug": "nodemon --config nodemon-debug.json",
     "prestart:prod": "rimraf dist && npm run build",
     "start:prod": "node dist/main.js",
-    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "lint": "tslint -p tsconfig.json -c tslint.json 'src/**/*.ts'",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

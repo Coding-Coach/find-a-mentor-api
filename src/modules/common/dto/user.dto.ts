@@ -1,5 +1,5 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { 
+import {
   IsEmail,
   IsUrl,
   IsIn,
@@ -51,7 +51,7 @@ export class UserDto {
   @ApiModelPropertyOptional()
   @IsOptional()
   @IsString({
-    each: true
+    each: true,
   })
   readonly spokenLanguages: string[];
 
@@ -60,7 +60,7 @@ export class UserDto {
   @ArrayMinSize(1)
   @ArrayMaxSize(5)
   @IsString({
-    each: true
+    each: true,
   })
   readonly tags: string[];
 

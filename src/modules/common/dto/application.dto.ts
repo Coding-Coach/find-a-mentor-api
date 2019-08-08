@@ -16,7 +16,7 @@ export class ApplicationDto {
   @IsString()
   @Length(3, 200)
   readonly description: string;
-  
+
   @ApiModelProperty()
   @IsString()
   @Length(3, 200)

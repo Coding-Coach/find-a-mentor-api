@@ -1,15 +1,28 @@
-import { Controller, Get, Put, Post, Query, Req, Body, Param, UsePipes, ValidationPipe, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+  UnauthorizedException,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { MentorsService } from './mentors.service';
-import { UsersService } from '../users/users.service';
-import { MentorFiltersDto } from './dto/mentorfilters.dto';
-import { ApplicationDto } from './dto/application.dto';
-import { User, Role } from '../users/interfaces/user.interface';
-import { Application, Status } from './interfaces/application.interface';
-import { UserDto } from '../users/dto/user.dto';
-import { EmailService } from "../email/email.service";
-import { Template } from "../email/interfaces/email.interface";
+import { MentorsService } from '../common/mentors.service';
+import { UsersService } from '../common/users.service';
+import { MentorFiltersDto } from '../common/dto/mentorfilters.dto';
+import { ApplicationDto } from '../common/dto/application.dto';
+import { User, Role } from '../common/interfaces/user.interface';
+import { Application, Status } from '../common/interfaces/application.interface';
+import { UserDto } from '../common/dto/user.dto';
+import { EmailService } from '../email/email.service';
+import { Template } from '../email/interfaces/email.interface';
 
 @ApiUseTags('/mentors')
 @Controller('mentors')
@@ -87,8 +100,8 @@ export class MentorsController {
       to: user.email,
       templateId: Template.MENTOR_APPLICATION_RECEIVED,
     };
-    
-    this.emailService.send(emailData)
+
+    this.emailService.send(emailData);
 
     return {
       success: true,
@@ -126,25 +139,24 @@ export class MentorsController {
       _id: application.user,
       roles: [...user.roles, Role.MENTOR],
     });
-    
-    
+
     const res: any = await this.mentorsService.updateApplication(applicationDto);
 
     this.usersService.update(userDto);
 
-    let templateId = null
+    let templateId = null;
     if (applicationDto.status === Status.REJECTED) {
-      templateId = Template.MENTOR_APPLICATION_REJECTED
+      templateId = Template.MENTOR_APPLICATION_REJECTED;
     } else {
-      templateId = Template.MENTOR_APPLICATION_APPROVED
+      templateId = Template.MENTOR_APPLICATION_APPROVED;
     }
 
     const emailData = {
       to: userDto.email,
       templateId,
     };
-    
-    this.emailService.send(emailData)
+
+    this.emailService.send(emailData);
 
     return {
       success: res.ok === 1,

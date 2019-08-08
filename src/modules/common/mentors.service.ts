@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Query, Model } from 'mongoose';
 import { MentorFiltersDto } from './dto/mentorfilters.dto';
 import { ApplicationDto } from './dto/application.dto';
-import { User } from '../users/interfaces/user.interface';
+import { User } from './interfaces/user.interface';
 import { Application, Status } from './interfaces/application.interface';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class MentorsService {
    * Search for mentors by the given filters
    * @param filters filters to apply
    */
-  async findAll(filters: MentorFiltersDto, loggedIn: Boolean): Promise<User[]> {
+  async findAll(filters: MentorFiltersDto, loggedIn: boolean): Promise<User[]> {
     const onlyMentors: any = {
       roles: 'Mentor',
     };
@@ -85,8 +85,12 @@ export class MentorsService {
   async findActiveApplicationByUser(user: User): Promise<Application> {
     return await this.applicationModel.findOne({ user: user._id, status: { $in: [Status.PENDING, Status.APPROVED]} }).exec();
   }
-  
+
   async findApplicationById(id: string): Promise<Application> {
     return await this.applicationModel.findOne({ _id: id }).exec();
+  }
+
+  async removeAllApplicationsByUserId(user: string) {
+    return await this.applicationModel.deleteMany({ user }).exec();
   }
 }

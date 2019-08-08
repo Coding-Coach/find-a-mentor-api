@@ -3,11 +3,11 @@ import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import '../config/env';
 import { UsersModule } from '../../src/modules/users/users.module';
-import { UsersService } from '../../src/modules/users/users.service';
+import { UsersService } from '../../src/modules/common/users.service';
 
 describe('Users', () => {
   let app: INestApplication;
-  let usersService = {findAll: () => [{ id: 1, name: 'John' }]};
+  const usersService = {findAll: () => [{ id: 1, name: 'John' }]};
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({

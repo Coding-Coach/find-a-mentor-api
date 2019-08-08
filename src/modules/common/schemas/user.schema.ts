@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { ChannelName } from '../interfaces/user.interface'
+import { ChannelName } from '../interfaces/user.interface';
 
 export const ChannelSchema = new mongoose.Schema({
   type: {
@@ -11,7 +11,7 @@ export const ChannelSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-})
+});
 
 export const UserSchema = new mongoose.Schema({
   auth0Id: {

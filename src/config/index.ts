@@ -22,7 +22,7 @@ const config = {
   },
   email: {
     FROM: 'Coding Coach <no-reply@mail.codingcoach.io>',
-  }
+  },
 };
 
 export default config;

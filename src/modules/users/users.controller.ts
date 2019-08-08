@@ -3,11 +3,12 @@ import { ApiBearerAuth, ApiImplicitParam, ApiOperation, ApiUseTags } from '@nest
 import { Request } from 'express';
 import fetch from 'node-fetch';
 import Config from '../../config';
-import { UserDto } from './dto/user.dto';
-import { UsersService } from './users.service';
-import { Role, User } from './interfaces/user.interface';
-import { EmailService } from "../email/email.service";
-import { Template } from "../email/interfaces/email.interface";
+import { UserDto } from '../common/dto/user.dto';
+import { UsersService } from '../common/users.service';
+import { MentorsService } from '../common/mentors.service';
+import { Role, User } from '../common/interfaces/user.interface';
+import { EmailService } from '../email/email.service';
+import { Template } from '../email/interfaces/email.interface';
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -17,6 +18,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly emailService: EmailService,
+    private readonly mentorService: MentorsService,
   ) { }
 
   @ApiOperation({ title: 'Return all registered users' })
@@ -49,7 +51,7 @@ export class UsersController {
           const userDto: UserDto = new UserDto({
             _id: existingMentor._id,
             auth0Id: userId,
-          })
+          });
 
           await this.usersService.update(userDto);
 
@@ -76,7 +78,7 @@ export class UsersController {
             templateId: Template.WELCOME_MESSAGE,
           };
 
-          this.emailService.send(emailData)
+          this.emailService.send(emailData);
 
           return {
             success: true,
@@ -165,6 +167,7 @@ export class UsersController {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
+    await this.mentorService.removeAllApplicationsByUserId(params.id);
     const res: any = await this.usersService.remove(params.id);
 
     return {
