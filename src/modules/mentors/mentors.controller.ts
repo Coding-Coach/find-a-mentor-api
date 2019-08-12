@@ -72,13 +72,24 @@ export class MentorsController {
     };
   }
 
-  @Get('myapplications')
-  @ApiOperation({ title: 'Retrieve applications for the current user' })
+  @Get(':id/applications')
+  @ApiOperation({ title: 'Retrieve applications for the given user' })
   @ApiBearerAuth()
-  async myApplications(@Req() request: Request, @Query('status') status: string) {
+  async myApplications(@Req() request: Request, @Param('id') userId: string, @Query('status') status: string) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+    const user: User = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    // Only current user or admin can get applications
+    if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException('Not authorized to perform this operation');
+    }
+
     const filters: any = {
-      user: current._id,
+      user: user._id,
     };
 
     if (status) {
