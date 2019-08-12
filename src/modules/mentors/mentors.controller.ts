@@ -72,10 +72,10 @@ export class MentorsController {
     };
   }
 
-  @Get(':id/applications')
+  @Get(':userId/applications')
   @ApiOperation({ title: 'Retrieve applications for the given user' })
   @ApiBearerAuth()
-  async myApplications(@Req() request: Request, @Param('id') userId: string, @Query('status') status: string) {
+  async myApplications(@Req() request: Request, @Param('userId') userId: string, @Query('status') status: string) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
     const user: User = await this.usersService.findById(userId);
 
