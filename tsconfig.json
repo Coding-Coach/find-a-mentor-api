@@ -11,6 +11,7 @@
     "baseUrl": "./"
   },
   "files": [
+    "src/main.ts",
     "src/utils/request.d.ts"
   ],
   "exclude": ["node_modules"]
