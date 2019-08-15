@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
 dotenv.config();
 
 import { NestFactory } from '@nestjs/core';
@@ -15,6 +16,12 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, options);
+
+  if (process.env.NODE_ENV === 'development') {
+    // We want to get the swagger docs only on development
+    fs.writeFileSync('./docs/cc-api-spec.json', JSON.stringify(document));
+  }
+
   SwaggerModule.setup('/docs', app, document);
 
   await app.listen(process.env.PORT || 3000);
