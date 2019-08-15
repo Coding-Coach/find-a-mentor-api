@@ -19,7 +19,7 @@ async function bootstrap() {
 
   if (process.env.NODE_ENV === 'development') {
     // We want to get the swagger docs only on development
-    document.schemes = ['https'];
+    document.schemes = ['https', 'http'];
     fs.writeFileSync('./docs/cc-api-spec.json', JSON.stringify(document));
   }
 
