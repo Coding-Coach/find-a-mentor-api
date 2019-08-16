@@ -16,29 +16,11 @@ export class MentorsService {
    * Search for mentors by the given filters
    * @param filters filters to apply
    */
-  async findAll(filters: MentorFiltersDto, loggedIn: boolean): Promise<User[]> {
+  async findAll(filters: MentorFiltersDto, isLoggedIn: boolean): Promise<User[]> {
     const onlyMentors: any = {
       roles: 'Mentor',
     };
-    let projections: any = {
-      name: true,
-      avatar: true,
-      title: true,
-      description: true,
-      createdAt: true,
-      tags: true,
-      country: true,
-      spokenLanguages: true,
-    };
-
-    // We need to return channels for logged in users only
-    if (loggedIn) {
-      projections = {
-        ...projections,
-        email: true,
-        channels: true,
-      };
-    }
+    const projections = this.getMentorFields(isLoggedIn);
 
     if (filters.name) {
       onlyMentors.name = { $regex: filters.name, $options: 'i' };
@@ -108,7 +90,48 @@ export class MentorsService {
     return await this.applicationModel.findOne({ _id: id }).exec();
   }
 
+  /**
+   * Get a random mentor from the database
+   */
+  async findRandomMentor(isLoggedIn: boolean): Promise<User> {
+    const filter: any = { roles: 'Mentor' };
+    const projections = this.getMentorFields(isLoggedIn);
+
+    const total: number = await this.userModel.find(filter).countDocuments();
+    const random: number = Math.floor(Math.random() * total);
+
+    return await this.userModel
+      .findOne(filter)
+      .select(projections)
+      .skip(random)
+      .exec();
+  }
+
   async removeAllApplicationsByUserId(user: string) {
     return await this.applicationModel.deleteMany({ user }).exec();
+  }
+
+  getMentorFields(isLoggedIn: boolean): any {
+    let projections: any = {
+      name: true,
+      avatar: true,
+      title: true,
+      description: true,
+      createdAt: true,
+      tags: true,
+      country: true,
+      spokenLanguages: true,
+    };
+
+    // We need to return channels for logged in users only
+    if (isLoggedIn) {
+      projections = {
+        ...projections,
+        email: true,
+        channels: true,
+      };
+    }
+
+    return projections;
   }
 }

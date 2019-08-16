@@ -45,6 +45,17 @@ export class MentorsController {
     };
   }
 
+  @Get('featured')
+  @ApiOperation({ title: 'Retrieves a random mentor to be featured in the blog (or anywhere else)' })
+  async featured(@Req() request: Request) {
+    const data: User = await this.mentorsService.findRandomMentor(!!request.user);
+
+    return {
+      success: true,
+      data,
+    };
+  }
+
   @Get('applications')
   @ApiOperation({ title: 'Retrieve applications filter by the given status' })
   @ApiBearerAuth()
