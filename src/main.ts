@@ -11,7 +11,7 @@ async function bootstrap() {
   app.enableCors({origin: process.env.CORS_ORIGIN || 'https://mentors.codingcoach.io'});
   const options = new DocumentBuilder()
     .setTitle('Coding Coach')
-    .setDescription('A REST API to serve the content for the alpha site')
+    .setDescription('A REST API for the coding coach platform')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
@@ -19,6 +19,7 @@ async function bootstrap() {
 
   if (process.env.NODE_ENV === 'development') {
     // We want to get the swagger docs only on development
+    document.schemes = ['https', 'http'];
     fs.writeFileSync('./docs/cc-api-spec.json', JSON.stringify(document));
   }
 
