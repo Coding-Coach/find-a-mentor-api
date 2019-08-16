@@ -1,7 +1,8 @@
 import { ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
+import { PaginationDto } from './pagination.dto';
 
-export class MentorFiltersDto {
+export class MentorFiltersDto extends PaginationDto {
 
   @ApiModelPropertyOptional()
   @IsOptional()
@@ -18,8 +19,4 @@ export class MentorFiltersDto {
   @ApiModelPropertyOptional()
   @IsOptional()
   readonly name: string;
-
-  constructor(values) {
-    Object.assign(this, values);
-  }
 }

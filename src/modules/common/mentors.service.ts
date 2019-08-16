@@ -40,6 +40,8 @@ export class MentorsService {
 
     return await this.userModel.find(onlyMentors)
       .select(projections)
+      .skip(filters.offset)
+      .limit(+filters.perpage)
       .exec();
   }
 
