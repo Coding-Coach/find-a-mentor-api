@@ -1,7 +1,7 @@
 
 ## Description
 
-A simple REST API to support [Coding Coach (alpha)](https://mentors.codingcoach.io/).
+A simple REST API to support the [Coding Coach mentors' app](https://mentors.codingcoach.io/).
 
 ## Installation
 
