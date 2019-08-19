@@ -22,7 +22,7 @@ import { User, Role } from '../common/interfaces/user.interface';
 import { Application, Status } from '../common/interfaces/application.interface';
 import { UserDto } from '../common/dto/user.dto';
 import { EmailService } from '../email/email.service';
-import { Template } from '../email/interfaces/email.interface';
+import { Template, SendDataRejectParams } from '../email/interfaces/email.interface';
 
 @ApiUseTags('/mentors')
 @Controller('mentors')
@@ -186,10 +186,13 @@ export class MentorsController {
     const emailData = {
       to: user.email,
       templateId,
+      dynamic_template_data: {
+        reason: data.reason,
+      },
     };
 
     const res: any = await this.mentorsService.updateApplication(applicationDto);
-    await this.emailService.send(emailData);
+    await this.emailService.send<SendDataRejectParams>(emailData);
 
     return {
       success: res.ok === 1,
