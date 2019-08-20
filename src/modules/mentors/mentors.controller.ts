@@ -134,12 +134,12 @@ export class MentorsController {
     });
 
     // Users can only apply once
-    if (application && application.status === Status.PENDING) {
-      throw new BadRequestException('You already applied, your application is in review.');
-    }
-
-    if (application && application.status === Status.APPROVED) {
-      throw new BadRequestException('You already applied, your application has been approved');
+    if (application) {
+      if (application.status === Status.PENDING) {
+        throw new BadRequestException('You already applied, your application is in review.');
+      } else if (application.status === Status.APPROVED) {
+        throw new BadRequestException('You already applied, your application has been approved');
+      }
     }
 
     await this.mentorsService.createApplication(applicationDto);
