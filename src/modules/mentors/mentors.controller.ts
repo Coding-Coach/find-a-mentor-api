@@ -23,6 +23,7 @@ import { Application, Status } from '../common/interfaces/application.interface'
 import { UserDto } from '../common/dto/user.dto';
 import { EmailService } from '../email/email.service';
 import { Template } from '../email/interfaces/email.interface';
+import { PaginationPipe } from '../common/pipes/pagination.pipe';
 
 @ApiUseTags('/mentors')
 @Controller('mentors')
@@ -36,8 +37,20 @@ export class MentorsController {
 
   @ApiOperation({ title: 'Return all mentors in the platform by the given filters' })
   @Get()
+  @UsePipes(new PaginationPipe())
   async index(@Req() request: Request, @Query() filters: MentorFiltersDto) {
     const data: User[] = await this.mentorsService.findAll(filters, !!request.user);
+
+    return {
+      success: true,
+      data,
+    };
+  }
+
+  @Get('featured')
+  @ApiOperation({ title: 'Retrieves a random mentor to be featured in the blog (or anywhere else)' })
+  async featured(@Req() request: Request) {
+    const data: User = await this.mentorsService.findRandomMentor(!!request.user);
 
     return {
       success: true,

@@ -23,6 +23,9 @@ const config = {
   email: {
     FROM: 'Coding Coach <no-reply@mail.codingcoach.io>',
   },
+  pagination: {
+    perPage: 20,
+  },
 };
 
 export default config;

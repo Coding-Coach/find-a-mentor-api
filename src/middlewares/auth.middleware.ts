@@ -20,6 +20,7 @@ const middleware = jwt({
  */
 const publicUrls = [
   '/mentors',
+  '/mentors/featured',
 ];
 
 @Injectable()
