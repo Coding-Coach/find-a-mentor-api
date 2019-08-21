@@ -21,7 +21,7 @@ export class PaginationPipe implements PipeTransform {
       return {
         ...value,
         page,
-        perpage: 0 + perpage,
+        perpage: parseInt(perpage, 10),
         offset,
       };
     }
