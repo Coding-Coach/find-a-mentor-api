@@ -5,7 +5,12 @@ export enum Template {
   MENTOR_APPLICATION_REJECTED = 'd-ad08366d02654587916a41bb3270afed',
 }
 
-export interface SendData {
+export interface SendData<T> {
   to: string;
   templateId: Template;
+  dynamic_template_data?: T;
+}
+
+export interface SendDataRejectParams {
+  reason: string;
 }
