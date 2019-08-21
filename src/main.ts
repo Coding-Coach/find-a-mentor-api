@@ -15,15 +15,17 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  const document = SwaggerModule.createDocument(app, options);
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV !== 'production') {
     // We want to get the swagger docs only on development
+    const document = SwaggerModule.createDocument(app, options);
+
     document.schemes = ['https', 'http'];
     fs.writeFileSync('./docs/cc-api-spec.json', JSON.stringify(document));
+    
+    SwaggerModule.setup('/docs', app, document);
   }
 
-  SwaggerModule.setup('/docs', app, document);
 
   await app.listen(process.env.PORT || 3000);
 }
