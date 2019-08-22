@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose';
 import * as countriesDb from 'i18n-iso-countries';
+import * as languagesDb from 'iso-639-1';
 import { ChannelName } from '../interfaces/user.interface';
 import { Filter } from '../dto/filter.dto';
 
@@ -50,7 +51,25 @@ UserSchema.statics.findUniqueCountries = async function (filters): Promise<Array
     .distinct('country');
 
   countries.sort().forEach((id) => {
-    const label = countriesDb.getName(id, 'en');
+    const label: string = countriesDb.getName(id, 'en');
+
+    if (label) {
+      result.push(new Filter({ id, label }));
+    }
+  });
+
+  return result;
+};
+
+UserSchema.statics.findUniqueLanguages = async function (filters): Promise<Array<Filter>> {
+  const result: Array<Filter> = [];
+
+  const languages = await this.find(filters)
+    .distinct('spokenLanguages');
+
+  languages.sort().forEach((id) => {
+    // @ts-ignore
+    const label: string = languagesDb.getName(id);
 
     if (label) {
       result.push(new Filter({ id, label }));

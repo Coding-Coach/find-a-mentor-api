@@ -39,8 +39,7 @@ export class MentorsService {
     }
 
     const countries = await this.userModel.findUniqueCountries(onlyMentors);
-    const languages = await this.userModel.find(onlyMentors)
-      .distinct('spokenLanguages');
+    const languages = await this.userModel.findUniqueLanguages(onlyMentors);
     const technologies = await this.userModel.find(onlyMentors)
       .distinct('tags');
 
@@ -55,7 +54,7 @@ export class MentorsService {
       mentors,
       filters: {
         countries,
-        languages: languages.sort(),
+        languages,
         technologies: technologies.sort(),
       },
     };
