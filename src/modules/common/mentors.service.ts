@@ -16,7 +16,7 @@ export class MentorsService {
    * Search for mentors by the given filters
    * @param filters filters to apply
    */
-  async findAll(filters: MentorFiltersDto, isLoggedIn: boolean): Promise<User[]> {
+  async findAll(filters: MentorFiltersDto, isLoggedIn: boolean) {
     const onlyMentors: any = {
       roles: 'Mentor',
     };
@@ -38,12 +38,27 @@ export class MentorsService {
       onlyMentors.spokenLanguages = filters.spokenLanguages;
     }
 
-    return await this.userModel.find(onlyMentors)
+    const countries = await this.userModel.findUniqueCountries(onlyMentors);
+    const languages = await this.userModel.find(onlyMentors)
+      .distinct('spokenLanguages');
+    const technologies = await this.userModel.find(onlyMentors)
+      .distinct('tags');
+
+    const mentors = await this.userModel.find(onlyMentors)
       .select(projections)
       .skip(filters.offset)
       .limit(filters.perpage)
       .sort({ created_at: 'desc' })
       .exec();
+
+    return {
+      mentors,
+      filters: {
+        countries,
+        languages: languages.sort(),
+        technologies: technologies.sort(),
+      },
+    };
   }
 
   async findApplications(filters): Promise<Application[]> {
