@@ -207,7 +207,12 @@ export class MentorsController {
     };
 
     const res: any = await this.mentorsService.updateApplication(applicationDto);
-    await this.emailService.send<SendDataRejectParams>(emailData);
+    try {
+      await this.emailService.send<SendDataRejectParams>(emailData);
+      await this.emailService.addMentor(user);
+    } catch (error) {
+      console.log(error);
+    }
 
     return {
       success: res.ok === 1,
