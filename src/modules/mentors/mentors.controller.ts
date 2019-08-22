@@ -40,11 +40,12 @@ export class MentorsController {
   @Get()
   @UsePipes(new PaginationPipe())
   async index(@Req() request: Request, @Query() filters: MentorFiltersDto) {
-    const data: User[] = await this.mentorsService.findAll(filters, !!request.user);
+    const data = await this.mentorsService.findAll(filters, !!request.user);
 
     return {
       success: true,
-      data,
+      filters: data.filters,
+      data: data.mentors,
     };
   }
 
