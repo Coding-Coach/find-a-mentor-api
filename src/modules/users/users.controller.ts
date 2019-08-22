@@ -142,6 +142,7 @@ export class UsersController {
     const userDto: UserDto = new UserDto({
       ...data,
       roles,
+      email: user.email,
       _id: user._id,
     });
     const res: any = await this.usersService.update(userDto);
