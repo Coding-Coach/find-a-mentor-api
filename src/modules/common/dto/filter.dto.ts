@@ -1,5 +1,5 @@
 
-export class Filter {
+export class FilterDto {
   readonly id: string;
   readonly label: string;
 

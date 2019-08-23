@@ -45,6 +45,7 @@ export class MentorsController {
     return {
       success: true,
       filters: data.filters,
+      pagination: data.pagination,
       data: data.mentors,
     };
   }
