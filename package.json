@@ -27,6 +27,7 @@
     "@nestjs/mongoose": "^6.1.2",
     "@nestjs/platform-express": "^6.0.0",
     "@nestjs/swagger": "^3.1.0",
+    "@sendgrid/client": "^6.4.0",
     "@sendgrid/mail": "^6.4.0",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.9.1",
