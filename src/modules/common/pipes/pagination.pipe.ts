@@ -8,11 +8,11 @@ export class PaginationPipe implements PipeTransform {
       let page = parseInt(value.page, 10);
       let perpage = parseInt(value.perpage, 10);
 
-      if (isNaN(page) || page <=0) {
+      if (isNaN(page) || page <= 0) {
         page = 1;
       }
       
-      if (isNaN(perpage) || perpage <=0) {
+      if (isNaN(perpage) || perpage <= 0) {
         perpage = Config.pagination.perPage;
       }
 
