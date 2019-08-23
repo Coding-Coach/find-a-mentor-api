@@ -211,7 +211,7 @@ export class MentorsController {
       await this.emailService.send<SendDataRejectParams>(emailData);
       await this.emailService.addMentor(user);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
 
     return {

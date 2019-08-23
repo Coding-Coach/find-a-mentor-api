@@ -5,9 +5,12 @@ import { SendData } from './interfaces/email.interface';
 import { Injectable } from '@nestjs/common';
 import { User } from '../common/interfaces/user.interface';
 
+const isProduction = process.env.NODE_ENV === 'production';
 const defaults = {
   from: Config.email.FROM,
 };
+
+const DEV_TESTING_LIST = '423467cd-c4bd-410c-ad52-adcd8dfbc389';
 
 @Injectable()
 export class EmailService {
@@ -24,7 +27,9 @@ export class EmailService {
   };
 
   static LIST_IDS = {
-    MENTORS: '3e581cd7-9b14-4486-933e-1e752557433f',
+    // We are adding all dev/testing contacts to a dev list, so we can remove them easly
+    MENTORS: isProduction ? '3e581cd7-9b14-4486-933e-1e752557433f' : DEV_TESTING_LIST,
+    NEWSLETTER: isProduction ? '6df91cab-90bd-4eaa-9710-c3804f8aba01' : DEV_TESTING_LIST,
   };
 
   async send<TemplateParams>(data: SendData<TemplateParams>) {
@@ -43,10 +48,14 @@ export class EmailService {
           email: contact.email,
           first_name: contact.name,
           country: contact.country,
+          custom_fields: {
+            // We can clean our list in SG with this field
+            e2_T: isProduction ? 'production' : 'development'
+          }
         }]
       }),
     };
-    
+
     return await sgClient.request(request);
   }
 }
