@@ -47,7 +47,7 @@ export class MentorsService {
       .select(projections)
       .skip(filters.offset)
       .limit(filters.perpage)
-      .sort({ created_at: 'desc' })
+      .sort({ createdAt: 'desc' })
       .exec();
 
     return {
