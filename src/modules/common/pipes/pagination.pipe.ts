@@ -6,22 +6,22 @@ export class PaginationPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata) {
     if (value && metadata.type === 'query') {
       let page = parseInt(value.page, 10);
-      let perpage = parseInt(value.perpage, 10);
+      let limit = parseInt(value.limit, 10);
 
       if (isNaN(page) || page <= 0) {
         page = 1;
       }
       
-      if (isNaN(perpage) || perpage <= 0) {
-        perpage = Config.pagination.perPage;
+      if (isNaN(limit) || limit <= 0) {
+        limit = Config.pagination.limit;
       }
 
-      const offset = (page - 1) * perpage;
+      const offset = (page - 1) * limit;
 
       return {
         ...value,
         page,
-        perpage,
+        limit,
         offset,
       };
     }

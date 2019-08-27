@@ -9,7 +9,7 @@ export class PaginationDto {
 
   @ApiModelPropertyOptional()
   @IsOptional()
-  readonly perpage: number;
+  readonly limit: number;
   
   readonly offset: number;
   
@@ -19,6 +19,6 @@ export class PaginationDto {
 
   constructor(values) {
     Object.assign(this, values);
-    this.hasMore = (values.offset + values.perpage) < values.total;
+    this.hasMore = (((values.page - 1) * values.limit) + values.limit) < values.total;
   }
 }

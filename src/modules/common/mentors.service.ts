@@ -47,7 +47,7 @@ export class MentorsService {
     const mentors: Array<User> = await this.userModel.find(onlyMentors)
       .select(projections)
       .skip(filters.offset)
-      .limit(filters.perpage)
+      .limit(filters.limit)
       .sort({ created_at: 'desc' })
       .exec();
 
@@ -56,7 +56,7 @@ export class MentorsService {
       pagination: new PaginationDto({
         total,
         page: filters.page,
-        perpage: filters.perpage
+        limit: filters.limit
       }),
       filters: {
         countries,
