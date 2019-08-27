@@ -1,6 +1,5 @@
 import { ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
-import Config from '../../../config';
 
 export class PaginationDto {
 
@@ -10,7 +9,16 @@ export class PaginationDto {
 
   @ApiModelPropertyOptional()
   @IsOptional()
-  readonly perpage: number;
+  readonly limit: number;
   
   readonly offset: number;
+  
+  readonly total: number;
+  
+  readonly hasMore: boolean;
+
+  constructor(values) {
+    Object.assign(this, values);
+    this.hasMore = (((values.page - 1) * values.limit) + values.limit) < values.total;
+  }
 }

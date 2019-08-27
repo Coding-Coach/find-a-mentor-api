@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 import * as countriesDb from 'i18n-iso-countries';
 import * as languagesDb from 'iso-639-1';
 import { ChannelName } from '../interfaces/user.interface';
-import { Filter } from '../dto/filter.dto';
+import { FilterDto } from '../dto/filter.dto';
 
 export const ChannelSchema = new mongoose.Schema({
   type: {
@@ -44,8 +44,8 @@ export const UserSchema = new mongoose.Schema({
 
 UserSchema.set('timestamps', true);
 
-UserSchema.statics.findUniqueCountries = async function (filters): Promise<Array<Filter>> {
-  const result: Array<Filter> = [];
+UserSchema.statics.findUniqueCountries = async function (filters): Promise<Array<FilterDto>> {
+  const result: Array<FilterDto> = [];
 
   const countries = await this.find(filters)
     .distinct('country');
@@ -54,15 +54,15 @@ UserSchema.statics.findUniqueCountries = async function (filters): Promise<Array
     const label: string = countriesDb.getName(id, 'en');
 
     if (label) {
-      result.push(new Filter({ id, label }));
+      result.push(new FilterDto({ id, label }));
     }
   });
 
   return result;
 };
 
-UserSchema.statics.findUniqueLanguages = async function (filters): Promise<Array<Filter>> {
-  const result: Array<Filter> = [];
+UserSchema.statics.findUniqueLanguages = async function (filters): Promise<Array<FilterDto>> {
+  const result: Array<FilterDto> = [];
 
   const languages = await this.find(filters)
     .distinct('spokenLanguages');
@@ -72,7 +72,7 @@ UserSchema.statics.findUniqueLanguages = async function (filters): Promise<Array
     const label: string = languagesDb.getName(id);
 
     if (label) {
-      result.push(new Filter({ id, label }));
+      result.push(new FilterDto({ id, label }));
     }
   });
 

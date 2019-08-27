@@ -5,23 +5,23 @@ import Config from '../../../config';
 export class PaginationPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata) {
     if (value && metadata.type === 'query') {
-      let page = value.page || 1;
-      let perpage = value.perpage || Config.pagination.perPage;
+      let page = parseInt(value.page, 10);
+      let limit = parseInt(value.limit, 10);
 
-      if (page <=0) {
+      if (isNaN(page) || page <= 0) {
         page = 1;
       }
       
-      if (perpage <=0) {
-        perpage = Config.pagination.perPage;
+      if (isNaN(limit) || limit <= 0) {
+        limit = Config.pagination.limit;
       }
 
-      const offset = (page - 1) * perpage;
+      const offset = (page - 1) * limit;
 
       return {
         ...value,
         page,
-        perpage: parseInt(perpage, 10),
+        limit,
         offset,
       };
     }
