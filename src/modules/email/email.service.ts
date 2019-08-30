@@ -50,9 +50,9 @@ export class EmailService {
           country: contact.country,
           custom_fields: {
             // We can clean our list in SG with this field
-            e2_T: isProduction ? 'production' : 'development'
-          }
-        }]
+            e2_T: isProduction ? 'production' : 'development',
+          },
+        }],
       }),
     };
 

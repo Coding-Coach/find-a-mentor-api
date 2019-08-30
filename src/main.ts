@@ -22,10 +22,9 @@ async function bootstrap() {
 
     document.schemes = ['https', 'http'];
     fs.writeFileSync('./docs/cc-api-spec.json', JSON.stringify(document));
-    
+
     SwaggerModule.setup('/docs', app, document);
   }
-
 
   await app.listen(process.env.PORT || 3000);
 }

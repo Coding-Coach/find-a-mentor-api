@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Query, Model } from 'mongoose';
 import { MentorFiltersDto } from './dto/mentorfilters.dto';
 import { ApplicationDto } from './dto/application.dto';
-import { FilterDto } from './dto/filter.dto'
+import { FilterDto } from './dto/filter.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { User } from './interfaces/user.interface';
 import { Application, Status } from './interfaces/application.interface';
@@ -40,11 +40,11 @@ export class MentorsService {
       onlyMentors.spokenLanguages = filters.spokenLanguages;
     }
 
-    const countries: Array<FilterDto> = await this.userModel.findUniqueCountries(onlyMentors);
-    const languages: Array<FilterDto> = await this.userModel.findUniqueLanguages(onlyMentors);
-    const technologies: Array<FilterDto> = await this.userModel.find(onlyMentors).distinct('tags');
+    const countries: FilterDto[] = await this.userModel.findUniqueCountries(onlyMentors);
+    const languages: FilterDto[] = await this.userModel.findUniqueLanguages(onlyMentors);
+    const technologies: FilterDto[] = await this.userModel.find(onlyMentors).distinct('tags');
     const total: number = await this.userModel.find(onlyMentors).countDocuments();
-    const mentors: Array<User> = await this.userModel.find(onlyMentors)
+    const mentors: User[] = await this.userModel.find(onlyMentors)
       .select(projections)
       .skip(filters.offset)
       .limit(filters.limit)
@@ -56,7 +56,7 @@ export class MentorsService {
       pagination: new PaginationDto({
         total,
         page: filters.page,
-        limit: filters.limit
+        limit: filters.limit,
       }),
       filters: {
         countries,
