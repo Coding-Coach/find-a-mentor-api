@@ -1,4 +1,6 @@
 
+[![Build Status](https://travis-ci.org/Coding-Coach/find-a-mentor-api.svg?branch=master)](https://travis-ci.org/Coding-Coach/find-a-mentor-api)
+
 ## Description
 
 A simple REST API to support the [Coding Coach mentors' app](https://mentors.codingcoach.io/).
@@ -42,7 +44,7 @@ $ yarn start:prod
 ```
 
 ## Endpoints
-We are using swagger to document the endpoints, after running the project just open your browser and go to http://localhost:3000/docs/
+We are using swagger to document the endpoints, you can find the current spec at https://api-staging.codingcoach.io/
 
 ## Test
 
