@@ -11,7 +11,7 @@ export class PaginationPipe implements PipeTransform {
       if (isNaN(page) || page <= 0) {
         page = 1;
       }
-      
+
       if (isNaN(limit) || limit <= 0) {
         limit = Config.pagination.limit;
       }

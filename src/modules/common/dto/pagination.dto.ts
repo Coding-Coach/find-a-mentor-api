@@ -10,11 +10,11 @@ export class PaginationDto {
   @ApiModelPropertyOptional()
   @IsOptional()
   readonly limit: number;
-  
+
   readonly offset: number;
-  
+
   readonly total: number;
-  
+
   readonly hasMore: boolean;
 
   constructor(values) {

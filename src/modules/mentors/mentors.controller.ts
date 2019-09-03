@@ -25,7 +25,6 @@ import { EmailService } from '../email/email.service';
 import { Template, SendDataRejectParams } from '../email/interfaces/email.interface';
 import { PaginationPipe } from '../common/pipes/pagination.pipe';
 
-
 @ApiUseTags('/mentors')
 @Controller('mentors')
 export class MentorsController {
@@ -212,7 +211,7 @@ export class MentorsController {
       await this.emailService.send<SendDataRejectParams>(emailData);
       await this.emailService.addMentor(user);
     } catch (error) {
-      console.error(error);
+      console.error(error); // tslint:disable-line no-console
     }
 
     return {
