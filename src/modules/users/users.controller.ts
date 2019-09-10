@@ -66,8 +66,6 @@ export class UsersController {
           const userDto: UserDto = new UserDto({
             auth0Id: userId,
             email: user.email,
-            name: user.nickname,
-            avatar: user.picture,
             roles: [Role.MEMBER],
           });
 
