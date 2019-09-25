@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import fetch from 'node-fetch';
 import Config from '../../config';
-import { response } from 'express';
 
 @Injectable()
 export class Auth0Service {

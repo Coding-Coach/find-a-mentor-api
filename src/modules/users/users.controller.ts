@@ -184,7 +184,7 @@ export class UsersController {
       return {
         success: false,
         error: error.message,
-      }
+      };
     }
   }
 

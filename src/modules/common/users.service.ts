@@ -7,7 +7,7 @@ import { isObjectId } from '../../utils/objectid';
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject('USER_MODEL') private readonly userModel: Model<User>
+    @Inject('USER_MODEL') private readonly userModel: Model<User>,
   ) { }
 
   async create(userDto: UserDto): Promise<User> {
