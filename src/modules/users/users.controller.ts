@@ -168,24 +168,24 @@ export class UsersController {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
-    // try {
-    //   // Remove all records from our database
-    //   await this.mentorService.removeAllApplicationsByUserId(params.id);
-    //   const res: any = await this.usersService.remove(params.id);
+    try {
+      // Remove all records from our database
+      await this.mentorService.removeAllApplicationsByUserId(params.id);
+      const res: any = await this.usersService.remove(params.id);
 
-    //   // Remove the user from auth0
-    //   const auth0: any = await this.auth0Service.getAdminAccessToken();
-    //   await this.auth0Service.deleteUser(auth0.access_token, user.auth0Id);
+      // Remove the user from auth0
+      const auth0: any = await this.auth0Service.getAdminAccessToken();
+      await this.auth0Service.deleteUser(auth0.access_token, user.auth0Id);
 
       return {
-        success: true, //res.ok === 1,
+        success: res.ok === 1,
       };
-    // } catch (error) {
-    //   return {
-    //     success: false,
-    //     error,
-    //   }
-    // }
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      }
+    }
   }
 
 }
