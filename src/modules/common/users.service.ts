@@ -1,15 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Query, Model } from 'mongoose';
 import { UserDto } from './dto/user.dto';
-import { Application } from './interfaces/application.interface';
 import { User } from './interfaces/user.interface';
 import { isObjectId } from '../../utils/objectid';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject('USER_MODEL') private readonly userModel: Model<User>,
-    @Inject('APPLICATION_MODEL') private readonly applicationModel: Model<Application>,
+    @Inject('USER_MODEL') private readonly userModel: Model<User>
   ) { }
 
   async create(userDto: UserDto): Promise<User> {

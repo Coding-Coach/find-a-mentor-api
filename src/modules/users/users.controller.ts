@@ -155,7 +155,7 @@ export class UsersController {
   @ApiOperation({ title: 'Deletes the given user' })
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Delete(':id')
-  async remove(@Req() request: Request, @Param() params) {
+  async remove(@Req() request, @Param() params) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
     const user: User = await this.usersService.findById(params.id);
 
@@ -163,29 +163,29 @@ export class UsersController {
       throw new BadRequestException('User not found');
     }
 
-    // Only own user or admins can remove the given user
-    if (!user._id.equals(current._id) && !current.roles.includes(Role.ADMIN)) {
-      throw new UnauthorizedException('Not authorized to perform this operation');
-    }
+    // // Only own user or admins can remove the given user
+    // if (!user._id.equals(current._id) && !current.roles.includes(Role.ADMIN)) {
+    //   throw new UnauthorizedException('Not authorized to perform this operation');
+    // }
 
-    try {
-      // Remove all records from our database
-      await this.mentorService.removeAllApplicationsByUserId(params.id);
-      const res: any = await this.usersService.remove(params.id);
+    // try {
+    //   // Remove all records from our database
+    //   await this.mentorService.removeAllApplicationsByUserId(params.id);
+    //   const res: any = await this.usersService.remove(params.id);
 
-      // Remove the user from auth0
-      const auth0: any = await this.auth0Service.getAdminAccessToken();
-      await this.auth0Service.deleteUser(auth0.access_token, user.auth0Id);
+    //   // Remove the user from auth0
+    //   const auth0: any = await this.auth0Service.getAdminAccessToken();
+    //   await this.auth0Service.deleteUser(auth0.access_token, user.auth0Id);
 
       return {
-        success: res.ok === 1,
+        success: true, //res.ok === 1,
       };
-    } catch (error) {
-      return {
-        success: false,
-        error,
-      }
-    }
+    // } catch (error) {
+    //   return {
+    //     success: false,
+    //     error,
+    //   }
+    // }
   }
 
 }
