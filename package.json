@@ -67,6 +67,7 @@
     "**/**/lodash": "^4.17.13"
   },
   "jest": {
+    "collectCoverage": true,
     "moduleFileExtensions": [
       "js",
       "json",
