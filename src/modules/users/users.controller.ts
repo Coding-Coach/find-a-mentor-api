@@ -163,10 +163,10 @@ export class UsersController {
       throw new BadRequestException('User not found');
     }
 
-    // // Only own user or admins can remove the given user
-    // if (!user._id.equals(current._id) && !current.roles.includes(Role.ADMIN)) {
-    //   throw new UnauthorizedException('Not authorized to perform this operation');
-    // }
+    // Only own user or admins can remove the given user
+    if (!user._id.equals(current._id) && !current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException('Not authorized to perform this operation');
+    }
 
     // try {
     //   // Remove all records from our database

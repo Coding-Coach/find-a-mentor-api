@@ -9,6 +9,17 @@ import { User } from '../../common/interfaces/user.interface';
 
 class ServiceMock {}
 
+class ObjectIdMock {
+  current: string;
+
+  constructor(current: string) {
+    this.current = current;
+  }
+  equals(value) {
+    return this.current === value.current;
+  }
+}
+
 describe('modules/users/UsersController', () => {
   let usersController: UsersController;
   let usersService: UsersService;
@@ -39,8 +50,8 @@ describe('modules/users/UsersController', () => {
   });
 
   it('should return success when removing a valid user', async () => {
-    usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: '123' }));
-    usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: '123' }));
+    usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('123'), roles: [] }));
+    usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('123') }));
 
     const request = {
       user: { auth0Id: '1234' },
@@ -52,7 +63,7 @@ describe('modules/users/UsersController', () => {
   });
   
   it('should throw an error when user not found', async () => {
-    usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: '123' }));
+    usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('123') }));
     usersService.findById = jest.fn(() => undefined);
 
     const request = {
@@ -63,5 +74,32 @@ describe('modules/users/UsersController', () => {
     await expect(usersController.remove(request, params))
       .rejects
       .toThrow(BadRequestException);
+  });
+
+  it('should throw an error if trying to remove other user', async () => {
+    usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('123'), roles: [] }));
+    usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('456') }));
+
+    const request = {
+      user: { auth0Id: '1234' },
+    };
+    const params = { id: '123' };
+
+    await expect(usersController.remove(request, params))
+      .rejects
+      .toThrow(UnauthorizedException);
+  });
+
+  it('should remove other user if is admin', async () => {
+    usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('123'), roles: ['Admin'] }));
+    usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('456') }));
+
+    const request = {
+      user: { auth0Id: '1234' },
+    };
+    const params = { id: '123' };
+    const response = { success: true };
+
+    expect(await usersController.remove(request, params)).toEqual(response);
   });
 });
