@@ -1,10 +1,9 @@
 import { Controller, Get, Delete, Put, Body, Param, Req, UnauthorizedException, BadRequestException, ValidationPipe, UsePipes } from '@nestjs/common';
 import { ApiBearerAuth, ApiImplicitParam, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import fetch from 'node-fetch';
-import Config from '../../config';
 import { UserDto } from '../common/dto/user.dto';
 import { UsersService } from '../common/users.service';
+import { Auth0Service } from '../common/auth0.service';
 import { MentorsService } from '../common/mentors.service';
 import { Role, User } from '../common/interfaces/user.interface';
 import { EmailService } from '../email/email.service';
@@ -19,6 +18,7 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly emailService: EmailService,
     private readonly mentorService: MentorsService,
+    private readonly auth0Service: Auth0Service,
   ) { }
 
   @ApiOperation({ title: 'Return all registered users' })
@@ -40,8 +40,8 @@ export class UsersController {
 
     if (!currentUser) {
       try {
-        const data: any = await this.getAdminAccessToken();
-        const user: any = await this.getUserProfile(data.access_token, userId);
+        const data: any = await this.auth0Service.getAdminAccessToken();
+        const user: any = await this.auth0Service.getUserProfile(data.access_token, userId);
 
         // If the user couldn't be found by the auth0Id, try to see whether we
         // can find one by the email. If so, we have a mentor that was imported
@@ -155,7 +155,7 @@ export class UsersController {
   @ApiOperation({ title: 'Deletes the given user' })
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Delete(':id')
-  async remove(@Req() request: Request, @Param() params) {
+  async remove(@Req() request, @Param() params) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
     const user: User = await this.usersService.findById(params.id);
 
@@ -168,45 +168,24 @@ export class UsersController {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
-    await this.mentorService.removeAllApplicationsByUserId(params.id);
-    const res: any = await this.usersService.remove(params.id);
+    try {
+      // Remove all records from our database
+      await this.mentorService.removeAllApplicationsByUserId(params.id);
+      const res: any = await this.usersService.remove(params.id);
 
-    return {
-      success: res.ok === 1,
-    };
-  }
+      // Remove the user from auth0
+      const auth0: any = await this.auth0Service.getAdminAccessToken();
+      await this.auth0Service.deleteUser(auth0.access_token, user.auth0Id);
 
-  // Get an access token for the Auth0 Admin API
-  async getAdminAccessToken() {
-    const options = {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        client_id: Config.auth0.backend.CLIENT_ID,
-        client_secret: Config.auth0.backend.CLIENT_SECRET,
-        audience: `https://${Config.auth0.backend.DOMAIN}/api/v2/`,
-        grant_type: 'client_credentials',
-      }),
-    };
-
-    const response = await fetch(`https://${Config.auth0.backend.DOMAIN}/oauth/token`, options);
-    const json = await response.json();
-
-    return json;
-  }
-
-  // Get the user's profile from auth0
-  async getUserProfile(accessToken, userID) {
-    const options = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    };
-
-    const response = await fetch(`https://${Config.auth0.backend.DOMAIN}/api/v2/users/${userID}`, options);
-    const json = await response.json();
-
-    return json;
+      return {
+        success: res.ok === 1,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   }
 
 }
