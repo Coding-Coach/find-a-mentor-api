@@ -49,7 +49,7 @@ Before setting up the project, you will need to signup to the following third pa
 - [Auth0](https://auth0.com/signup), we use auth0 to handle authentication in the app.
 - [SendGrid](https://sendgrid.com/pricing/), we use this service to send emails, you can use the free tier.
 
-In order to setup the third party vendors, you will need to create a your `.env` file at the root folder. There's an `.env.example` file that you can use for reference. Just duplicate this file and name it `.env`.
+In order to setup the third party vendors, you will need to create your `.env` file at the root folder. There's an `.env.example` file that you can use for reference. Just duplicate this file and name it `.env`.
 
 ```bash
 $ cp .env.example .env
@@ -98,4 +98,17 @@ AUTH0_BACKEND_CLIENT_SECRET=client-secret-from-auth0
 
 And that's all! Your environment is ready to use Auth0 to authenticate users! 🎉
 
+### Configuring SendGrid
+We use sendgrid to send transactional emails, as well as managing our newsletter.
 
+After signing up for the free plan, in the left menu go to `Settings - API Keys` and click the `Create Create Api` button at the top.
+
+Give it a name to your new api key, select `Full Access` from the menu and click `Create & View` button.
+
+Make sure to copy the key and save it in a safe place (because SendGrid will not show this key again), then open your `.env` file an set the key value as follow:
+
+```
+SENDGRID_API_KEY=sendgrid-api-key-here
+```
+
+That's all! Now you can start sending emails from the app.
