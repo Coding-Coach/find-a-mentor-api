@@ -112,3 +112,51 @@ SENDGRID_API_KEY=sendgrid-api-key-here
 ```
 
 That's all! Now you can start sending emails from the app.
+
+## Setting up the database
+We use [mongodb](https://www.mongodb.com/) to store our data. You have a couple options here:
+
+1. [Download](https://www.mongodb.com/download-center/community) and install mongodb in your system
+2. Use [docker](https://www.docker.com/) to run mongo in a container, we provide a script to run it easily
+3. Use [AtlasDB](https://www.mongodb.com/cloud/atlas) for development (they have a free plan)
+
+
+### Installing mongodb
+This is the easiest way to run the app, as you only need to install mongo and then go to the next stop in this guide.
+
+### Using Docker
+If using docker, just run the container using docker compose:
+
+```bash
+$ docker-compose -f docker-compose-db.yml up -d
+```
+
+### Using Atlas
+If using AtlasDB, you will need to do some additional steps such as creating a new user, whitelisting your IP address and a couple other things, just follow the [documentation](https://docs.atlas.mongodb.com/connect-to-cluster/) and you should be good to go.
+
+Then update the `.env` file with the AtlasDB URL to connect to your cluster.
+
+```
+MONGO_DATABASE_URL=mongodb+srv://<user>:<password>@<your-custom-domain>.mongodb.net/test?retryWrites=true&w=majority
+```
+
+You will get this value from Atlas
+
+## Running the app
+After setting up the vendors and the database, all that's left is to install the dependencies using yarn and run the code!
+
+```
+$ yarn install
+$ yarn start:dev
+```
+
+That's all! The API should be up and running. You can take a look at the [API Documentation](https://api-staging.codingcoach.io/) to learn about the endpoinds we already have.
+
+
+## FAQ
+#### How can I update a user's role?
+By default new users are assigned the role of `Member`, in order to set a user as an `Admin`, all you have to do is run the following task in your terminal:
+
+```
+$ yarn user:roles --email crysfel@bleext.com --roles 'Admin,Member'
+```
