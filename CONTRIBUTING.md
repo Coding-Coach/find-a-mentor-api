@@ -13,13 +13,13 @@ Forking the project will create a copy of that project in your own GitHub accoun
 
 ### Updating your local
 
-In order to update your local environment to the latest version on `master`, you will have to pull the changes using the `upstream` repository, for example: `git pull upstream master`. This will pull all the new commits from the origin repository to your local environment.
+In order to update your local environment to the latest version on `master`, you will have to pull the changes using the `upstream` repository, for example: `git pull upstream master`. This will pull all the new commits from the upstream repository to your local environment.
 
 ### Features/Bugs
 
-When working on a new feature, create a new branch `feature/something` from the `develop` branch, for example `feature/login-form`. Commit your work against this new branch and push everything to your forked project. Once everything is completed, you should create a PR to the original project. Make sure to add a description about your work.
+When working on a new feature, create a new branch `feature/something` from the `master` branch, for example `feature/login-form`. Commit your work against this new branch and push everything to your forked project. Once everything is completed, you should create a PR to the original project. Make sure to add a description about your work.
 
-When fixing a bug, create a new branch `fix/something` from the `develop` branch, for example `fix/css-btn-issues`. When completed, push your commits to your forked repository and create a PR from there. Please make sure to describe what was the problem and how did you fix it.
+When fixing a bug, create a new branch `fix/something` from the `master` branch, for example `fix/date-format`. When completed, push your commits to your forked repository and create a PR from there. Please make sure to describe what was the problem and how did you fix it.
 
 ### Updating your local branch
 
@@ -122,7 +122,7 @@ We use [mongodb](https://www.mongodb.com/) to store our data. You have a couple 
 
 
 ### Installing mongodb
-This is the easiest way to run the app, as you only need to install mongo and then go to the next stop in this guide.
+This is the easiest way to run the app, as you only need to install mongo and then go to the next step in this guide.
 
 ### Using Docker
 If using docker, just run the container using docker compose:
@@ -160,3 +160,5 @@ By default new users are assigned the role of `Member`, in order to set a user a
 ```
 $ yarn user:roles --email crysfel@bleext.com --roles 'Admin,Member'
 ```
+
+Or, you can always update the database directly 🤓
