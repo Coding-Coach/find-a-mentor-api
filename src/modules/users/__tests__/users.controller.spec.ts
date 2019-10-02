@@ -49,6 +49,7 @@ describe('modules/users/UsersController', () => {
     usersController = module.get<UsersController>(UsersController);
     mentorsService = module.get<MentorsService>(MentorsService);
     auth0Service = module.get<Auth0Service>(Auth0Service);
+    emailService = module.get<EmailService>(EmailService);
   });
 
   it('should return success when removing a valid user', async () => {
@@ -67,7 +68,7 @@ describe('modules/users/UsersController', () => {
 
     expect(await usersController.remove(request, params)).toEqual(response);
   });
-  
+
   it('should throw an error when user not found', async () => {
     const request = {
       user: { auth0Id: '1234' },
@@ -106,12 +107,33 @@ describe('modules/users/UsersController', () => {
     usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(request.user.auth0Id), roles: ['Admin'] }));
     usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }));
     usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
+    emailService.send = jest.fn();
     mentorsService.removeAllApplicationsByUserId = jest.fn(() => Promise.resolve());
     auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({}));
     auth0Service.deleteUser = jest.fn(() => Promise.resolve());
 
     expect(await usersController.remove(request, params)).toEqual(response);
   });
+
+  it('should send email if user is deleted by admin', async () => {
+    const request = {
+      user: { auth0Id: '1234' },
+    };
+    const params = { id: '5678' };
+    const response = { success: true };
+
+    usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(request.user.auth0Id), roles: ['Admin'] }));
+    usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }));
+    usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
+    emailService.send = jest.fn();
+    mentorsService.removeAllApplicationsByUserId = jest.fn(() => Promise.resolve());
+    auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({}));
+    auth0Service.deleteUser = jest.fn(() => Promise.resolve());
+
+    expect(await usersController.remove(request, params)).toEqual(response);
+    expect(emailService.send).toHaveBeenCalled();
+  });
+
 
   it('should remove all previous applications', async () => {
     const request = {

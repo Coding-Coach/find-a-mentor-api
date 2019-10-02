@@ -172,6 +172,17 @@ export class UsersController {
       // Remove all records from our database
       await this.mentorService.removeAllApplicationsByUserId(params.id);
       const res: any = await this.usersService.remove(params.id);
+      if (res.ok && current.roles.includes(Role.ADMIN)) {
+        const emailData = {
+          to: user.email,
+          templateId: Template.USER_DELETED,
+          dynamic_template_data: {
+            reason: params.reason,
+          },
+        };
+
+        this.emailService.send(emailData);
+      }
 
       // Remove the user from auth0
       const auth0: any = await this.auth0Service.getAdminAccessToken();
