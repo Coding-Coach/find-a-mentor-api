@@ -172,6 +172,11 @@ export class UsersController {
       // Remove all records from our database
       await this.mentorService.removeAllApplicationsByUserId(params.id);
       const res: any = await this.usersService.remove(params.id);
+
+      // Remove the user from auth0
+      const auth0: any = await this.auth0Service.getAdminAccessToken();
+
+      // Send the eamil to the deleted user
       if (res.ok && current.roles.includes(Role.ADMIN)) {
         const emailData = {
           to: user.email,
@@ -180,12 +185,8 @@ export class UsersController {
             reason: params.reason,
           },
         };
-
         this.emailService.send(emailData);
       }
-
-      // Remove the user from auth0
-      const auth0: any = await this.auth0Service.getAdminAccessToken();
       await this.auth0Service.deleteUser(auth0.access_token, user.auth0Id);
 
       return {
