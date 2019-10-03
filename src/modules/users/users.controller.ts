@@ -175,8 +175,9 @@ export class UsersController {
 
       // Remove the user from auth0
       const auth0: any = await this.auth0Service.getAdminAccessToken();
+      await this.auth0Service.deleteUser(auth0.access_token, user.auth0Id);
 
-      // Send the eamil to the deleted user
+      // Send email to the deleted user
       if (res.ok && current.roles.includes(Role.ADMIN)) {
         const emailData = {
           to: user.email,
@@ -187,7 +188,6 @@ export class UsersController {
         };
         this.emailService.send(emailData);
       }
-      await this.auth0Service.deleteUser(auth0.access_token, user.auth0Id);
 
       return {
         success: res.ok === 1,
