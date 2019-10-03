@@ -34,7 +34,7 @@ export class UsersController {
 
   @ApiOperation({ title: 'Returns the current user' })
   @Get('current')
-  async currentUser(@Req() request: Request) {
+  async currentUser(@Req() request) {
     const userId: string = request.user.auth0Id;
     const currentUser: User = await this.usersService.findByAuth0Id(userId);
 

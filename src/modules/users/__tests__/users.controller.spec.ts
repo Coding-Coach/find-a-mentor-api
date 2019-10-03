@@ -60,6 +60,34 @@ describe('modules/users/UsersController', () => {
       expect(await usersController.index()).toEqual(response);
     })
   });
+  
+  describe('currentUser', () => {
+    it('should return the current user', async () => {
+      const request = { user: { auth0Id: '123' } };
+      const data: User = <User>({ _id: 123, name: 'Crysfel Villa'});
+      const response = { success: true, data };
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(data));
+
+      expect(await usersController.currentUser(request)).toEqual(response);
+    });
+
+    it('should create a new user', async () => {
+      const request = { user: { auth0Id: '123' } };
+      const data: User = <User>({ _id: '123', name: 'Crysfel Villa' });
+      const response = { success: true, data };
+
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(undefined));
+      usersService.findByEmail = jest.fn(() => Promise.resolve(undefined));
+      usersService.create = jest.fn(() => Promise.resolve(data));
+      emailService.send = jest.fn();
+      auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({ access_token: 'abc' }));
+      auth0Service.getUserProfile = jest.fn(() => Promise.resolve({ _id: '123' }));
+
+      expect(await usersController.currentUser(request)).toEqual(response);
+      expect(usersService.create).toHaveBeenCalled();
+      expect(emailService.send).toHaveBeenCalled();
+    });
+  });
 
   describe('remove', () => {
     it('should return success when removing a valid user', async () => {
