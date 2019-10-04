@@ -1,6 +1,5 @@
 import { Controller, Get, Delete, Put, Body, Param, Req, UnauthorizedException, BadRequestException, ValidationPipe, UsePipes } from '@nestjs/common';
 import { ApiBearerAuth, ApiImplicitParam, ApiOperation, ApiUseTags } from '@nestjs/swagger';
-import { Request } from 'express';
 import { UserDto } from '../common/dto/user.dto';
 import { UsersService } from '../common/users.service';
 import { Auth0Service } from '../common/auth0.service';
@@ -119,7 +118,7 @@ export class UsersController {
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Put(':id')
   @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true, whitelist: true }))
-  async update(@Req() request: Request, @Param() params, @Body() data: UserDto) {
+  async update(@Req() request, @Param() params, @Body() data: UserDto) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
     const user: User = await this.usersService.findById(params.id);
 
