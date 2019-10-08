@@ -18,7 +18,7 @@ export class MentorsService {
    * Search for mentors by the given filters
    * @param filters filters to apply
    */
-  async findAll(filters: MentorFiltersDto, isLoggedIn: boolean) {
+  async findAll(filters: MentorFiltersDto, isLoggedIn: boolean): Promise<any> {
     const onlyMentors: any = {
       roles: 'Mentor',
     };
