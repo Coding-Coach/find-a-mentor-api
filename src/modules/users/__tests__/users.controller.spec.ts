@@ -279,6 +279,7 @@ describe('modules/users/UsersController', () => {
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(request.user.auth0Id), roles: ['Admin'] }));
       usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }));
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
+      emailService.send = jest.fn();
       mentorsService.removeAllApplicationsByUserId = jest.fn(() => Promise.resolve());
       auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({}));
       auth0Service.deleteUser = jest.fn(() => Promise.resolve());
