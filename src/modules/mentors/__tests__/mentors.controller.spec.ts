@@ -84,7 +84,6 @@ describe('modules/mentors/MentorsController', () => {
       };
       mentorsService.findAll = jest.fn(() => Promise.resolve(testMentorsData));
       const data = await mentorsController.index(<Request>req, <MentorFiltersDto>testFilters);
-      expect(data.data).toBeInstanceOf(Array);
       expect(data.data).toMatchObject(testMentorsData.mentors);
       expect(data.success).toBe(true);
       expect(data.pagination).toBeTruthy();
@@ -102,7 +101,6 @@ describe('modules/mentors/MentorsController', () => {
       mentorsService.findRandomMentor = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(testMentor.id), auth0Id: 'abcd' }));
       const data = await mentorsController.featured(<Request>req);
       expect(data.success).toBe(true);
-      expect(data.data).toBeInstanceOf(Object);
       expect(data.data.auth0Id).toBe('abcd');
     });
   });
@@ -140,7 +138,6 @@ describe('modules/mentors/MentorsController', () => {
       mentorsService.findApplications = jest.fn(() => Promise.resolve(<Application[]>testApplication));
       const data = await mentorsController.applications(<Request>req, '');
       expect(data.success).toBe(true);
-      expect(data.data).toBeInstanceOf(Array);
       expect(data.data.length).toBe(2);
     });
 
@@ -158,7 +155,6 @@ describe('modules/mentors/MentorsController', () => {
       mentorsService.findApplications = jest.fn(() => Promise.resolve(<Application[]>testApplication));
       const data = await mentorsController.applications(<Request>req, 'Pending');
       expect(data.success).toBe(true);
-      expect(data.data).toBeInstanceOf(Array);
       expect(data.data.length).toBe(1);
     });
   });
@@ -198,7 +194,6 @@ describe('modules/mentors/MentorsController', () => {
       mentorsService.findApplications = jest.fn(() => Promise.resolve(<Application[]>testApplication));
       const data = await mentorsController.myApplications(req, '1234', 'Pending');
       expect(data.success).toBe(true);
-      expect(data.data).toBeInstanceOf(Array);
       expect(data.data).toMatchObject(testApplication);
     });
 
@@ -217,7 +212,6 @@ describe('modules/mentors/MentorsController', () => {
       mentorsService.findApplications = jest.fn(() => Promise.resolve(<Application[]>testApplication));
       const data = await mentorsController.myApplications(req, '1234', '');
       expect(data.success).toBe(true);
-      expect(data.data).toBeInstanceOf(Array);
       expect(data.data).toMatchObject(testApplication);
     });
   });
@@ -269,7 +263,7 @@ describe('modules/mentors/MentorsController', () => {
       mentorsService.createApplication = jest.fn(() => Promise.resolve(<ApplicationDto>testApplication));
       emailService.send = jest.fn();
       const data =  await mentorsController.applyToBecomeMentor(req, <ApplicationDto>testApplication);
-      expect(emailService.send).toHaveBeenCalled();
+      expect(emailService.send).toBeCalledTimes(1);
       expect(data.success).toBe(true);
     });
   });
@@ -338,10 +332,10 @@ describe('modules/mentors/MentorsController', () => {
       emailService.addMentor = jest.fn();
       mentorsService.updateApplication = jest.fn(() => Promise.resolve({ ok: 1 }));
       const data = await mentorsController.reviewApplication(req, '1234', <ApplicationDto>testApplication);
-      expect(emailService.send).toHaveBeenCalled();
-      expect(emailService.addMentor).toHaveBeenCalled();
+      expect(emailService.send).toBeCalledTimes(1)
+      expect(emailService.addMentor).toBeCalledTimes(1);
       expect(data.success).toBe(true);
-      expect(usersService.update).toHaveBeenCalled();
+      expect(usersService.update).toBeCalledTimes(1);
     });
 
     it('should successfully update user when status is rejected', async () => {
@@ -360,8 +354,8 @@ describe('modules/mentors/MentorsController', () => {
       emailService.addMentor = jest.fn();
       mentorsService.updateApplication = jest.fn(() => Promise.resolve({ ok: 1 }));
       const data = await mentorsController.reviewApplication(req, '1234', <ApplicationDto>testApplication);
-      expect(emailService.send).toHaveBeenCalled();
-      expect(emailService.addMentor).toHaveBeenCalled();
+      expect(emailService.send).toBeCalledTimes(1);
+      expect(emailService.addMentor).toBeCalledTimes(1);
       expect(data.success).toBe(true);
     });
   });
