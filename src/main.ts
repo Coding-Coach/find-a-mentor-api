@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 dotenv.config();
 
-import Config from './config'
+import Config from './config';
 import * as Sentry from '@sentry/node';
 Sentry.init({ dsn: Config.sentry.DSN });
 

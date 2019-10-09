@@ -42,7 +42,7 @@ export class UsersController {
     const response = {
       success: true,
       data: currentUser,
-    }
+    };
 
     if (!currentUser) {
       try {
@@ -60,7 +60,7 @@ export class UsersController {
           });
 
           await this.usersService.update(userDto);
-          response.data = existingMentor
+          response.data = existingMentor;
 
         } else {
           // If the user doesn't exist in the database we need
@@ -83,7 +83,7 @@ export class UsersController {
 
           this.emailService.send(emailData);
 
-          response.data = newUser
+          response.data = newUser;
         }
       } catch (error) {
         return {
@@ -93,7 +93,7 @@ export class UsersController {
       }
     }
 
-    Sentry.configureScope(function(scope) {
+    Sentry.configureScope(scope => {
       scope.setUser({
         id: response.data._id,
         email: response.data.email,
