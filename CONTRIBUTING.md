@@ -13,13 +13,13 @@ Forking the project will create a copy of that project in your own GitHub accoun
 
 ### Updating your local
 
-In order to update your local environment to the latest version on `master`, you will have to pull the changes using the `upstream` repository, for example: `git pull upstream master`. This will pull all the new commits from the origin repository to your local environment.
+In order to update your local environment to the latest version on `master`, you will have to pull the changes using the `upstream` repository, for example: `git pull upstream master`. This will pull all the new commits from the upstream repository to your local environment.
 
 ### Features/Bugs
 
-When working on a new feature, create a new branch `feature/something` from the `develop` branch, for example `feature/login-form`. Commit your work against this new branch and push everything to your forked project. Once everything is completed, you should create a PR to the original project. Make sure to add a description about your work.
+When working on a new feature, create a new branch `feature/something` from the `master` branch, for example `feature/login-form`. Commit your work against this new branch and push everything to your forked project. Once everything is completed, you should create a PR to the original project. Make sure to add a description about your work.
 
-When fixing a bug, create a new branch `fix/something` from the `develop` branch, for example `fix/css-btn-issues`. When completed, push your commits to your forked repository and create a PR from there. Please make sure to describe what was the problem and how did you fix it.
+When fixing a bug, create a new branch `fix/something` from the `master` branch, for example `fix/date-format`. When completed, push your commits to your forked repository and create a PR from there. Please make sure to describe what was the problem and how did you fix it.
 
 ### Updating your local branch
 
@@ -49,7 +49,7 @@ Before setting up the project, you will need to signup to the following third pa
 - [Auth0](https://auth0.com/signup), we use auth0 to handle authentication in the app.
 - [SendGrid](https://sendgrid.com/pricing/), we use this service to send emails, you can use the free tier.
 
-In order to setup the third party vendors, you will need to create a your `.env` file at the root folder. There's an `.env.example` file that you can use for reference. Just duplicate this file and name it `.env`.
+In order to setup the third party vendors, you will need to create your `.env` file at the root folder. There's an `.env.example` file that you can use for reference. Just duplicate this file and name it `.env`.
 
 ```bash
 $ cp .env.example .env
@@ -98,4 +98,67 @@ AUTH0_BACKEND_CLIENT_SECRET=client-secret-from-auth0
 
 And that's all! Your environment is ready to use Auth0 to authenticate users! 🎉
 
+### Configuring SendGrid
+We use sendgrid to send transactional emails, as well as managing our newsletter.
 
+After signing up for the free plan, in the left menu go to `Settings - API Keys` and click the `Create Create Api` button at the top.
+
+Give it a name to your new api key, select `Full Access` from the menu and click `Create & View` button.
+
+Make sure to copy the key and save it in a safe place (because SendGrid will not show this key again), then open your `.env` file an set the key value as follow:
+
+```
+SENDGRID_API_KEY=sendgrid-api-key-here
+```
+
+That's all! Now you can start sending emails from the app.
+
+## Setting up the database
+We use [mongodb](https://www.mongodb.com/) to store our data. You have a couple options here:
+
+1. [Download](https://www.mongodb.com/download-center/community) and install mongodb in your system
+2. Use [docker](https://www.docker.com/) to run mongo in a container, we provide a script to run it easily
+3. Use [AtlasDB](https://www.mongodb.com/cloud/atlas) for development (they have a free plan)
+
+
+### Installing mongodb
+This is the easiest way to run the app, as you only need to install mongo and then go to the next step in this guide.
+
+### Using Docker
+If using docker, just run the container using docker compose:
+
+```bash
+$ docker-compose -f docker-compose-db.yml up -d
+```
+
+### Using Atlas
+If using AtlasDB, you will need to do some additional steps such as creating a new user, whitelisting your IP address and a couple other things, just follow the [documentation](https://docs.atlas.mongodb.com/connect-to-cluster/) and you should be good to go.
+
+Then update the `.env` file with the AtlasDB URL to connect to your cluster.
+
+```
+MONGO_DATABASE_URL=mongodb+srv://<user>:<password>@<your-custom-domain>.mongodb.net/test?retryWrites=true&w=majority
+```
+
+You will get this value from Atlas
+
+## Running the app
+After setting up the vendors and the database, all that's left is to install the dependencies using yarn and run the code!
+
+```
+$ yarn install
+$ yarn start:dev
+```
+
+That's all! The API should be up and running. You can take a look at the [API Documentation](https://api-staging.codingcoach.io/) to learn about the endpoinds we already have.
+
+
+## FAQ
+#### How can I update a user's role?
+By default new users are assigned the role of `Member`, in order to set a user as an `Admin`, all you have to do is run the following task in your terminal:
+
+```
+$ yarn user:roles --email crysfel@bleext.com --roles 'Admin,Member'
+```
+
+Or, you can always update the database directly 🤓

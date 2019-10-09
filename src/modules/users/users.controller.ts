@@ -177,6 +177,18 @@ export class UsersController {
       const auth0: any = await this.auth0Service.getAdminAccessToken();
       await this.auth0Service.deleteUser(auth0.access_token, user.auth0Id);
 
+      // Send email to the deleted user
+      if (res.ok && current.roles.includes(Role.ADMIN)) {
+        const emailData = {
+          to: user.email,
+          templateId: Template.USER_DELETED,
+          dynamic_template_data: {
+            reason: params.reason,
+          },
+        };
+        this.emailService.send(emailData);
+      }
+
       return {
         success: res.ok === 1,
       };
