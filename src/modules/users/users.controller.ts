@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/node';
+
 import { Controller, Get, Delete, Put, Body, Param, Req, UnauthorizedException, BadRequestException, ValidationPipe, UsePipes } from '@nestjs/common';
 import { ApiBearerAuth, ApiImplicitParam, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -37,6 +39,10 @@ export class UsersController {
   async currentUser(@Req() request: Request) {
     const userId: string = request.user.auth0Id;
     const currentUser: User = await this.usersService.findByAuth0Id(userId);
+    const response = {
+      success: true,
+      data: currentUser,
+    };
 
     if (!currentUser) {
       try {
@@ -54,11 +60,8 @@ export class UsersController {
           });
 
           await this.usersService.update(userDto);
+          response.data = existingMentor;
 
-          return {
-            success: true,
-            data: existingMentor,
-          };
         } else {
           // If the user doesn't exist in the database we need
           // to add it because this is a new user. The initial
@@ -80,10 +83,7 @@ export class UsersController {
 
           this.emailService.send(emailData);
 
-          return {
-            success: true,
-            data: newUser,
-          };
+          response.data = newUser;
         }
       } catch (error) {
         return {
@@ -93,10 +93,15 @@ export class UsersController {
       }
     }
 
-    return {
-      success: true,
-      data: currentUser,
-    };
+    Sentry.configureScope(scope => {
+      scope.setUser({
+        id: response.data._id,
+        email: response.data.email,
+        username: response.data.name,
+      });
+    });
+
+    return response;
   }
 
   @ApiOperation({ title: 'Returns a single user by ID' })

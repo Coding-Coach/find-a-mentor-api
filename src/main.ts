@@ -2,6 +2,10 @@ import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 dotenv.config();
 
+import Config from './config';
+import * as Sentry from '@sentry/node';
+Sentry.init({ dsn: Config.sentry.DSN });
+
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
