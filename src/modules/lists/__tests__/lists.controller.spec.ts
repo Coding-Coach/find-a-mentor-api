@@ -7,7 +7,6 @@ import { List } from '../interfaces/list.interface';
 import { ListDto } from '../dto/list.dto';
 import { UsersService } from '../../common/users.service';
 import { Role, User } from '../../common/interfaces/user.interface';
-import { UserDto } from '../../common/dto/user.dto';
 
 class ServiceMock { }
 

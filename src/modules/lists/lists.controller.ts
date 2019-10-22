@@ -36,7 +36,7 @@ export class ListsController {
 
     const list: List = await this.listsService.createList({
       ...data,
-      user: <User>{ _id: user._id },
+      user: { _id: user._id } as User,
     });
 
     return {

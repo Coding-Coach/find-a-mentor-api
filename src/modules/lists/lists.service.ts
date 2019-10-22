@@ -10,7 +10,6 @@ export class ListsService {
   ) { }
 
   async createList(data: ListDto): Promise<List> {
-    console.log(data)
     const list = new this.listModel(data);
     return await list.save();
   }
