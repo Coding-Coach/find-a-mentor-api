@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { List } from './interfaces/list.interface';
+import { ListDto } from './dto/list.dto';
 
 @Injectable()
 export class ListsService {
@@ -8,7 +9,9 @@ export class ListsService {
     @Inject('LIST_MODEL') private readonly listModel: Model<List>,
   ) { }
 
-  async createList(): Promise<List> {
-    return Promise.resolve(<List>{});
+  async createList(data: ListDto): Promise<List> {
+    console.log(data)
+    const list = new this.listModel(data);
+    return await list.save();
   }
 }

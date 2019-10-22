@@ -1,10 +1,11 @@
-import { BadRequestException, Controller, Get, Post, Param, Req, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Param, Req, UnauthorizedException, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Role, User } from '../common/interfaces/user.interface';
 import { List } from './interfaces/list.interface';
 import { UsersService } from '../common/users.service';
 import { ListsService } from './lists.service';
+import { ListDto } from './dto/list.dto';
 
 @ApiUseTags('/users/:userid/lists')
 @ApiBearerAuth()
@@ -18,7 +19,8 @@ export class ListsController {
 
   @ApiOperation({ title: 'Creates a new mentor\'s list for the given user' })
   @Post()
-  async store(@Req() request: Request, @Param('userid') userId: string) {
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async store(@Req() request: Request, @Param('userid') userId: string, @Body() data: ListDto) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
     const user: User = await this.usersService.findById(userId);
 
@@ -32,11 +34,14 @@ export class ListsController {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
-    const list: List = await this.listsService.createList();
+    const list: List = await this.listsService.createList({
+      ...data,
+      user: <User>{ _id: user._id },
+    });
 
     return {
       success: true,
-      list,
+      list: { _id: list._id },
     };
   }
 
