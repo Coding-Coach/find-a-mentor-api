@@ -55,8 +55,8 @@ describe('modules/lists/ListsController', () => {
       listDto = new ListDto();
       request = { user: { auth0Id: '1234' } };
       response = { success: true, list: { _id: '12345' } };
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('1234'), roles: [Role.MEMBER, Role.ADMIN] }));
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('1234'), roles: [Role.MEMBER] }));
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER, Role.ADMIN] }));
+      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
       listsService.createList = jest.fn(() => Promise.resolve(<List>{ _id: '12345' }));
     });
 
@@ -78,13 +78,24 @@ describe('modules/lists/ListsController', () => {
     });
 
     it('should add a list for other users if current user is the Admin', async () => {
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('5678'), roles: [Role.MEMBER] }));
+      const _id = new ObjectIdMock('5678');
+      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id, roles: [Role.MEMBER] }));
 
       expect(await listsController.store(request, userId, listDto)).toEqual(response);
+      expect(listsService.createList).toHaveBeenCalledTimes(1);
+      expect(listsService.createList).toHaveBeenCalledWith({
+        ...listDto,
+        user: { _id },
+      });
     });
 
     it('should add a list for same user', async () => {
       expect(await listsController.store(request, userId, listDto)).toEqual(response);
+      expect(listsService.createList).toHaveBeenCalledTimes(1);
+      expect(listsService.createList).toHaveBeenCalledWith({
+        ...listDto,
+        user: { _id: new ObjectIdMock(userId) }
+      });
     });
   });
 });
