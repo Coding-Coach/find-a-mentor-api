@@ -4,8 +4,10 @@ import { Request } from 'express';
 import { ListsController } from '../lists.controller';
 import { ListsService } from '../lists.service';
 import { List } from '../interfaces/list.interface';
+import { ListDto } from '../dto/list.dto';
 import { UsersService } from '../../common/users.service';
 import { Role, User } from '../../common/interfaces/user.interface';
+import { UserDto } from '../../common/dto/user.dto';
 
 class ServiceMock { }
 
@@ -44,11 +46,13 @@ describe('modules/lists/ListsController', () => {
 
   describe('store', () => {
     let userId: string;
+    let listDto: ListDto;
     let request: any;
     let response: any;
 
     beforeEach(() => {
       userId = '1234'
+      listDto = new ListDto();
       request = { user: { auth0Id: '1234' } };
       response = { success: true, list: { _id: '12345' } };
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('1234'), roles: [Role.MEMBER, Role.ADMIN] }));
@@ -59,7 +63,7 @@ describe('modules/lists/ListsController', () => {
     it('should throw an error when user not found', async () => {
       usersService.findById = jest.fn(() => Promise.resolve(undefined));
 
-      await expect(listsController.store(<Request>request, userId))
+      await expect(listsController.store(<Request>request, userId, listDto))
         .rejects
         .toThrow(BadRequestException);
     });
@@ -68,7 +72,7 @@ describe('modules/lists/ListsController', () => {
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('1234'), roles: [Role.MEMBER] }));
       usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('5678'), roles: [Role.MEMBER] }));
 
-      await expect(listsController.store(<Request>request, userId))
+      await expect(listsController.store(<Request>request, userId, listDto))
         .rejects
         .toThrow(UnauthorizedException);
     });
@@ -76,11 +80,11 @@ describe('modules/lists/ListsController', () => {
     it('should add a list for other users if current user is the Admin', async () => {
       usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('5678'), roles: [Role.MEMBER] }));
 
-      expect(await listsController.store(request, userId)).toEqual(response);
+      expect(await listsController.store(request, userId, listDto)).toEqual(response);
     });
 
     it('should add a list for same user', async () => {
-      expect(await listsController.store(request, userId)).toEqual(response);
+      expect(await listsController.store(request, userId, listDto)).toEqual(response);
     });
   });
 });
