@@ -19,7 +19,7 @@ export class ApplicationDto {
 
   @ApiModelProperty()
   @IsString()
-  @Length(3, 200)
+  @Length(3, 400)
   readonly reason: string;
 
   constructor(values) {
