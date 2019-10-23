@@ -3,6 +3,7 @@ import { Query, Model } from 'mongoose';
 import { List } from './interfaces/list.interface';
 import { ListDto } from './dto/list.dto';
 import { User } from '../common/interfaces/user.interface';
+import { isObjectId } from '../../utils/objectid';
 
 @Injectable()
 export class ListsService {
@@ -30,5 +31,11 @@ export class ListsService {
    */
   async findFavoriteList(user: User): Promise<List> {
     return await this.listModel.findOne({ user: user._id, isFavorite: true }).exec();
+  }
+
+  async findByUserId(_id: string): Promise<List[]> {
+    if (isObjectId(_id)) {
+      return await this.listModel.find({user: {_id}}).exec();
+    }
   }
 }
