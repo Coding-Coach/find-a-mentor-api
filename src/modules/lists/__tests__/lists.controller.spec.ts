@@ -25,7 +25,7 @@ describe('modules/lists/ListsController', () => {
   let listsController: ListsController;
   let usersService: UsersService;
   let listsService: ListsService;
-  
+
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       controllers: [ListsController],
@@ -66,7 +66,7 @@ describe('modules/lists/ListsController', () => {
         .rejects
         .toThrow(BadRequestException);
     });
-    
+
     it('should throw an error when creating a list for other user', async () => {
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('1234'), roles: [Role.MEMBER] }));
       usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('5678'), roles: [Role.MEMBER] }));
@@ -97,4 +97,80 @@ describe('modules/lists/ListsController', () => {
       });
     });
   });
+
+  describe('myLists', () => {
+    let userId: string;
+    let listDto: ListDto;
+    let request: any;
+    let response: any;
+    const testUserList = [
+      {
+        public: true,
+        isFavourite: false,
+        _id: '1234',
+        user: "testUser",
+        name: 'Designers',
+        mentors: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        public: false,
+        isFavourite: false,
+        _id: '12345',
+        user: "testUser1",
+        name: 'Python Mentors',
+        mentors: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ]
+
+    beforeEach(() => {
+      userId = '1234'
+      listDto = new ListDto();
+      request = { user: { auth0Id: '1234' } };
+      response = { success: true, list: { _id: '12345' } };
+    });
+
+    it('should throw an error when user is not found', async () => {
+      usersService.findById = jest.fn(() => Promise.resolve(undefined));
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
+      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>testUserList));
+
+      await expect(listsController.myList(<Request>request, userId))
+        .rejects
+        .toThrow(BadRequestException);
+    });
+
+    it('should show all lists for a user both public and private if user is current user', async () => {
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
+      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
+      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>testUserList));
+      const response = await listsController.myList(<Request>request, userId);
+      expect(response.success).toBe(true);
+      expect(response.lists.length).toBe(2);
+      expect(response.lists).toMatchObject(testUserList)
+    });
+
+    it('should show all lists for a user both public and private if user is current admin', async () => {
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('54367'), roles: [Role.ADMIN] }));
+      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
+      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>testUserList));
+      const response = await listsController.myList(<Request>request, userId);
+      expect(response.success).toBe(true);
+      expect(response.lists.length).toBe(2);
+      expect(response.lists).toMatchObject(testUserList)
+    })
+
+    it('should show only public lists if user is not current user or admin', async () => {
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('54367'), roles: [Role.MEMBER] }));
+      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
+      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>testUserList));
+      const response = await listsController.myList(<Request>request, userId);
+      expect(response.success).toBe(true);
+      expect(response.lists.length).toBe(1);
+      expect(response.lists).toMatchObject([testUserList[0]])
+    })
+  })
 });
