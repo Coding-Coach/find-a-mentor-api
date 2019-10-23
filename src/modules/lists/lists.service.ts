@@ -37,5 +37,7 @@ export class ListsService {
     if (isObjectId(_id)) {
       return await this.listModel.find({user: {_id}}).exec();
     }
+
+    return Promise.resolve(null);
   }
 }

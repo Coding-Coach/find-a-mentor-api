@@ -19,6 +19,7 @@ export class UsersService {
     if (isObjectId(_id)) {
       return await this.userModel.findOne({ _id }).exec();
     }
+
     return Promise.resolve(null);
   }
 
