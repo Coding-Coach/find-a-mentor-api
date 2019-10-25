@@ -15,11 +15,10 @@ export class ListsService {
     return await list.save();
   }
 
-  async findByUserId(_id: string): Promise<List[]> {
+  async findByUserId({_id, public: isPublic }): Promise<List[]> {
     if (isObjectId(_id)) {
-      return await this.listModel.find({user: {_id}}).exec();
+      return await this.listModel.find({user: {_id}, public: {$in: isPublic}}).exec();
     }
-
     return Promise.resolve(null);
   }
 }
