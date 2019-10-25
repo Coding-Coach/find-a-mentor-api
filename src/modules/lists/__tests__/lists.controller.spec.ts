@@ -166,7 +166,7 @@ describe('modules/lists/ListsController', () => {
     it('should show only public lists if user is not current user or admin', async () => {
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('54367'), roles: [Role.MEMBER] }));
       usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
-      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>testUserList));
+      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[testUserList[0]]));
       const response = await listsController.myList(<Request>request, userId);
       expect(response.success).toBe(true);
       expect(response.lists.length).toBe(1);

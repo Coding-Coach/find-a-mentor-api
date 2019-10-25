@@ -55,20 +55,19 @@ export class ListsController {
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    let visibleList;
-    const lists: List[] = await this.listsService.findByUserId(userId);
+    let lists: List[];
 
     // Only current user and admins can view both private and public lists for a user
     if (current._id.equals(user._id) || current.roles.includes(Role.ADMIN)) {
-      visibleList = lists;
-    } else {
-      if (Array.isArray(lists)) {
-        visibleList = lists.filter(list => list.public === true);
-      }
+      lists = await this.listsService.findByUserId({ _id: userId, public: [true, false]});
     }
+    else{
+      lists = await this.listsService.findByUserId({ _id: userId, public: [true] });
+    }
+
     return {
       success: true,
-      lists: visibleList,
+      lists,
     };
   }
 
