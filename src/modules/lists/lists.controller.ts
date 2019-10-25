@@ -60,8 +60,7 @@ export class ListsController {
     // Only current user and admins can view both private and public lists for a user
     if (current._id.equals(user._id) || current.roles.includes(Role.ADMIN)) {
       lists = await this.listsService.findByUserId({ _id: userId, public: [true, false]});
-    }
-    else{
+    } else {
       lists = await this.listsService.findByUserId({ _id: userId, public: [true] });
     }
 
