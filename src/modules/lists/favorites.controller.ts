@@ -30,7 +30,7 @@ export class FavoritesController {
     }
 
     // Make sure mentor exist
-    if (!mentor) {
+    if (!mentor || !mentor.roles.includes(Role.MENTOR)) {
       throw new BadRequestException('Mentor not found');
     }
 
@@ -39,14 +39,38 @@ export class FavoritesController {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
-    const favorites = new ListDto({
-      name: 'Favorites',
-      isFavorite: true,
-      user: { _id: user._id } as User,
-      mentors: [{ _id: mentor._id } as User] 
-    });
+    // We can only have a single favorites list
+    const list: List = await this.listsService.findFavoriteList(user);
 
-    this.listsService.createList(favorites);
+    // If the favorites doesn't exist yet, we need to create it
+    if (!list) {
+      const favorites: ListDto = new ListDto({
+        name: 'Favorites',
+        isFavorite: true,
+        user: { _id: user._id } as User,
+        mentors: [{ _id: mentor._id } as User],
+      });
+
+      await this.listsService.createList(favorites);
+    } else {
+      let listDto: ListDto;
+
+      if (list.mentors.includes(mentor._id)) {
+        // If the mentor exist in the list we need to remove it
+        listDto = new ListDto({
+          _id: list._id,
+          mentors: list.mentors.filter(item => !item._id.equals(mentor._id)),
+        });
+      } else {
+        // If the mentor doesn't exist in the list we need to add it
+        listDto = new ListDto({
+          _id: list._id,
+          mentors: [...list.mentors, { _id: mentor._id }],
+        });
+      }
+
+      await this.listsService.update(listDto);
+    }
 
     return {
       success: true,
