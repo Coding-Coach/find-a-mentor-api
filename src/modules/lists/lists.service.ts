@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { List } from './interfaces/list.interface';
 import { ListDto } from './dto/list.dto';
-import { isObjectId } from '../../utils/objectid';
 
 @Injectable()
 export class ListsService {
@@ -15,10 +14,21 @@ export class ListsService {
     return await list.save();
   }
 
-  async findByUserId({_id, public: isPublic }): Promise<List[]> {
-    if (isObjectId(_id)) {
-      return await this.listModel.find({user: {_id}, public: {$in: isPublic}}).exec();
+  async findByUserId(params: any): Promise<List[]> {
+    const filters: any = {};
+    if (params.userId) {
+      filters.user = { _id: params.userId };
     }
-    return Promise.resolve(null);
+    if (params.public) {
+      filters.public = { public: params.public };
+    }
+
+    if (filters.public !== undefined) {
+      filters.public = params.public;
+    }
+
+    // TODO: Add more filters here later on (as we need them)
+
+    return await this.listModel.find(filters).exec();
   }
 }
