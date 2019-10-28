@@ -29,7 +29,20 @@ export class ListsService {
    * Find the favorite list for the given user
    */
   async findFavoriteList(user: User): Promise<List> {
-    return await this.listModel.findOne({ user: user._id, isFavorite: true }).exec();
+    return await this.listModel
+      .findOne({ user: user._id, isFavorite: true })
+      .select({ name: true, mentors: true })
+      .populate({
+        path: 'mentors',
+        select: [
+          'name',
+          'avatar',
+          'title',
+          'description',
+          'country',
+        ]
+      })
+      .exec();
   }
 
   /**

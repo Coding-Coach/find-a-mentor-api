@@ -17,6 +17,30 @@ export class FavoritesController {
     private readonly listsService: ListsService,
   ) { }
 
+  @ApiOperation({ title: 'Returns the favorite list for the given user' })
+  @Get()
+  async list(@Req() request: Request, @Param('userid') userId: string) {
+    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+    const user: User = await this.usersService.findById(userId);
+
+    // Make sure user exist
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    // Only admins or current user can get the favorites
+    if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException('Not authorized to perform this operation');
+    }
+
+    const data: List = await this.listsService.findFavoriteList(user);
+
+    return {
+      success: true,
+      data,
+    };
+  }
+
   @ApiOperation({ title: 'Adds or removes a mentor from the favorite list' })
   @Post(':mentorid')
   async toggle(@Req() request: Request, @Param('userid') userId: string, @Param('mentorid') mentorId: string) {

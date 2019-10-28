@@ -120,4 +120,54 @@ describe('modules/lists/FavoritesController', () => {
       expect(listsService.update).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('list', () => {
+    let userId: string;
+    let response: any;
+    let request: Request;
+    let list: List;
+    let user: User;
+
+    beforeEach(() => {
+      userId = '123';
+      list = <List>{ _id: 123, name: 'Favorites', mentors: [{ _id: 123, name: 'Sarah Doe' }, { _id: 456, name: 'John Doe' }] }
+      request = <Request>{ user: { auth0Id: '1234' } };
+      response = { success: true, data: list};
+      user = <User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] };
+
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(user));
+      usersService.findById = jest.fn(() => Promise.resolve(user));
+      listsService.findFavoriteList = jest.fn(() => Promise.resolve(list));
+    });
+
+    it('should throw an error when user doesnt exist', async () => {
+      usersService.findById = jest.fn(() => Promise.resolve(undefined));
+
+      await expect(favoritesController.list(request, userId))
+        .rejects
+        .toThrow(BadRequestException);
+    });
+
+    it('should throw an error when trying to get favorites from other user', async () => {
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('9843'), roles: [Role.MEMBER] }));      
+
+      await expect(favoritesController.list(request, userId))
+        .rejects
+        .toThrow(UnauthorizedException);
+    });
+
+    it('should return the favorites for any user to an admin', async () => {
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('9843'), roles: [Role.ADMIN] }));
+
+      expect(await favoritesController.list(request, userId)).toEqual(response);
+      expect(listsService.findFavoriteList).toHaveBeenCalledTimes(1);
+      expect(listsService.findFavoriteList).toHaveBeenCalledWith(user);
+    });
+
+    it('should return the favorites for the current user', async () => {
+      expect(await favoritesController.list(request, userId)).toEqual(response);
+      expect(listsService.findFavoriteList).toHaveBeenCalledTimes(1);
+      expect(listsService.findFavoriteList).toHaveBeenCalledWith(user);
+    });
+  });
 });
