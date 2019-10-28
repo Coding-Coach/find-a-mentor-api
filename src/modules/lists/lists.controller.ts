@@ -45,4 +45,29 @@ export class ListsController {
     };
   }
 
+  @ApiOperation({ title: 'Gets mentor\'s list for the given user' })
+  @Get()
+  async myList(@Req() request, @Param('userid') userId: string) {
+    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+    const user: User = await this.usersService.findById(userId);
+
+    // check if user exists
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    let lists: List[];
+
+    // Only current user and admins can view both private and public lists for a user
+    if (current._id.equals(user._id) || current.roles.includes(Role.ADMIN)) {
+      lists = await this.listsService.findByUserId({userId});
+    } else {
+      lists = await this.listsService.findByUserId({userId, public: true });
+    }
+
+    return {
+      success: true,
+      lists,
+    };
+  }
+
 }
