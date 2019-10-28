@@ -22,4 +22,8 @@ export class ListDto {
   readonly mentors: User[];
 
   readonly user: User;
+
+  constructor(values) {
+    Object.assign(this, values);
+  }
 }

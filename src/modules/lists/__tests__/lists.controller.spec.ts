@@ -51,7 +51,7 @@ describe('modules/lists/ListsController', () => {
 
     beforeEach(() => {
       userId = '1234'
-      listDto = new ListDto();
+      listDto = new ListDto({});
       request = { user: { auth0Id: '1234' } };
       response = { success: true, list: { _id: '12345' } };
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER, Role.ADMIN] }));
