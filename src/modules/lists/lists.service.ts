@@ -40,7 +40,7 @@ export class ListsService {
           'title',
           'description',
           'country',
-        ]
+        ],
       })
       .exec();
   }
