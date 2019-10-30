@@ -31,4 +31,25 @@ export class ListsService {
   async findFavoriteList(user: User): Promise<List> {
     return await this.listModel.findOne({ user: user._id, isFavorite: true }).exec();
   }
+
+  /**
+   * Return all lists for a given user
+   */
+  async findByUserId(params: any): Promise<List[]> {
+    const filters: any = {};
+    if (params.userId) {
+      filters.user = { _id: params.userId };
+    }
+    if (params.public) {
+      filters.public = { public: params.public };
+    }
+
+    if (filters.public !== undefined) {
+      filters.public = params.public;
+    }
+
+    // TODO: Add more filters here later on (as we need them)
+
+    return await this.listModel.find(filters).exec();
+  }
 }
