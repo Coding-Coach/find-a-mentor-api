@@ -79,7 +79,7 @@ export class FavoritesController {
     } else {
       let listDto: ListDto;
 
-      if (list.mentors.includes(mentor._id)) {
+      if (list.mentors.find(item => item._id.equals(mentor._id))) {
         // If the mentor exist in the list we need to remove it
         listDto = new ListDto({
           _id: list._id,
