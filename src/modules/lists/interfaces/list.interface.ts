@@ -6,6 +6,7 @@ export interface List extends Document {
   readonly user: ObjectID;
   readonly name: string;
   readonly public: boolean;
+  readonly isFavorite: boolean;
   readonly mentors: User[];
   readonly createdAt: Date;
   readonly updatedAt: Date;

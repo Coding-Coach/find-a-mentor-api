@@ -56,6 +56,9 @@ export class ListsService {
     if (params.public) {
       filters.public = { public: params.public };
     }
+    if (filters.listId) {
+      filters._id = { _id: params.listId };
+    }
 
     if (filters.public !== undefined) {
       filters.public = params.public;
