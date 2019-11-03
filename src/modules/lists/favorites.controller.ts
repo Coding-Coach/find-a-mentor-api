@@ -37,7 +37,7 @@ export class FavoritesController {
 
     return {
       success: true,
-      data,
+      data: data || [],
     };
   }
 
