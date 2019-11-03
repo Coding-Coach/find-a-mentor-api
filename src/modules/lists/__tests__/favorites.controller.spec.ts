@@ -173,7 +173,7 @@ describe('modules/lists/FavoritesController', () => {
     it('should return and empty array when there are no favorites', async () => {
       listsService.findFavoriteList = jest.fn(() => Promise.resolve(undefined));
 
-      expect(await favoritesController.list(request, userId)).toEqual({ success: true, data: [] });
+      expect(await favoritesController.list(request, userId)).toEqual({ success: true, data: { mentors: [] } });
       expect(listsService.findFavoriteList).toHaveBeenCalledTimes(1);
       expect(listsService.findFavoriteList).toHaveBeenCalledWith(user);
     });
