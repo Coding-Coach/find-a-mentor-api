@@ -34,11 +34,11 @@ export class FavoritesController {
     }
 
     const list: List = await this.listsService.findFavoriteList(user);
-    const data: List = list || <List>({ mentors: [] });
+    const data: List = list || ({ mentors: [] }) as List;
 
     return {
       success: true,
-      data: data,
+      data,
     };
   }
 
