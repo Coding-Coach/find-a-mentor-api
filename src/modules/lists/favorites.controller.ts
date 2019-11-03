@@ -33,11 +33,12 @@ export class FavoritesController {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
-    const data: List = await this.listsService.findFavoriteList(user);
+    const list: List = await this.listsService.findFavoriteList(user);
+    const data: List = list || ({ mentors: [] }) as List;
 
     return {
       success: true,
-      data: data || [],
+      data,
     };
   }
 
