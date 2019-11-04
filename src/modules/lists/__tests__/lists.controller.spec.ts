@@ -202,25 +202,16 @@ describe('modules/lists/ListsController', () => {
       listId = '12345';
       request = { user: { auth0Id: '1234' } };
     });
-    it('should throw an error when name is not provided', async () => {
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
-      const data: ListDto = {
-        public: true
-      }
-      await expect(listsController.updateList(<Request>request, userId, listId, data))
-        .rejects
-        .toThrow(BadRequestException);
-    });
 
     it('should throw an error when user is not found', async () => {
       usersService.findById = jest.fn(() => Promise.resolve(undefined));
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
-      const data: ListDto = {
+      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[]));
+      const data = {
         name: 'some random name',
         public: true
       }
-      await expect(listsController.updateList(<Request>request, userId, listId, data))
+      await expect(listsController.updateList(<Request>request, userId, listId, <ListDto>data))
         .rejects
         .toThrow(BadRequestException);
     });
@@ -228,12 +219,11 @@ describe('modules/lists/ListsController', () => {
     it('should throw an error when updating a list for other user', async () => {
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('1234'), roles: [Role.MEMBER] }));
       usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('5678'), roles: [Role.MEMBER] }));
-
-      const data: ListDto = {
+      const data = {
         name: 'some random name',
         public: true
       }
-      await expect(listsController.updateList(<Request>request, userId, listId, data))
+      await expect(listsController.updateList(<Request>request, userId, listId, <ListDto>data))
         .rejects
         .toThrow(UnauthorizedException);
     });
@@ -242,11 +232,11 @@ describe('modules/lists/ListsController', () => {
       usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
       listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[]));
-      const data: ListDto = {
+      const data = {
         name: 'some random name',
         public: true
       }
-      await expect(listsController.updateList(<Request>request, userId, listId, data))
+      await expect(listsController.updateList(<Request>request, userId, listId, <ListDto>data))
         .rejects
         .toThrow(BadRequestException);
     });
@@ -256,14 +246,15 @@ describe('modules/lists/ListsController', () => {
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
       listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[testUserList[1]]));
       listsService.update = jest.fn(() => Promise.resolve());
-      const data: ListDto = {
+      const data = {
         name: 'some random name',
         public: true
       };
-      await listsController.updateList(<Request>request, userId, listId, data);
+      await listsController.updateList(<Request>request, userId, listId, <ListDto>data);
       expect(listsService.update).toBeCalledTimes(1);
       expect(listsService.update).toHaveBeenCalledWith({
         _id: listId,
+        isFavorite: false,
         ...data
       });
 
