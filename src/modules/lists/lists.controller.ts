@@ -3,7 +3,6 @@ import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Role, User } from '../common/interfaces/user.interface';
 import { List } from './interfaces/list.interface';
-import { UpdateList } from './interfaces/updatelist.interface';
 import { UsersService } from '../common/users.service';
 import { ListsService } from './lists.service';
 import { ListDto } from './dto/list.dto';
@@ -73,14 +72,10 @@ export class ListsController {
 
   @ApiOperation({ title: 'Updates a given list' })
   @Put('/:listid')
-  async updateList(@Req() request: Request, @Param('userid') userId: string, @Param('listid') listId: string, @Body() data: UpdateList) {
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async updateList(@Req() request: Request, @Param('userid') userId: string, @Param('listid') listId: string, @Body() data: ListDto) {
     const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
     const user: User = await this.usersService.findById(userId);
-
-    // check if name is provided
-    if (!data.name) {
-      throw new BadRequestException('name not provided');
-    }
 
     // check if user exists
     if (!user) {
@@ -99,14 +94,11 @@ export class ListsController {
       throw new BadRequestException('list not found');
     }
 
-    // check if list is favourite
-    if (list[0].isFavorite) {
-      throw new BadRequestException('list not found');
-    }
 
     // update list
-    const listInfo: any = {
+    const listInfo: ListDto = {
       _id: listId,
+      isFavorite: false,
       ...data,
     };
 
