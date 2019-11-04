@@ -61,7 +61,7 @@ export class ListsService {
     }
 
     if (filters.isFavorite) {
-      filters.isFavorite = { isFavorite: params.isFavorite }
+      filters.isFavorite = { isFavorite: params.isFavorite };
     }
 
     if (filters.public !== undefined) {

@@ -94,7 +94,6 @@ export class ListsController {
       throw new BadRequestException('list not found');
     }
 
-
     // update list
     const listInfo: ListDto = {
       _id: listId,
