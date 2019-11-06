@@ -87,7 +87,7 @@ export class ListsController {
       throw new UnauthorizedException('Not authorized to perform this operation');
     }
 
-    const list: List[] = await this.listsService.findByUserId({userId, listId});
+    const list: List[] = await this.listsService.findByUserId({userId, listId, isFavorite: false});
 
     // check if list exists
     if (list.length < 1) {
@@ -97,7 +97,6 @@ export class ListsController {
     // update list
     const listInfo: ListDto = {
       _id: listId,
-      isFavorite: false,
       ...data,
     };
 

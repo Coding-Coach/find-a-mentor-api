@@ -254,7 +254,6 @@ describe('modules/lists/ListsController', () => {
       expect(listsService.update).toBeCalledTimes(1);
       expect(listsService.update).toHaveBeenCalledWith({
         _id: listId,
-        isFavorite: false,
         ...data
       });
 

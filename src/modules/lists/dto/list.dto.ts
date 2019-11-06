@@ -18,11 +18,6 @@ export class ListDto {
 
   @ApiModelPropertyOptional()
   @IsOptional()
-  @IsBoolean()
-  readonly isFavorite: boolean;
-
-  @ApiModelPropertyOptional()
-  @IsOptional()
   @IsArray()
   readonly mentors: User[];
 

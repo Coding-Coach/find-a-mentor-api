@@ -56,12 +56,12 @@ export class ListsService {
     if (params.public) {
       filters.public = { public: params.public };
     }
-    if (filters.listId) {
+    if (params.listId) {
       filters._id = { _id: params.listId };
     }
 
-    if (filters.isFavorite) {
-      filters.isFavorite = { isFavorite: params.isFavorite };
+    if (params.isFavorite) {
+      filters.isFavorite = params.isFavorite;
     }
 
     if (filters.public !== undefined) {
