@@ -60,7 +60,7 @@ export class ListsService {
       filters._id = { _id: params.listId };
     }
 
-    if (params.isFavorite) {
+    if (params.isFavorite !== undefined) {
       filters.isFavorite = params.isFavorite;
     }
 
