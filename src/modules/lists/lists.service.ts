@@ -6,9 +6,7 @@ import { User } from '../common/interfaces/user.interface';
 
 @Injectable()
 export class ListsService {
-  constructor(
-    @Inject('LIST_MODEL') private readonly listModel: Model<List>,
-  ) { }
+  constructor(@Inject('LIST_MODEL') private readonly listModel: Model<List>) {}
 
   /**
    * Creates a new list in the database
@@ -22,7 +20,9 @@ export class ListsService {
    * Updates an existing list
    */
   async update(list: ListDto): Promise<Query<any>> {
-    return await this.listModel.updateOne({ _id: list._id }, list, { runValidators: true });
+    return await this.listModel.updateOne({ _id: list._id }, list, {
+      runValidators: true,
+    });
   }
 
   /**
@@ -34,13 +34,7 @@ export class ListsService {
       .select({ name: true, mentors: true })
       .populate({
         path: 'mentors',
-        select: [
-          'name',
-          'avatar',
-          'title',
-          'description',
-          'country',
-        ],
+        select: ['name', 'avatar', 'title', 'description', 'country'],
       })
       .exec();
   }
@@ -64,5 +58,12 @@ export class ListsService {
     // TODO: Add more filters here later on (as we need them)
 
     return await this.listModel.find(filters).exec();
+  }
+
+  /**
+   * Delete a list for a given list id
+   */
+  async delete(_id: string): Promise<Query<any>> {
+    return await this.listModel.deleteOne({ _id });
   }
 }

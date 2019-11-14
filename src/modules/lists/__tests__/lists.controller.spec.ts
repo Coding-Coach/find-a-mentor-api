@@ -173,4 +173,72 @@ describe('modules/lists/ListsController', () => {
       expect(response.lists).toMatchObject([testUserList[0]])
     })
   })
+
+  describe('deleteList', () => {
+    let userId: string;
+    let listId: string;
+    let request: any;
+
+    beforeEach(() => {
+      userId = '1234';
+      listId = '12345';
+      request = { user: { auth0Id: '1234' } };
+
+      listsService.delete = jest.fn(() => Promise.resolve({ ok: 1 }));
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(userId),
+          roles: [Role.MEMBER],
+        }),
+      );
+    });
+
+    it('should throw error when delete if user is not current user or admin', async () => {
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('54367'),
+          roles: [Role.MEMBER],
+        }),
+      );
+
+      await expect(
+        listsController.deleteList(<Request>request, userId, listId),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should return success if user is admin', async () => {
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('54367'),
+          roles: [Role.ADMIN],
+        }),
+      );
+
+      const res = await listsController.deleteList(
+        <Request>request,
+        userId,
+        listId,
+      );
+
+      expect(res.success).toEqual(true);
+    });
+
+    it('should return success if user is current user', async () => {
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('1234'),
+          roles: [Role.MEMBER],
+        }),
+      );
+
+      const res = await listsController.deleteList(
+        <Request>request,
+        userId,
+        listId,
+      );
+
+      expect(res.success).toEqual(true);
+    });
+  });
+
 });
