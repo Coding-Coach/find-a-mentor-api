@@ -21,6 +21,7 @@ export class MentorsService {
   async findAll(filters: MentorFiltersDto, isLoggedIn: boolean): Promise<any> {
     const onlyMentors: any = {
       roles: 'Mentor',
+      available: true,
     };
     const projections = this.getMentorFields(isLoggedIn);
 
