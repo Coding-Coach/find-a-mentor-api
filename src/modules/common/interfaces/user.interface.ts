@@ -25,7 +25,7 @@ export interface User extends Document {
   readonly _id: ObjectID;
   readonly auth0Id: string;
   readonly email: string;
-  readonly available: boolean,
+  readonly available: boolean;
   readonly name: string;
   readonly avatar: string;
   readonly title: string;
