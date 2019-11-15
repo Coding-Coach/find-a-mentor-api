@@ -25,6 +25,7 @@ export const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  available: Boolean,
   name: {
     type: String,
     required: true,

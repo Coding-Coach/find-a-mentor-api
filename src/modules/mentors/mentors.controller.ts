@@ -188,6 +188,7 @@ export class MentorsController {
     });
     const userDto: UserDto = new UserDto({
       _id: application.user,
+      available: true,
       roles: [...user.roles, Role.MENTOR],
     });
 
