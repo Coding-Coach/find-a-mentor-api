@@ -27,11 +27,6 @@ dotenv.config();
 
   const result = await User.updateMany({ roles: 'Mentor', available: undefined }, { available: true });
 
-  if (result.nModified === users.length) {
-    console.log('Mentors updated successfully! 🎉');
-    process.exit(0)
-  }
-
   console.log(`${result.nModified} records updated out of ${users.length}`)
   process.exit(0)
 
