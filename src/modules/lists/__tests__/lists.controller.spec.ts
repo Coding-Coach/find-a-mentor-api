@@ -100,13 +100,11 @@ describe('modules/lists/ListsController', () => {
 
   describe('myLists', () => {
     let userId: string;
-    let listDto: ListDto;
     let request: any;
-    let response: any;
     const testUserList = [
       {
         public: true,
-        isFavourite: false,
+        isFavorite: false,
         _id: '1234',
         user: "testUser",
         name: 'Designers',
@@ -116,7 +114,7 @@ describe('modules/lists/ListsController', () => {
       },
       {
         public: false,
-        isFavourite: false,
+        isFavorite: false,
         _id: '12345',
         user: "testUser1",
         name: 'Python Mentors',
@@ -127,10 +125,8 @@ describe('modules/lists/ListsController', () => {
     ]
 
     beforeEach(() => {
-      userId = '1234'
-      listDto = new ListDto({});
+      userId = '1234';
       request = { user: { auth0Id: '1234' } };
-      response = { success: true, list: { _id: '12345' } };
     });
 
     it('should throw an error when user is not found', async () => {
@@ -172,5 +168,95 @@ describe('modules/lists/ListsController', () => {
       expect(response.lists.length).toBe(1);
       expect(response.lists).toMatchObject([testUserList[0]])
     })
+  })
+
+  describe('updateList', () => {
+    let userId: string;
+    let listId: string;
+    let request: any;
+    const testUserList = [
+      {
+        public: true,
+        isFavorite: true,
+        _id: '1234',
+        user: "testUser",
+        name: 'Designers',
+        mentors: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        public: false,
+        isFavorite: false,
+        _id: '12345',
+        user: "testUser1",
+        name: 'Python Mentors',
+        mentors: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ]
+
+    beforeEach(() => {
+      userId = '1234';
+      listId = '12345';
+      request = { user: { auth0Id: '1234' } };
+    });
+
+    it('should throw an error when user is not found', async () => {
+      usersService.findById = jest.fn(() => Promise.resolve(undefined));
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
+      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[]));
+      const data = {
+        name: 'some random name',
+        public: true
+      }
+      await expect(listsController.updateList(<Request>request, userId, listId, <ListDto>data))
+        .rejects
+        .toThrow(BadRequestException);
+    });
+
+    it('should throw an error when updating a list for other user', async () => {
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('1234'), roles: [Role.MEMBER] }));
+      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('5678'), roles: [Role.MEMBER] }));
+      const data = {
+        name: 'some random name',
+        public: true
+      }
+      await expect(listsController.updateList(<Request>request, userId, listId, <ListDto>data))
+        .rejects
+        .toThrow(UnauthorizedException);
+    });
+
+    it('should throw an error if list is not found', async () => {
+      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
+      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[]));
+      const data = {
+        name: 'some random name',
+        public: true
+      }
+      await expect(listsController.updateList(<Request>request, userId, listId, <ListDto>data))
+        .rejects
+        .toThrow(BadRequestException);
+    });
+
+    it('should update a list succesfully', async () => {
+      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] }));
+      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[testUserList[1]]));
+      listsService.update = jest.fn(() => Promise.resolve());
+      const data = {
+        name: 'some random name',
+        public: true
+      };
+      await listsController.updateList(<Request>request, userId, listId, <ListDto>data);
+      expect(listsService.update).toBeCalledTimes(1);
+      expect(listsService.update).toHaveBeenCalledWith({
+        _id: listId,
+        ...data
+      });
+
+    });
   })
 });
