@@ -10,6 +10,7 @@ import {
   UsePipes,
   ValidationPipe,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -91,7 +92,57 @@ export class ListsController {
     };
   }
 
-  @ApiOperation({ title: `Delete the given mentor's list for the given user` })
+  @ApiOperation({ title: 'Updates a given list' })
+  @Put('/:listid')
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async updateList(
+    @Req() request: Request,
+    @Param('userid') userId: string,
+    @Param('listid') listId: string,
+    @Body() data: ListDto,
+  ) {
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
+    const user: User = await this.usersService.findById(userId);
+
+    // check if user exists
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    // only admins and current user can update lists
+    if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
+    }
+
+    const list: List[] = await this.listsService.findByUserId({
+      userId,
+      listId,
+      isFavorite: false,
+    });
+
+    // check if list exists
+    if (list.length < 1) {
+      throw new BadRequestException('list not found');
+    }
+
+    // update list
+    const listInfo: ListDto = {
+      _id: listId,
+      ...data,
+    };
+
+    await this.listsService.update(listInfo);
+
+    return {
+      success: true,
+    };
+  }
+
+  @ApiOperation({ title: `Deletes the given mentor's list for the given user` })
   @Delete(':listId')
   async deleteList(
     @Req() request: Request,
