@@ -239,6 +239,21 @@ describe('modules/lists/ListsController', () => {
 
       expect(res.success).toEqual(true);
     });
+
+    it('should throw an error when user is not found', async () => {
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('54367'),
+          roles: [Role.MEMBER],
+        }),
+      );
+      usersService.findById = jest.fn(() => Promise.resolve(undefined));
+
+      await expect(
+        listsController.deleteList(<Request>request, userId, listId),
+      ).rejects.toThrow(BadRequestException);
+    });
   });
 
 });
+

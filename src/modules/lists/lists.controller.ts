@@ -28,7 +28,7 @@ export class ListsController {
     private readonly listsService: ListsService,
   ) {}
 
-  @ApiOperation({ title: "Creates a new mentor's list for the given user" })
+  @ApiOperation({ title: `Creates a new mentor's list for the given user` })
   @Post()
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async store(
@@ -64,7 +64,7 @@ export class ListsController {
     };
   }
 
-  @ApiOperation({ title: "Gets mentor's list for the given user" })
+  @ApiOperation({ title: `Gets mentor's list for the given user` })
   @Get()
   async myList(@Req() request, @Param('userid') userId: string) {
     const current: User = await this.usersService.findByAuth0Id(
@@ -91,7 +91,7 @@ export class ListsController {
     };
   }
 
-  @ApiOperation({ title: "Delete the given mentor's list for the given user" })
+  @ApiOperation({ title: `Delete the given mentor's list for the given user` })
   @Delete(':listId')
   async deleteList(
     @Req() request: Request,
@@ -102,6 +102,10 @@ export class ListsController {
       request.user.auth0Id,
     );
     const user: User = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
 
     if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException(
