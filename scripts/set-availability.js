@@ -13,7 +13,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 (async () => {
-  mongoose.connect(process.env.MONGO_DATABASE_URL, { useNewUrlParser: true });
+  await mongoose.connect(process.env.MONGO_DATABASE_URL, { useNewUrlParser: true });
 
 
   const User = mongoose.model('User', {
@@ -23,11 +23,11 @@ dotenv.config();
     roles: Array,
   });
 
-  const users = await User.find({ roles: 'Mentor', available: undefined }).exec();
+  const total = await User.find({ roles: 'Mentor', available: undefined }).count();
 
   const result = await User.updateMany({ roles: 'Mentor', available: undefined }, { available: true });
 
-  console.log(`${result.nModified} records updated out of ${users.length}`)
+  console.log(`${result.nModified} records updated out of ${total}`)
   process.exit(0)
 
 })();
