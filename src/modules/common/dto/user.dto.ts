@@ -1,5 +1,6 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsEmail,
   IsUrl,
   IsIn,
@@ -25,6 +26,10 @@ export class UserDto {
   @Length(3, 50)
   @IsString()
   readonly name: string;
+
+  @ApiModelProperty()
+  @IsBoolean()
+  readonly available: boolean;
 
   @ApiModelPropertyOptional()
   @IsString()

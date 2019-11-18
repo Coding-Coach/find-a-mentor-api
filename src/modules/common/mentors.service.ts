@@ -136,6 +136,7 @@ export class MentorsService {
 
   getMentorFields(isLoggedIn: boolean): any {
     let projections: any = {
+      available: true,
       name: true,
       avatar: true,
       title: true,
