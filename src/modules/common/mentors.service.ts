@@ -22,7 +22,19 @@ export class MentorsService {
     const onlyMentors: any = {
       roles: 'Mentor',
     };
-    const projections = this.getMentorFields(isLoggedIn);
+    const projections = this.getMentorFields();
+
+    if (isLoggedIn) {
+      // Filter by availability
+      if (filters.available !== undefined) {
+        onlyMentors.available = filters.available;
+      }
+
+      // Return channels only for available mentors
+      if (filters.available) {
+        projections.channels = filters.available;
+      }
+    }
 
     if (filters.name) {
       onlyMentors.name = { $regex: filters.name, $options: 'i' };
@@ -134,7 +146,7 @@ export class MentorsService {
     return await this.applicationModel.deleteMany({ user }).exec();
   }
 
-  getMentorFields(isLoggedIn: boolean): any {
+  getMentorFields(): any {
     let projections: any = {
       available: true,
       name: true,
@@ -146,15 +158,6 @@ export class MentorsService {
       country: true,
       spokenLanguages: true,
     };
-
-    // We need to return channels for logged in users only
-    if (isLoggedIn) {
-      projections = {
-        ...projections,
-        email: true,
-        channels: true,
-      };
-    }
 
     return projections;
   }

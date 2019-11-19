@@ -4,6 +4,10 @@ import { PaginationDto } from './pagination.dto';
 
 export class MentorFiltersDto extends PaginationDto {
 
+  // Private fields used internally only
+  readonly available: boolean;
+
+  // Public filters that can be set from clients
   @ApiModelPropertyOptional()
   @IsOptional()
   readonly tags: string;
