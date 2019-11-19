@@ -25,15 +25,7 @@ export class MentorsService {
     const projections = this.getMentorFields();
 
     if (isLoggedIn) {
-      // Filter by availability
-      if (filters.available !== undefined) {
-        onlyMentors.available = filters.available;
-      }
-
-      // Return channels only for available mentors
-      if (filters.available) {
-        projections.channels = filters.available;
-      }
+      projections.channels = true;
     }
 
     if (filters.name) {
@@ -64,7 +56,19 @@ export class MentorsService {
       .exec();
 
     return {
-      mentors,
+      mentors: mentors.map(mentor => ({
+        _id: mentor._id,
+        available: mentor.available,
+        spokenLanguages: mentor.spokenLanguages,
+        tags: mentor.tags,
+        name: mentor.name,
+        avatar: mentor.avatar,
+        title: mentor.title,
+        description: mentor.description,
+        country: mentor.country,
+        createdAt: mentor.createdAt,
+        channels: mentor.available ? mentor.channels : [],
+      })),
       pagination: new PaginationDto({
         total,
         page: filters.page,

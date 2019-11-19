@@ -39,20 +39,13 @@ export class MentorsController {
   @Get()
   @UsePipes(new PaginationPipe())
   async index(@Req() request: Request, @Query() filters: MentorFiltersDto) {
-    const available = await this.mentorsService.findAll({ ...filters, available: true }, !!request.user);
-    const unavailable = await this.mentorsService.findAll({ ...filters, available: false }, !!request.user);
+    const data = await this.mentorsService.findAll(filters, !!request.user);
 
     return {
       success: true,
-      filters: available.filters,
-      pagination: {
-        ...available.pagination,
-        total: available.pagination.total + unavailable.pagination.total,
-      },
-      data: [
-        ...available.mentors,
-        ...unavailable.mentors,
-      ],
+      filters: data.filters,
+      pagination: data.pagination,
+      data: data.mentors,
     };
   }
 
