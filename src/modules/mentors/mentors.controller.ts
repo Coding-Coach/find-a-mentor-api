@@ -52,7 +52,7 @@ export class MentorsController {
   @Get('featured')
   @ApiOperation({ title: 'Retrieves a random mentor to be featured in the blog (or anywhere else)' })
   async featured(@Req() request: Request) {
-    const data: User = await this.mentorsService.findRandomMentor(!!request.user);
+    const data: User = await this.mentorsService.findRandomMentor();
 
     return {
       success: true,

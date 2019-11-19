@@ -22,7 +22,11 @@ export class MentorsService {
     const onlyMentors: any = {
       roles: 'Mentor',
     };
-    const projections = this.getMentorFields(isLoggedIn);
+    const projections = this.getMentorFields();
+
+    if (isLoggedIn) {
+      projections.channels = true;
+    }
 
     if (filters.name) {
       onlyMentors.name = { $regex: filters.name, $options: 'i' };
@@ -52,7 +56,19 @@ export class MentorsService {
       .exec();
 
     return {
-      mentors,
+      mentors: mentors.map(mentor => ({
+        _id: mentor._id,
+        available: mentor.available,
+        spokenLanguages: mentor.spokenLanguages,
+        tags: mentor.tags,
+        name: mentor.name,
+        avatar: mentor.avatar,
+        title: mentor.title,
+        description: mentor.description,
+        country: mentor.country,
+        createdAt: mentor.createdAt,
+        channels: mentor.available ? mentor.channels : [],
+      })),
       pagination: new PaginationDto({
         total,
         page: filters.page,
@@ -116,9 +132,9 @@ export class MentorsService {
   /**
    * Get a random mentor from the database
    */
-  async findRandomMentor(isLoggedIn: boolean): Promise<User> {
+  async findRandomMentor(): Promise<User> {
     const filter: any = { roles: 'Mentor' };
-    const projections = this.getMentorFields(isLoggedIn);
+    const projections = this.getMentorFields();
 
     const total: number = await this.userModel.find(filter).countDocuments();
     const random: number = Math.floor(Math.random() * total);
@@ -134,8 +150,8 @@ export class MentorsService {
     return await this.applicationModel.deleteMany({ user }).exec();
   }
 
-  getMentorFields(isLoggedIn: boolean): any {
-    let projections: any = {
+  getMentorFields(): any {
+    const projections: any = {
       available: true,
       name: true,
       avatar: true,
@@ -146,15 +162,6 @@ export class MentorsService {
       country: true,
       spokenLanguages: true,
     };
-
-    // We need to return channels for logged in users only
-    if (isLoggedIn) {
-      projections = {
-        ...projections,
-        email: true,
-        channels: true,
-      };
-    }
 
     return projections;
   }

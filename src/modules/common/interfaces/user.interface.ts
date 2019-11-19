@@ -35,4 +35,5 @@ export interface User extends Document {
   readonly tags: string[];
   readonly roles: Role[];
   readonly channels: Channel[];
+  readonly createdAt: string;
 }
