@@ -128,9 +128,9 @@ export class MentorsService {
   /**
    * Get a random mentor from the database
    */
-  async findRandomMentor(isLoggedIn: boolean): Promise<User> {
+  async findRandomMentor(): Promise<User> {
     const filter: any = { roles: 'Mentor' };
-    const projections = this.getMentorFields(isLoggedIn);
+    const projections = this.getMentorFields();
 
     const total: number = await this.userModel.find(filter).countDocuments();
     const random: number = Math.floor(Math.random() * total);
@@ -147,7 +147,7 @@ export class MentorsService {
   }
 
   getMentorFields(): any {
-    let projections: any = {
+    const projections: any = {
       available: true,
       name: true,
       avatar: true,

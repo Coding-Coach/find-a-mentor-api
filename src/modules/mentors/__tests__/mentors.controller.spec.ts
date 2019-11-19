@@ -84,7 +84,10 @@ describe('modules/mentors/MentorsController', () => {
       };
       mentorsService.findAll = jest.fn(() => Promise.resolve(testMentorsData));
       const data = await mentorsController.index(<Request>req, <MentorFiltersDto>testFilters);
-      expect(data.data).toMatchObject(testMentorsData.mentors);
+      expect(data.data).toMatchObject([
+        ...testMentorsData.mentors,
+        ...testMentorsData.mentors,
+      ]);
       expect(data.success).toBe(true);
       expect(data.pagination).toBeTruthy();
     });
