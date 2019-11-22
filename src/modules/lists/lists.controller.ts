@@ -19,7 +19,6 @@ import { List } from './interfaces/list.interface';
 import { UsersService } from '../common/users.service';
 import { ListsService } from './lists.service';
 import { ListDto } from './dto/list.dto';
-import { UserDto } from '../common/dto/user.dto';
 
 @ApiUseTags('/users/:userid/lists')
 @ApiBearerAuth()
