@@ -220,16 +220,10 @@ export class ListsController {
       ],
     };
 
-    try {
-      const res: any = await this.listsService.update(listInfo);
-      return {
-        success: res.ok === 1,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
+    await this.listsService.update(listInfo);
+
+    return {
+      success: true,
+    };
   }
 }
