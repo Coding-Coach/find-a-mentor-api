@@ -3,7 +3,6 @@ import { IsOptional } from 'class-validator';
 import { PaginationDto } from './pagination.dto';
 
 export class MentorFiltersDto extends PaginationDto {
-
   // Private fields used internally only
   readonly available: boolean;
 

@@ -45,13 +45,14 @@ export const UserSchema = new mongoose.Schema({
 
 UserSchema.set('timestamps', true);
 
-UserSchema.statics.findUniqueCountries = async function(filters): Promise<FilterDto[]> {
+UserSchema.statics.findUniqueCountries = async function(
+  filters,
+): Promise<FilterDto[]> {
   const result: FilterDto[] = [];
 
-  const countries = await this.find(filters)
-    .distinct('country');
+  const countries = await this.find(filters).distinct('country');
 
-  countries.sort().forEach((id) => {
+  countries.sort().forEach(id => {
     const label: string = countriesDb.getName(id, 'en');
 
     if (label) {
@@ -62,13 +63,14 @@ UserSchema.statics.findUniqueCountries = async function(filters): Promise<Filter
   return result;
 };
 
-UserSchema.statics.findUniqueLanguages = async function(filters): Promise<FilterDto[]> {
+UserSchema.statics.findUniqueLanguages = async function(
+  filters,
+): Promise<FilterDto[]> {
   const result: FilterDto[] = [];
 
-  const languages = await this.find(filters)
-    .distinct('spokenLanguages');
+  const languages = await this.find(filters).distinct('spokenLanguages');
 
-  languages.sort().forEach((id) => {
+  languages.sort().forEach(id => {
     // @ts-ignore
     const label: string = languagesDb.getName(id);
 

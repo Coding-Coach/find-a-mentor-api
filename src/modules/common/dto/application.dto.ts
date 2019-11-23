@@ -3,7 +3,6 @@ import { Length, IsString, IsIn, IsDefined } from 'class-validator';
 import { Status } from '../interfaces/application.interface';
 
 export class ApplicationDto {
-
   readonly _id: string;
 
   @ApiModelProperty()

@@ -11,4 +11,4 @@ import { listsProviders } from './list.providers';
   controllers: [FavoritesController, ListsController],
   providers: [ListsService, ...listsProviders],
 })
-export class ListsModule { }
+export class ListsModule {}
