@@ -212,13 +212,13 @@ export class ListsController {
     if (list.length < 1) {
       throw new BadRequestException('list not found');
     }
-    const listInfo: any = {
+    const listInfo = {
       _id: listId,
       mentors: [
         ...list[0].mentors,
         ...data.mentors,
       ],
-    };
+    } as ListDto;
 
     await this.listsService.update(listInfo);
 
