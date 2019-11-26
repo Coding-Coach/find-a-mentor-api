@@ -6,9 +6,7 @@ import { isObjectId } from '../../utils/objectid';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @Inject('USER_MODEL') private readonly userModel: Model<User>,
-  ) { }
+  constructor(@Inject('USER_MODEL') private readonly userModel: Model<User>) {}
 
   async create(userDto: UserDto): Promise<User> {
     const user = new this.userModel(userDto);
@@ -36,7 +34,9 @@ export class UsersService {
   }
 
   async update(userDto: UserDto): Promise<Query<any>> {
-    return await this.userModel.updateOne({ _id: userDto._id }, userDto, {runValidators: true});
+    return await this.userModel.updateOne({ _id: userDto._id }, userDto, {
+      runValidators: true,
+    });
   }
 
   async remove(_id: string): Promise<Query<any>> {

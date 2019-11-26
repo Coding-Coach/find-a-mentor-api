@@ -19,23 +19,30 @@ import { UsersService } from '../common/users.service';
 import { MentorFiltersDto } from '../common/dto/mentorfilters.dto';
 import { ApplicationDto } from '../common/dto/application.dto';
 import { User, Role } from '../common/interfaces/user.interface';
-import { Application, Status } from '../common/interfaces/application.interface';
+import {
+  Application,
+  Status,
+} from '../common/interfaces/application.interface';
 import { UserDto } from '../common/dto/user.dto';
 import { EmailService } from '../email/email.service';
-import { Template, SendDataRejectParams } from '../email/interfaces/email.interface';
+import {
+  Template,
+  SendDataRejectParams,
+} from '../email/interfaces/email.interface';
 import { PaginationPipe } from '../common/pipes/pagination.pipe';
 
 @ApiUseTags('/mentors')
 @Controller('mentors')
 export class MentorsController {
-
   constructor(
     private readonly mentorsService: MentorsService,
     private readonly usersService: UsersService,
     private readonly emailService: EmailService,
-  ) { }
+  ) {}
 
-  @ApiOperation({ title: 'Return all mentors in the platform by the given filters' })
+  @ApiOperation({
+    title: 'Return all mentors in the platform by the given filters',
+  })
   @Get()
   @UsePipes(new PaginationPipe())
   async index(@Req() request: Request, @Query() filters: MentorFiltersDto) {
@@ -50,7 +57,10 @@ export class MentorsController {
   }
 
   @Get('featured')
-  @ApiOperation({ title: 'Retrieves a random mentor to be featured in the blog (or anywhere else)' })
+  @ApiOperation({
+    title:
+      'Retrieves a random mentor to be featured in the blog (or anywhere else)',
+  })
   async featured(@Req() request: Request) {
     const data: User = await this.mentorsService.findRandomMentor();
 
@@ -64,7 +74,9 @@ export class MentorsController {
   @ApiOperation({ title: 'Retrieve applications filter by the given status' })
   @ApiBearerAuth()
   async applications(@Req() request: Request, @Query('status') status: string) {
-    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
 
     if (!current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException('Access denied');
@@ -79,7 +91,9 @@ export class MentorsController {
       }
     }
 
-    const data: Application[] = await this.mentorsService.findApplications(filters);
+    const data: Application[] = await this.mentorsService.findApplications(
+      filters,
+    );
 
     return {
       success: true,
@@ -90,8 +104,14 @@ export class MentorsController {
   @Get(':userId/applications')
   @ApiOperation({ title: 'Retrieve applications for the given user' })
   @ApiBearerAuth()
-  async myApplications(@Req() request: Request, @Param('userId') userId: string, @Query('status') status: string) {
-    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+  async myApplications(
+    @Req() request: Request,
+    @Param('userId') userId: string,
+    @Query('status') status: string,
+  ) {
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
     const user: User = await this.usersService.findById(userId);
 
     if (!user) {
@@ -100,7 +120,9 @@ export class MentorsController {
 
     // Only current user or admin can get applications
     if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
-      throw new UnauthorizedException('Not authorized to perform this operation');
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
     }
 
     const filters: any = {
@@ -114,7 +136,9 @@ export class MentorsController {
       }
     }
 
-    const data: Application[] = await this.mentorsService.findApplications(filters);
+    const data: Application[] = await this.mentorsService.findApplications(
+      filters,
+    );
 
     return {
       success: true,
@@ -122,13 +146,29 @@ export class MentorsController {
     };
   }
 
-  @ApiOperation({ title: 'Creates a new request to become a mentor, pending for Admin to approve' })
+  @ApiOperation({
+    title:
+      'Creates a new request to become a mentor, pending for Admin to approve',
+  })
   @ApiBearerAuth()
   @Post('applications')
-  @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true, whitelist: true }))
-  async applyToBecomeMentor(@Req() request: Request, @Body() data: ApplicationDto) {
-    const user: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
-    const application: Application = await this.mentorsService.findActiveApplicationByUser(user);
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      skipMissingProperties: true,
+      whitelist: true,
+    }),
+  )
+  async applyToBecomeMentor(
+    @Req() request: Request,
+    @Body() data: ApplicationDto,
+  ) {
+    const user: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
+    const application: Application = await this.mentorsService.findActiveApplicationByUser(
+      user,
+    );
     const applicationDto = new ApplicationDto({
       description: data.description,
       status: Status.PENDING,
@@ -138,9 +178,13 @@ export class MentorsController {
     // Users can only apply once
     if (application) {
       if (application.status === Status.PENDING) {
-        throw new BadRequestException('You already applied, your application is in review.');
+        throw new BadRequestException(
+          'You already applied, your application is in review.',
+        );
       } else if (application.status === Status.APPROVED) {
-        throw new BadRequestException('You already applied, your application has been approved');
+        throw new BadRequestException(
+          'You already applied, your application has been approved',
+        );
       }
     }
 
@@ -161,15 +205,29 @@ export class MentorsController {
   @ApiOperation({ title: 'Approves or rejects an application after review' })
   @ApiBearerAuth()
   @Put('applications/:id')
-  @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true, whitelist: true }))
-  async reviewApplication(@Req() request: Request, @Param('id') applicationId: string, @Body() data: ApplicationDto) {
-    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      skipMissingProperties: true,
+      whitelist: true,
+    }),
+  )
+  async reviewApplication(
+    @Req() request: Request,
+    @Param('id') applicationId: string,
+    @Body() data: ApplicationDto,
+  ) {
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
 
     if (!current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException('Access denied');
     }
 
-    const application: Application = await this.mentorsService.findApplicationById(applicationId);
+    const application: Application = await this.mentorsService.findApplicationById(
+      applicationId,
+    );
 
     if (!application) {
       throw new BadRequestException('Application not found');
@@ -207,7 +265,9 @@ export class MentorsController {
       },
     };
 
-    const res: any = await this.mentorsService.updateApplication(applicationDto);
+    const res: any = await this.mentorsService.updateApplication(
+      applicationDto,
+    );
     try {
       await this.emailService.send<SendDataRejectParams>(emailData);
       await this.emailService.addMentor(user);

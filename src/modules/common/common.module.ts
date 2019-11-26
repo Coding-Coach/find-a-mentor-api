@@ -10,4 +10,4 @@ import { MentorsService } from './mentors.service';
   providers: [MentorsService, UsersService, Auth0Service, ...commonProviders],
   exports: [MentorsService, UsersService, Auth0Service, ...commonProviders],
 })
-export class CommonModule { }
+export class CommonModule {}

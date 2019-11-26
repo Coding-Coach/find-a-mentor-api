@@ -16,4 +16,4 @@ import { EmailService } from '../email/email.service';
   controllers: [MentorsController],
   providers: [MentorsService, EmailService, UsersService],
 })
-export class MentorsModule { }
+export class MentorsModule {}

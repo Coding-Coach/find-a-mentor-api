@@ -4,7 +4,6 @@ import Config from '../../config';
 
 @Injectable()
 export class Auth0Service {
-
   // Get an access token for the Auth0 Admin API
   async getAdminAccessToken() {
     const options = {
@@ -18,7 +17,10 @@ export class Auth0Service {
       }),
     };
 
-    const response = await fetch(`https://${Config.auth0.backend.DOMAIN}/oauth/token`, options);
+    const response = await fetch(
+      `https://${Config.auth0.backend.DOMAIN}/oauth/token`,
+      options,
+    );
     const json = await response.json();
 
     return json;
@@ -32,7 +34,10 @@ export class Auth0Service {
       },
     };
 
-    const response = await fetch(`https://${Config.auth0.backend.DOMAIN}/api/v2/users/${userID}`, options);
+    const response = await fetch(
+      `https://${Config.auth0.backend.DOMAIN}/api/v2/users/${userID}`,
+      options,
+    );
     const json = await response.json();
 
     return json;
@@ -47,7 +52,10 @@ export class Auth0Service {
       },
     };
 
-    const response = await fetch(`https://${Config.auth0.backend.DOMAIN}/api/v2/users/${userID}`, options);
+    const response = await fetch(
+      `https://${Config.auth0.backend.DOMAIN}/api/v2/users/${userID}`,
+      options,
+    );
 
     return response;
   }

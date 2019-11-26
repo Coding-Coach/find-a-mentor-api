@@ -18,22 +18,21 @@ const middleware = jwt({
 /**
  * Public paths that doesn't require authentication
  */
-const publicUrls = [
-  '/mentors',
-  '/mentors/featured',
-];
+const publicUrls = ['/mentors', '/mentors/featured'];
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    middleware(req, res, (error) => {
+    middleware(req, res, error => {
       // For public endpoints we don't need to require authentication
       if (publicUrls.indexOf(req.baseUrl) >= 0) {
         next();
       } else {
         if (error) {
           const status = error.status || 401;
-          const message = error.message || 'You need to be authenticated in order to access this resource.';
+          const message =
+            error.message ||
+            'You need to be authenticated in order to access this resource.';
 
           return res.status(status).send({
             success: false,

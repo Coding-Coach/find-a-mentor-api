@@ -8,7 +8,7 @@ import { ListDto } from '../dto/list.dto';
 import { UsersService } from '../../common/users.service';
 import { Role, User } from '../../common/interfaces/user.interface';
 
-class ServiceMock { }
+class ServiceMock {}
 
 class ObjectIdMock {
   current: string;
@@ -29,13 +29,16 @@ describe('modules/lists/FavoritesController', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       controllers: [FavoritesController],
-      providers: [{
-        provide: UsersService,
-        useValue: new ServiceMock(),
-      }, {
-        provide: ListsService,
-        useValue: new ServiceMock(),
-      }],
+      providers: [
+        {
+          provide: UsersService,
+          useValue: new ServiceMock(),
+        },
+        {
+          provide: ListsService,
+          useValue: new ServiceMock(),
+        },
+      ],
     }).compile();
 
     usersService = module.get<UsersService>(UsersService);
@@ -56,42 +59,76 @@ describe('modules/lists/FavoritesController', () => {
       mentorIdObj = new ObjectIdMock(mentorId);
       request = { user: { auth0Id: '1234' } };
       response = { success: true };
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER, Role.ADMIN] }));
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER, Role.MENTOR] }));
-      listsService.createList = jest.fn(() => Promise.resolve(<List>{ _id: '12345' }));
-      listsService.findFavoriteList = jest.fn(() => Promise.resolve(<List>{ _id: '12345', mentors: [{ _id: mentorIdObj }] }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(userId),
+          roles: [Role.MEMBER, Role.ADMIN],
+        }),
+      );
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(userId),
+          roles: [Role.MEMBER, Role.MENTOR],
+        }),
+      );
+      listsService.createList = jest.fn(() =>
+        Promise.resolve(<List>{ _id: '12345' }),
+      );
+      listsService.findFavoriteList = jest.fn(() =>
+        Promise.resolve(<List>{
+          _id: '12345',
+          mentors: [{ _id: mentorIdObj }],
+        }),
+      );
       listsService.update = jest.fn(() => Promise.resolve());
     });
 
     it('should throw an error when user not found', async () => {
       usersService.findById = jest.fn(() => Promise.resolve(undefined));
 
-      await expect(favoritesController.toggle(<Request>request, userId, mentorId))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(
+        favoritesController.toggle(<Request>request, userId, mentorId),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw an error if trying to add not a mentor', async () => {
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(mentorId), roles: [Role.MEMBER] }));
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(mentorId),
+          roles: [Role.MEMBER],
+        }),
+      );
 
-      await expect(favoritesController.toggle(<Request>request, userId, mentorId))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(
+        favoritesController.toggle(<Request>request, userId, mentorId),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw an error when toggling favorites for other user', async () => {
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('1234'), roles: [Role.MEMBER] }));
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('5678'), roles: [Role.MEMBER, Role.MENTOR] }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('1234'),
+          roles: [Role.MEMBER],
+        }),
+      );
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('5678'),
+          roles: [Role.MEMBER, Role.MENTOR],
+        }),
+      );
 
-      await expect(favoritesController.toggle(<Request>request, userId, mentorId))
-        .rejects
-        .toThrow(UnauthorizedException);
+      await expect(
+        favoritesController.toggle(<Request>request, userId, mentorId),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
-    it('should create a new favorite list and add a mentor when favorite list doesn\'t exist', async () => {
+    it("should create a new favorite list and add a mentor when favorite list doesn't exist", async () => {
       listsService.findFavoriteList = jest.fn(() => Promise.resolve(undefined));
 
-      expect(await favoritesController.toggle(request, userId, mentorId)).toEqual(response);
+      expect(
+        await favoritesController.toggle(request, userId, mentorId),
+      ).toEqual(response);
       expect(listsService.createList).toHaveBeenCalledTimes(1);
       expect(listsService.createList).toHaveBeenCalledWith({
         name: 'Favorites',
@@ -102,21 +139,32 @@ describe('modules/lists/FavoritesController', () => {
     });
 
     it('should add a new mentor to the existing favorite list', async () => {
-      expect(await favoritesController.toggle(request, userId, mentorId)).toEqual(response);
+      expect(
+        await favoritesController.toggle(request, userId, mentorId),
+      ).toEqual(response);
       expect(listsService.update).toHaveBeenCalledTimes(1);
       expect(listsService.update).toHaveBeenCalledWith({
         _id: '12345',
-        mentors: [{ _id: new ObjectIdMock('5678') }, { _id: new ObjectIdMock('1234')}],
+        mentors: [
+          { _id: new ObjectIdMock('5678') },
+          { _id: new ObjectIdMock('1234') },
+        ],
       });
     });
 
     it('should remove and existing mentor from the favorite list', async () => {
       const _id = { _id: mentorIdObj };
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id, roles: [Role.MEMBER, Role.MENTOR] }));
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{ _id, roles: [Role.MEMBER, Role.MENTOR] }),
+      );
       // @ts-ignore
-      listsService.findFavoriteList = jest.fn(() => Promise.resolve(<List>{ _id: '12345', mentors: [_id] }));
+      listsService.findFavoriteList = jest.fn(() =>
+        Promise.resolve(<List>{ _id: '12345', mentors: [_id] }),
+      );
 
-      expect(await favoritesController.toggle(request, userId, mentorId)).toEqual(response);
+      expect(
+        await favoritesController.toggle(request, userId, mentorId),
+      ).toEqual(response);
       expect(listsService.update).toHaveBeenCalledTimes(1);
     });
   });
@@ -130,9 +178,16 @@ describe('modules/lists/FavoritesController', () => {
 
     beforeEach(() => {
       userId = '123';
-      list = <List>{ _id: 123, name: 'Favorites', mentors: [{ _id: 123, name: 'Sarah Doe' }, { _id: 456, name: 'John Doe' }] }
+      list = <List>{
+        _id: 123,
+        name: 'Favorites',
+        mentors: [
+          { _id: 123, name: 'Sarah Doe' },
+          { _id: 456, name: 'John Doe' },
+        ],
+      };
       request = <Request>{ user: { auth0Id: '1234' } };
-      response = { success: true, data: list};
+      response = { success: true, data: list };
       user = <User>{ _id: new ObjectIdMock(userId), roles: [Role.MEMBER] };
 
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(user));
@@ -143,21 +198,31 @@ describe('modules/lists/FavoritesController', () => {
     it('should throw an error when user doesnt exist', async () => {
       usersService.findById = jest.fn(() => Promise.resolve(undefined));
 
-      await expect(favoritesController.list(request, userId))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(favoritesController.list(request, userId)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw an error when trying to get favorites from other user', async () => {
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('9843'), roles: [Role.MEMBER] }));      
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('9843'),
+          roles: [Role.MEMBER],
+        }),
+      );
 
-      await expect(favoritesController.list(request, userId))
-        .rejects
-        .toThrow(UnauthorizedException);
+      await expect(favoritesController.list(request, userId)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should return the favorites for any user to an admin', async () => {
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('9843'), roles: [Role.ADMIN] }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('9843'),
+          roles: [Role.ADMIN],
+        }),
+      );
 
       expect(await favoritesController.list(request, userId)).toEqual(response);
       expect(listsService.findFavoriteList).toHaveBeenCalledTimes(1);
@@ -173,7 +238,10 @@ describe('modules/lists/FavoritesController', () => {
     it('should return and empty array when there are no favorites', async () => {
       listsService.findFavoriteList = jest.fn(() => Promise.resolve(undefined));
 
-      expect(await favoritesController.list(request, userId)).toEqual({ success: true, data: { mentors: [] } });
+      expect(await favoritesController.list(request, userId)).toEqual({
+        success: true,
+        data: { mentors: [] },
+      });
       expect(listsService.findFavoriteList).toHaveBeenCalledTimes(1);
       expect(listsService.findFavoriteList).toHaveBeenCalledWith(user);
     });
