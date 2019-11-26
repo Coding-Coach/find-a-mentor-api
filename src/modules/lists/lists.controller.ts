@@ -176,4 +176,54 @@ export class ListsController {
       };
     }
   }
+
+  @ApiOperation({ title: 'Add a new mentor to existing list' })
+  @Put('/:listid/add')
+  async addMentorToList(
+    @Req() request: Request,
+    @Param('userid') userId: string,
+    @Param('listid') listId: string,
+    @Body() data: ListDto,
+  ) {
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
+    const user: User = await this.usersService.findById(userId);
+
+    // check if user exists
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    // only admins and current user can add mentors to a list
+    if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
+    }
+
+    const list: List[] = await this.listsService.findByUserId({
+      userId,
+      listId,
+      isFavorite: false,
+    });
+
+    // check if list exists
+    if (list.length < 1) {
+      throw new BadRequestException('list not found');
+    }
+    const listInfo = {
+      _id: listId,
+      mentors: [
+        ...list[0].mentors,
+        ...data.mentors,
+      ],
+    } as ListDto;
+
+    await this.listsService.update(listInfo);
+
+    return {
+      success: true,
+    };
+  }
 }
