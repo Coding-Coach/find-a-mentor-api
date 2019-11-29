@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Query, Model } from 'mongoose';
 import { UserDto } from './dto/user.dto';
-import { User } from './interfaces/user.interface';
+import { User, Role } from './interfaces/user.interface';
 import { isObjectId } from '../../utils/objectid';
 
 @Injectable()

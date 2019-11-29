@@ -214,10 +214,7 @@ export class ListsController {
     }
     const listInfo = {
       _id: listId,
-      mentors: [
-        ...list[0].mentors,
-        ...data.mentors,
-      ],
+      mentors: [...list[0].mentors, ...data.mentors],
     } as ListDto;
 
     await this.listsService.update(listInfo);
