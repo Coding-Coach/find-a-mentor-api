@@ -10,5 +10,6 @@ import { listsProviders } from './list.providers';
   imports: [DatabaseModule, CommonModule],
   controllers: [FavoritesController, ListsController],
   providers: [ListsService, ...listsProviders],
+  exports: [ListsService, ...listsProviders]
 })
 export class ListsModule { }

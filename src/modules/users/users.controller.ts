@@ -9,6 +9,9 @@ import { MentorsService } from '../common/mentors.service';
 import { Role, User } from '../common/interfaces/user.interface';
 import { EmailService } from '../email/email.service';
 import { Template } from '../email/interfaces/email.interface';
+import { List } from '../lists/interfaces/list.interface';
+import { ListDto } from '../lists/dto/list.dto';
+import { ListsService } from '../lists/lists.service';
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -20,6 +23,7 @@ export class UsersController {
     private readonly emailService: EmailService,
     private readonly mentorService: MentorsService,
     private readonly auth0Service: Auth0Service,
+    private readonly listsService: ListsService,
   ) { }
 
   @ApiOperation({ title: 'Return all registered users' })
@@ -74,6 +78,16 @@ export class UsersController {
           });
 
           const newUser: User = await this.usersService.create(userDto);
+
+          // We need to create an emty favorite list
+          const favorites: ListDto = new ListDto({
+            name: 'Favorites',
+            isFavorite: true,
+            user: newUser,
+            mentors: [],
+          });
+
+          await this.listsService.createList(favorites);
 
           const emailData = {
             to: userDto.email,
