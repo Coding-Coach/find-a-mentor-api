@@ -48,15 +48,4 @@ export class UsersService {
       ok: 0,
     });
   }
-
-  async totalsByRole(): Promise<Query<any>> {
-    const members: number = await this.userModel.find({ roles: [Role.MEMBER]}).countDocuments();
-    const mentors: number = await this.userModel.find({ roles: Role.MENTOR}).countDocuments();
-
-    return {
-      total: members + mentors,
-      members,
-      mentors,
-    };
-  }
 }
