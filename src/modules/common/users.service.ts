@@ -48,4 +48,12 @@ export class UsersService {
       ok: 0,
     });
   }
+
+  async totalsByRole(): Promise<Query<any>> {
+    return {
+      total: 2500,
+      members: 2000,
+      mentors: 500,
+    };
+  }
 }
