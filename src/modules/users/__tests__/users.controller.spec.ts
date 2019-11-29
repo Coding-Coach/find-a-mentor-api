@@ -4,6 +4,7 @@ import { UsersController } from '../users.controller';
 import { UsersService } from '../../common/users.service';
 import { EmailService } from '../../email/email.service';
 import { MentorsService } from '../../common/mentors.service';
+import { ListsService } from '../../lists/lists.service';
 import { Auth0Service } from '../../common/auth0.service';
 import { UserDto } from '../../common/dto/user.dto';
 import { User } from '../../common/interfaces/user.interface';
@@ -27,6 +28,7 @@ describe('modules/users/UsersController', () => {
   let emailService: EmailService;
   let mentorsService: MentorsService;
   let auth0Service: Auth0Service;
+  let listService: ListsService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -43,6 +45,9 @@ describe('modules/users/UsersController', () => {
       }, {
         provide: Auth0Service,
         useValue: new ServiceMock(),
+      }, {
+        provide: ListsService,
+        useValue: new ServiceMock(),
       }],
     }).compile();
 
@@ -51,6 +56,7 @@ describe('modules/users/UsersController', () => {
     mentorsService = module.get<MentorsService>(MentorsService);
     auth0Service = module.get<Auth0Service>(Auth0Service);
     emailService = module.get<EmailService>(EmailService);
+    listService = module.get<ListsService>(ListsService);
   });
 
   describe('index', () => {
@@ -85,12 +91,14 @@ describe('modules/users/UsersController', () => {
       usersService.findByEmail = jest.fn(() => Promise.resolve(undefined));
       usersService.create = jest.fn(() => Promise.resolve(data));
       emailService.send = jest.fn();
+      listService.createList = jest.fn();
       auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({ access_token: 'abc' }));
       auth0Service.getUserProfile = jest.fn(() => Promise.resolve({ _id: '123' }));
 
       expect(await usersController.currentUser(request)).toEqual(response);
       expect(usersService.create).toHaveBeenCalledTimes(1);
       expect(emailService.send).toHaveBeenCalledTimes(1);
+      expect(listService.createList).toHaveBeenCalledTimes(1);
     });
     
     it('should link an existing mentor', async () => {

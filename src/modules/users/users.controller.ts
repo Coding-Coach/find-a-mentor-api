@@ -9,7 +9,6 @@ import { MentorsService } from '../common/mentors.service';
 import { Role, User } from '../common/interfaces/user.interface';
 import { EmailService } from '../email/email.service';
 import { Template } from '../email/interfaces/email.interface';
-import { List } from '../lists/interfaces/list.interface';
 import { ListDto } from '../lists/dto/list.dto';
 import { ListsService } from '../lists/lists.service';
 
