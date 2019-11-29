@@ -1,4 +1,14 @@
-import { BadRequestException, Controller, Get, Post, Param, Req, UnauthorizedException, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Post,
+  Param,
+  Req,
+  UnauthorizedException,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Role, User } from '../common/interfaces/user.interface';
@@ -11,16 +21,17 @@ import { ListDto } from './dto/list.dto';
 @ApiBearerAuth()
 @Controller('users/:userid/favorites')
 export class FavoritesController {
-
   constructor(
     private readonly usersService: UsersService,
     private readonly listsService: ListsService,
-  ) { }
+  ) {}
 
   @ApiOperation({ title: 'Returns the favorite list for the given user' })
   @Get()
   async list(@Req() request: Request, @Param('userid') userId: string) {
-    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
     const user: User = await this.usersService.findById(userId);
 
     // Make sure user exist
@@ -30,11 +41,13 @@ export class FavoritesController {
 
     // Only admins or current user can get the favorites
     if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
-      throw new UnauthorizedException('Not authorized to perform this operation');
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
     }
 
     const list: List = await this.listsService.findFavoriteList(user);
-    const data: List = list || ({ mentors: [] }) as List;
+    const data: List = list || ({ mentors: [] } as List);
 
     return {
       success: true,
@@ -44,8 +57,14 @@ export class FavoritesController {
 
   @ApiOperation({ title: 'Adds or removes a mentor from the favorite list' })
   @Post(':mentorid')
-  async toggle(@Req() request: Request, @Param('userid') userId: string, @Param('mentorid') mentorId: string) {
-    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+  async toggle(
+    @Req() request: Request,
+    @Param('userid') userId: string,
+    @Param('mentorid') mentorId: string,
+  ) {
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
     const user: User = await this.usersService.findById(userId);
     const mentor: User = await this.usersService.findById(mentorId);
 
@@ -61,7 +80,9 @@ export class FavoritesController {
 
     // Only admins can toggle favorites for other users
     if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
-      throw new UnauthorizedException('Not authorized to perform this operation');
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
     }
 
     // We can only have a single favorites list
@@ -101,5 +122,4 @@ export class FavoritesController {
       success: true,
     };
   }
-
 }

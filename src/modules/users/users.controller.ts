@@ -1,7 +1,24 @@
 import * as Sentry from '@sentry/node';
 
-import { Controller, Get, Delete, Put, Body, Param, Req, UnauthorizedException, BadRequestException, ValidationPipe, UsePipes } from '@nestjs/common';
-import { ApiBearerAuth, ApiImplicitParam, ApiOperation, ApiUseTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Delete,
+  Put,
+  Body,
+  Param,
+  Req,
+  UnauthorizedException,
+  BadRequestException,
+  ValidationPipe,
+  UsePipes,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiImplicitParam,
+  ApiOperation,
+  ApiUseTags,
+} from '@nestjs/swagger';
 import { UserDto } from '../common/dto/user.dto';
 import { UsersService } from '../common/users.service';
 import { Auth0Service } from '../common/auth0.service';
@@ -16,7 +33,6 @@ import { ListsService } from '../lists/lists.service';
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
-
   constructor(
     private readonly usersService: UsersService,
     private readonly emailService: EmailService,
@@ -49,7 +65,10 @@ export class UsersController {
     if (!currentUser) {
       try {
         const data: any = await this.auth0Service.getAdminAccessToken();
-        const user: any = await this.auth0Service.getUserProfile(data.access_token, userId);
+        const user: any = await this.auth0Service.getUserProfile(
+          data.access_token,
+          userId,
+        );
 
         // If the user couldn't be found by the auth0Id, try to see whether we
         // can find one by the email. If so, we have a mentor that was imported
@@ -63,7 +82,6 @@ export class UsersController {
 
           await this.usersService.update(userDto);
           response.data = existingMentor;
-
         } else {
           // If the user doesn't exist in the database we need
           // to add it because this is a new user. The initial
@@ -135,9 +153,17 @@ export class UsersController {
   @ApiOperation({ title: 'Updates an existing user' })
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Put(':id')
-  @UsePipes(new ValidationPipe({ transform: true, skipMissingProperties: true, whitelist: true }))
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      skipMissingProperties: true,
+      whitelist: true,
+    }),
+  )
   async update(@Req() request, @Param() params, @Body() data: UserDto) {
-    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
     const user: User = await this.usersService.findById(params.id);
 
     // Users should only update their own data
@@ -147,7 +173,9 @@ export class UsersController {
 
     // Only admins can update other users
     if (!user._id.equals(current._id) && !current.roles.includes(Role.ADMIN)) {
-      throw new UnauthorizedException('Not authorized to perform this operation');
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
     }
 
     // Only an admin can update the roles
@@ -173,7 +201,9 @@ export class UsersController {
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Delete(':id')
   async remove(@Req() request, @Param() params) {
-    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
     const user: User = await this.usersService.findById(params.id);
 
     if (!user) {
@@ -182,7 +212,9 @@ export class UsersController {
 
     // Only own user or admins can remove the given user
     if (!user._id.equals(current._id) && !current.roles.includes(Role.ADMIN)) {
-      throw new UnauthorizedException('Not authorized to perform this operation');
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
     }
 
     try {
@@ -216,5 +248,4 @@ export class UsersController {
       };
     }
   }
-
 }

@@ -458,4 +458,126 @@ describe('modules/lists/ListsController', () => {
       ).rejects.toThrow(BadRequestException);
     });
   });
+
+  describe('addMentorToList', () => {
+    let userId: string;
+    let listId: string;
+    let request: any;
+    const testUserList = [
+      {
+        public: true,
+        isFavorite: true,
+        _id: '1234',
+        user: 'testUser',
+        name: 'Designers',
+        mentors: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    beforeEach(() => {
+      userId = '1234';
+      listId = '12345';
+      request = { user: { auth0Id: '1234' } };
+    });
+
+    it('should throw an error when user is not found', async () => {
+      usersService.findById = jest.fn(() => Promise.resolve(undefined));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(userId),
+          roles: [Role.MEMBER],
+        }),
+      );
+      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[]));
+      const data = {
+        mentors: [{_id: '123456'}],
+      };
+      await expect(
+        listsController.addMentorToList(<Request>request, userId, listId, <ListDto>(
+          data
+        )),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw an error when updating a list for other user', async () => {
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('1234'),
+          roles: [Role.MEMBER],
+        }),
+      );
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('5678'),
+          roles: [Role.MEMBER],
+        }),
+      );
+      const data = {
+        mentors: [{_id: '123456'}],
+      };
+      await expect(
+        listsController.addMentorToList(<Request>request, userId, listId, <ListDto>(
+          data
+        )),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should throw an error if list is not found', async () => {
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(userId),
+          roles: [Role.MEMBER],
+        }),
+      );
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(userId),
+          roles: [Role.MEMBER],
+        }),
+      );
+      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[]));
+      const data = {
+        mentors: [{_id: '123456'}],
+      };
+      await expect(
+        listsController.addMentorToList(<Request>request, userId, listId, <ListDto>(
+          data
+        )),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should add a mentor to a list successfully', async () => {
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(userId),
+          roles: [Role.MEMBER],
+        }),
+      );
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(userId),
+          roles: [Role.MEMBER],
+        }),
+      );
+      listsService.findByUserId = jest.fn(() =>
+        Promise.resolve(<List[]>[testUserList[0]]),
+      );
+      listsService.update = jest.fn(() => Promise.resolve());
+      const data = {
+        mentors: [{_id: '123456'}],
+      };
+      await listsController.addMentorToList(<Request>request, userId, listId, <ListDto>(
+        data
+        ));
+      expect(listsService.update).toBeCalledTimes(1);
+      expect(listsService.update).toHaveBeenCalledWith({
+        _id: listId,
+        mentors: [
+          ...data.mentors
+      ]
+      });
+    });
+  });
 });

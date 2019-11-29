@@ -12,4 +12,4 @@ import { listsProviders } from './list.providers';
   providers: [ListsService, ...listsProviders],
   exports: [ListsService, ...listsProviders],
 })
-export class ListsModule { }
+export class ListsModule {}

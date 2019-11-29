@@ -28,8 +28,12 @@ export class EmailService {
 
   static LIST_IDS = {
     // We are adding all dev/testing contacts to a dev list, so we can remove them easly
-    MENTORS: isProduction ? '3e581cd7-9b14-4486-933e-1e752557433f' : DEV_TESTING_LIST,
-    NEWSLETTER: isProduction ? '6df91cab-90bd-4eaa-9710-c3804f8aba01' : DEV_TESTING_LIST,
+    MENTORS: isProduction
+      ? '3e581cd7-9b14-4486-933e-1e752557433f'
+      : DEV_TESTING_LIST,
+    NEWSLETTER: isProduction
+      ? '6df91cab-90bd-4eaa-9710-c3804f8aba01'
+      : DEV_TESTING_LIST,
   };
 
   async send<TemplateParams>(data: SendData<TemplateParams>) {
@@ -44,15 +48,17 @@ export class EmailService {
       url: '/v3/marketing/contacts',
       body: JSON.stringify({
         list_ids: [EmailService.LIST_IDS.MENTORS],
-        contacts: [{
-          email: contact.email,
-          first_name: contact.name,
-          country: contact.country,
-          custom_fields: {
-            // We can clean our list in SG with this field
-            e2_T: isProduction ? 'production' : 'development',
+        contacts: [
+          {
+            email: contact.email,
+            first_name: contact.name,
+            country: contact.country,
+            custom_fields: {
+              // We can clean our list in SG with this field
+              e2_T: isProduction ? 'production' : 'development',
+            },
           },
-        }],
+        ],
       }),
     };
 

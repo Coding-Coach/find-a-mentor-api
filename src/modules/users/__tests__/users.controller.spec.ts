@@ -33,7 +33,8 @@ describe('modules/users/UsersController', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [{
+      providers: [
+        {
           provide: UsersService,
           useValue: new ServiceMock(),
       }, {
@@ -61,14 +62,14 @@ describe('modules/users/UsersController', () => {
 
   describe('index', () => {
     it('should return all registered users', async () => {
-      const data: User[] = [<User>({ _id: 123, name: 'Crysfel Villa'})];
+      const data: User[] = [<User>{ _id: 123, name: 'Crysfel Villa' }];
       const response = { success: true, data };
       usersService.findAll = jest.fn(() => Promise.resolve(data));
 
       expect(await usersController.index()).toEqual(response);
-    })
+    });
   });
-  
+
   describe('currentUser', () => {
     let request;
     let data: User;
@@ -76,7 +77,7 @@ describe('modules/users/UsersController', () => {
 
     beforeEach(() => {
       request = { user: { auth0Id: '123' } };
-      data = <User>({ _id: 123, name: 'Crysfel Villa' });
+      data = <User>{ _id: 123, name: 'Crysfel Villa' };
       response = { success: true, data };
     });
 
@@ -100,14 +101,18 @@ describe('modules/users/UsersController', () => {
       expect(emailService.send).toHaveBeenCalledTimes(1);
       expect(listService.createList).toHaveBeenCalledTimes(1);
     });
-    
+
     it('should link an existing mentor', async () => {
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(undefined));
       usersService.findByEmail = jest.fn(() => Promise.resolve(data));
       usersService.update = jest.fn(() => Promise.resolve());
       emailService.send = jest.fn();
-      auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({ access_token: 'abc' }));
-      auth0Service.getUserProfile = jest.fn(() => Promise.resolve({ _id: '123' }));
+      auth0Service.getAdminAccessToken = jest.fn(() =>
+        Promise.resolve({ access_token: 'abc' }),
+      );
+      auth0Service.getUserProfile = jest.fn(() =>
+        Promise.resolve({ _id: '123' }),
+      );
 
       expect(await usersController.currentUser(request)).toEqual(response);
       expect(usersService.update).toHaveBeenCalledTimes(1);
@@ -117,7 +122,7 @@ describe('modules/users/UsersController', () => {
   describe('show', () => {
     it('should return a user', async () => {
       const params = { id: 123 };
-      const data: User = <User>({ _id: 123, name: 'Crysfel Villa' });
+      const data: User = <User>{ _id: 123, name: 'Crysfel Villa' };
       const response = { success: true, data };
 
       usersService.findById = jest.fn(() => Promise.resolve(data));
@@ -132,13 +137,13 @@ describe('modules/users/UsersController', () => {
 
       usersService.findById = jest.fn(() => Promise.resolve(undefined));
 
-      await expect(usersController.show(params))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(usersController.show(params)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(usersService.findById).toHaveBeenCalledTimes(1);
       expect(usersService.findById).toHaveBeenCalledWith(params.id);
     });
-  })
+  });
 
   describe('update', () => {
     let request;
@@ -150,36 +155,54 @@ describe('modules/users/UsersController', () => {
       request = { user: { auth0Id: '123' } };
       params = { id: 123 };
       data = new UserDto({});
-      response = { success: true }
+      response = { success: true };
     });
 
     it('should throw error if user not found', async () => {
       usersService.findByAuth0Id = jest.fn();
       usersService.findById = jest.fn();
 
-      await expect(usersController.update(request, params, data))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(
+        usersController.update(request, params, data),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw error if updating other user as a non Admin', async () => {
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('456'), roles: []}));
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('123'), }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{ _id: new ObjectIdMock('456'), roles: [] }),
+      );
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{ _id: new ObjectIdMock('123') }),
+      );
 
-      await expect(usersController.update(request, params, data))
-        .rejects
-        .toThrow(UnauthorizedException);
+      await expect(
+        usersController.update(request, params, data),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should not update roles if not an Admin', async () => {
-      const original = <User>{ _id: new ObjectIdMock('123'), roles: ['Member'] }
-      const data = new UserDto({ name: 'Crysfel Villa', avatar: 'test.jpg', roles: ['Admin', 'SomethingElse'] });
+      const original = <User>{
+        _id: new ObjectIdMock('123'),
+        roles: ['Member'],
+      };
+      const data = new UserDto({
+        name: 'Crysfel Villa',
+        avatar: 'test.jpg',
+        roles: ['Admin', 'SomethingElse'],
+      });
 
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('123'), roles: ['Member'] }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('123'),
+          roles: ['Member'],
+        }),
+      );
       usersService.findById = jest.fn(() => Promise.resolve(original));
       usersService.update = jest.fn(() => Promise.resolve({ ok: 1 }));
 
-      expect(await usersController.update(request, params, data)).toEqual(response);
+      expect(await usersController.update(request, params, data)).toEqual(
+        response,
+      );
       expect(usersService.update).toHaveBeenCalledTimes(1);
       expect(usersService.update).toHaveBeenCalledWith({
         ...original,
@@ -190,16 +213,30 @@ describe('modules/users/UsersController', () => {
 
     it('should update roles if is an admin', async () => {
       const request = { user: { auth0Id: '123' } };
-      const response = { success: true }
+      const response = { success: true };
       const params = { id: 123 };
-      const original = <User>{ _id: new ObjectIdMock('123'), roles: ['Member'] }
-      const data = new UserDto({ name: 'Crysfel Villa', avatar: 'test.jpg', roles: ['Member', 'Admin'] });
+      const original = <User>{
+        _id: new ObjectIdMock('123'),
+        roles: ['Member'],
+      };
+      const data = new UserDto({
+        name: 'Crysfel Villa',
+        avatar: 'test.jpg',
+        roles: ['Member', 'Admin'],
+      });
 
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('123'), roles: ['Admin'] }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('123'),
+          roles: ['Admin'],
+        }),
+      );
       usersService.findById = jest.fn(() => Promise.resolve(original));
       usersService.update = jest.fn(() => Promise.resolve({ ok: 1 }));
 
-      expect(await usersController.update(request, params, data)).toEqual(response);
+      expect(await usersController.update(request, params, data)).toEqual(
+        response,
+      );
       expect(usersService.update).toHaveBeenCalledTimes(1);
       expect(usersService.update).toHaveBeenCalledWith({
         ...original,
@@ -210,14 +247,30 @@ describe('modules/users/UsersController', () => {
     });
 
     it('should not update the email', async () => {
-      const original = <User>{ _id: new ObjectIdMock('123'), email: 'test@test.com', roles: ['Member'] }
-      const data = new UserDto({ name: 'Crysfel Villa', email: 'should@ignore.com', avatar: 'test.jpg', roles: ['Member', 'Admin'] });
+      const original = <User>{
+        _id: new ObjectIdMock('123'),
+        email: 'test@test.com',
+        roles: ['Member'],
+      };
+      const data = new UserDto({
+        name: 'Crysfel Villa',
+        email: 'should@ignore.com',
+        avatar: 'test.jpg',
+        roles: ['Member', 'Admin'],
+      });
 
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock('123'), roles: ['Admin'] }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('123'),
+          roles: ['Admin'],
+        }),
+      );
       usersService.findById = jest.fn(() => Promise.resolve(original));
       usersService.update = jest.fn(() => Promise.resolve({ ok: 1 }));
 
-      expect(await usersController.update(request, params, data)).toEqual(response);
+      expect(await usersController.update(request, params, data)).toEqual(
+        response,
+      );
       expect(usersService.update).toHaveBeenCalledTimes(1);
       expect(usersService.update).toHaveBeenCalledWith({
         ...original,
@@ -226,7 +279,7 @@ describe('modules/users/UsersController', () => {
         roles: ['Member', 'Admin'],
       });
     });
-  })
+  });
 
   describe('remove', () => {
     let request;
@@ -242,44 +295,74 @@ describe('modules/users/UsersController', () => {
     });
 
     it('should return success when removing a valid user', async () => {
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(request.user.auth0Id), roles: [] }));
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(request.user.auth0Id),
+          roles: [],
+        }),
+      );
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
+      );
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
-      mentorsService.removeAllApplicationsByUserId = jest.fn(() => Promise.resolve());
+      mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
+        Promise.resolve(),
+      );
       auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({}));
       auth0Service.deleteUser = jest.fn(() => Promise.resolve());
 
       expect(await usersController.remove(request, params)).toEqual(response);
     });
-    
+
     it('should throw an error when user not found', async () => {
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(request.user.auth0Id), roles: [] }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(request.user.auth0Id),
+          roles: [],
+        }),
+      );
       usersService.findById = jest.fn(() => undefined);
 
-      await expect(usersController.remove(request, params))
-        .rejects
-        .toThrow(BadRequestException);
+      await expect(usersController.remove(request, params)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw an error if trying to remove other user', async () => {
       const params = { id: '5678' };
 
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(request.user.auth0Id), roles: [] }));
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(request.user.auth0Id),
+          roles: [],
+        }),
+      );
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
+      );
 
-      await expect(usersController.remove(request, params))
-        .rejects
-        .toThrow(UnauthorizedException);
+      await expect(usersController.remove(request, params)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should remove other user if is admin', async () => {
       const params = { id: '5678' };
 
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(request.user.auth0Id), roles: ['Admin'] }));
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(request.user.auth0Id),
+          roles: ['Admin'],
+        }),
+      );
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
+      );
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
       emailService.send = jest.fn();
-      mentorsService.removeAllApplicationsByUserId = jest.fn(() => Promise.resolve());
+      mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
+        Promise.resolve(),
+      );
       auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({}));
       auth0Service.deleteUser = jest.fn(() => Promise.resolve());
 
@@ -287,42 +370,78 @@ describe('modules/users/UsersController', () => {
     });
 
     it('should remove all previous applications', async () => {
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(request.user.auth0Id), roles: [] }));
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(request.user.auth0Id),
+          roles: [],
+        }),
+      );
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
+      );
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
-      mentorsService.removeAllApplicationsByUserId = jest.fn(() => Promise.resolve());
+      mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
+        Promise.resolve(),
+      );
       auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({}));
       auth0Service.deleteUser = jest.fn(() => Promise.resolve());
 
-      await usersController.remove(request, params)
+      await usersController.remove(request, params);
 
-      expect(mentorsService.removeAllApplicationsByUserId).toHaveBeenCalledTimes(1);
-      expect(mentorsService.removeAllApplicationsByUserId).toHaveBeenCalledWith(params.id);
+      expect(
+        mentorsService.removeAllApplicationsByUserId,
+      ).toHaveBeenCalledTimes(1);
+      expect(mentorsService.removeAllApplicationsByUserId).toHaveBeenCalledWith(
+        params.id,
+      );
     });
 
     it('should remove user from database', async () => {
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(request.user.auth0Id), roles: [] }));
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(request.user.auth0Id),
+          roles: [],
+        }),
+      );
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
+      );
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
-      mentorsService.removeAllApplicationsByUserId = jest.fn(() => Promise.resolve());
+      mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
+        Promise.resolve(),
+      );
       auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({}));
       auth0Service.deleteUser = jest.fn(() => Promise.resolve());
 
-      await usersController.remove(request, params)
+      await usersController.remove(request, params);
 
       expect(usersService.remove).toHaveBeenCalledTimes(1);
       expect(usersService.remove).toHaveBeenCalledWith(params.id);
     });
 
     it('should remove user from auth0', async () => {
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(request.user.auth0Id), roles: [] }));
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(params.id), auth0Id: 'abcd' }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(request.user.auth0Id),
+          roles: [],
+        }),
+      );
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(params.id),
+          auth0Id: 'abcd',
+        }),
+      );
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
-      mentorsService.removeAllApplicationsByUserId = jest.fn(() => Promise.resolve());
-      auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({ access_token: '159' }));
+      mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
+        Promise.resolve(),
+      );
+      auth0Service.getAdminAccessToken = jest.fn(() =>
+        Promise.resolve({ access_token: '159' }),
+      );
       auth0Service.deleteUser = jest.fn(() => Promise.resolve());
 
-      await usersController.remove(request, params)
+      await usersController.remove(request, params);
 
       expect(auth0Service.getAdminAccessToken).toHaveBeenCalledTimes(1);
       expect(auth0Service.deleteUser).toHaveBeenCalledTimes(1);
@@ -332,12 +451,28 @@ describe('modules/users/UsersController', () => {
     it('should return an error if something fails', async () => {
       const response = { success: false, error: 'Something failed' };
 
-      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(request.user.auth0Id), roles: [] }));
-      usersService.findById = jest.fn(() => Promise.resolve(<User>{ _id: new ObjectIdMock(params.id), auth0Id: 'abcd' }));
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(request.user.auth0Id),
+          roles: [],
+        }),
+      );
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(params.id),
+          auth0Id: 'abcd',
+        }),
+      );
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
-      mentorsService.removeAllApplicationsByUserId = jest.fn(() => Promise.resolve());
-      auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({ access_token: '159' }));
-      auth0Service.deleteUser = jest.fn(() => { throw new Error('Something failed') });
+      mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
+        Promise.resolve(),
+      );
+      auth0Service.getAdminAccessToken = jest.fn(() =>
+        Promise.resolve({ access_token: '159' }),
+      );
+      auth0Service.deleteUser = jest.fn(() => {
+        throw new Error('Something failed');
+      });
 
       expect(await usersController.remove(request, params)).toEqual(response);
     });
