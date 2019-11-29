@@ -1,4 +1,3 @@
-
 export interface Totals {
   readonly total: number;
   readonly admins: number;

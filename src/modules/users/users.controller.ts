@@ -39,7 +39,7 @@ export class UsersController {
     private readonly mentorService: MentorsService,
     private readonly auth0Service: Auth0Service,
     private readonly listsService: ListsService,
-  ) { }
+  ) {}
 
   @ApiOperation({ title: 'Return all registered users' })
   @Get()

@@ -1,4 +1,3 @@
-
 const config = {
   mongo: {
     url: process.env.MONGO_DATABASE_URL,

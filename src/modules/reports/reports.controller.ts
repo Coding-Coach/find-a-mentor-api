@@ -1,4 +1,11 @@
-import { Controller, Get, Query, Req, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Req,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { User, Role } from '../common/interfaces/user.interface';
@@ -13,12 +20,20 @@ export class ReportsController {
   constructor(
     private readonly usersService: UsersService,
     private readonly reportsService: ReportsService,
-  ) { }
+  ) {}
 
-  @ApiOperation({ title: 'Return total number of users by role for the given date range' })
+  @ApiOperation({
+    title: 'Return total number of users by role for the given date range',
+  })
   @Get('users')
-  async users(@Req() request: Request, @Query('start') start: string, @Query('end') end: string) {
-    const current: User = await this.usersService.findByAuth0Id(request.user.auth0Id);
+  async users(
+    @Req() request: Request,
+    @Query('start') start: string,
+    @Query('end') end: string,
+  ) {
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
 
     if (!current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException('Access denied');

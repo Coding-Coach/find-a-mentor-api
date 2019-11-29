@@ -37,16 +37,20 @@ describe('modules/users/UsersController', () => {
         {
           provide: UsersService,
           useValue: new ServiceMock(),
-        }, {
+        },
+        {
           provide: EmailService,
           useValue: new ServiceMock(),
-        }, {
+        },
+        {
           provide: MentorsService,
           useValue: new ServiceMock(),
-        }, {
+        },
+        {
           provide: Auth0Service,
           useValue: new ServiceMock(),
-        }, {
+        },
+        {
           provide: ListsService,
           useValue: new ServiceMock(),
         },
@@ -94,8 +98,12 @@ describe('modules/users/UsersController', () => {
       usersService.create = jest.fn(() => Promise.resolve(data));
       emailService.send = jest.fn();
       listService.createList = jest.fn();
-      auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({ access_token: 'abc' }));
-      auth0Service.getUserProfile = jest.fn(() => Promise.resolve({ _id: '123' }));
+      auth0Service.getAdminAccessToken = jest.fn(() =>
+        Promise.resolve({ access_token: 'abc' }),
+      );
+      auth0Service.getUserProfile = jest.fn(() =>
+        Promise.resolve({ _id: '123' }),
+      );
 
       expect(await usersController.currentUser(request)).toEqual(response);
       expect(usersService.create).toHaveBeenCalledTimes(1);

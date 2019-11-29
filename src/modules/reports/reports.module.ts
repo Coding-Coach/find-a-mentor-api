@@ -9,4 +9,4 @@ import { CommonModule } from '../common/common.module';
   controllers: [ReportsController],
   providers: [ReportsService],
 })
-export class ReportsModule { }
+export class ReportsModule {}

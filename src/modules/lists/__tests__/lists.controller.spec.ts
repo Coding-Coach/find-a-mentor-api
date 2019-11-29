@@ -492,12 +492,12 @@ describe('modules/lists/ListsController', () => {
       );
       listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[]));
       const data = {
-        mentors: [{_id: '123456'}],
+        mentors: [{ _id: '123456' }],
       };
       await expect(
-        listsController.addMentorToList(<Request>request, userId, listId, <ListDto>(
-          data
-        )),
+        listsController.addMentorToList(<Request>request, userId, listId, <
+          ListDto
+        >data),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -515,12 +515,12 @@ describe('modules/lists/ListsController', () => {
         }),
       );
       const data = {
-        mentors: [{_id: '123456'}],
+        mentors: [{ _id: '123456' }],
       };
       await expect(
-        listsController.addMentorToList(<Request>request, userId, listId, <ListDto>(
-          data
-        )),
+        listsController.addMentorToList(<Request>request, userId, listId, <
+          ListDto
+        >data),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -539,12 +539,12 @@ describe('modules/lists/ListsController', () => {
       );
       listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[]));
       const data = {
-        mentors: [{_id: '123456'}],
+        mentors: [{ _id: '123456' }],
       };
       await expect(
-        listsController.addMentorToList(<Request>request, userId, listId, <ListDto>(
-          data
-        )),
+        listsController.addMentorToList(<Request>request, userId, listId, <
+          ListDto
+        >data),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -566,17 +566,15 @@ describe('modules/lists/ListsController', () => {
       );
       listsService.update = jest.fn(() => Promise.resolve());
       const data = {
-        mentors: [{_id: '123456'}],
+        mentors: [{ _id: '123456' }],
       };
-      await listsController.addMentorToList(<Request>request, userId, listId, <ListDto>(
-        data
-        ));
+      await listsController.addMentorToList(<Request>request, userId, listId, <
+        ListDto
+      >data);
       expect(listsService.update).toBeCalledTimes(1);
       expect(listsService.update).toHaveBeenCalledWith({
         _id: listId,
-        mentors: [
-          ...data.mentors
-      ]
+        mentors: [...data.mentors],
       });
     });
   });

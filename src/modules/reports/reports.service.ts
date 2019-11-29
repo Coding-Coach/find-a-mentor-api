@@ -5,9 +5,7 @@ import { Totals } from './interfaces/totals.interface';
 
 @Injectable()
 export class ReportsService {
-  constructor(
-    @Inject('USER_MODEL') private readonly userModel: Model<User>,
-  ) { }
+  constructor(@Inject('USER_MODEL') private readonly userModel: Model<User>) {}
 
   async totalsByRole(start: string, end: string): Promise<Totals> {
     const dates: any = {};
@@ -25,9 +23,15 @@ export class ReportsService {
     }
 
     const total: number = await this.userModel.find().countDocuments();
-    const admins: number = await this.userModel.find({ roles: Role.ADMIN, ...dates }).countDocuments();
-    const members: number = await this.userModel.find({ roles: [Role.MEMBER], ...dates }).countDocuments();
-    const mentors: number = await this.userModel.find({ roles: Role.MENTOR, ...dates }).countDocuments();
+    const admins: number = await this.userModel
+      .find({ roles: Role.ADMIN, ...dates })
+      .countDocuments();
+    const members: number = await this.userModel
+      .find({ roles: [Role.MEMBER], ...dates })
+      .countDocuments();
+    const mentors: number = await this.userModel
+      .find({ roles: Role.MENTOR, ...dates })
+      .countDocuments();
 
     return {
       total,
