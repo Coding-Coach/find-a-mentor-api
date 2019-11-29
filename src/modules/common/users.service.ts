@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Query, Model } from 'mongoose';
 import { UserDto } from './dto/user.dto';
-import { User } from './interfaces/user.interface';
+import { User, Role } from './interfaces/user.interface';
 import { isObjectId } from '../../utils/objectid';
 
 @Injectable()
@@ -50,10 +50,13 @@ export class UsersService {
   }
 
   async totalsByRole(): Promise<Query<any>> {
+    const members: number = await this.userModel.find({ roles: [Role.MEMBER]}).countDocuments();
+    const mentors: number = await this.userModel.find({ roles: Role.MENTOR}).countDocuments();
+
     return {
-      total: 2500,
-      members: 2000,
-      mentors: 500,
+      total: members + mentors,
+      members,
+      mentors,
     };
   }
 }
