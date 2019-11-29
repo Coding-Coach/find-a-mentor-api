@@ -24,11 +24,14 @@ export class ReportsService {
       }
     }
 
+    const total: number = await this.userModel.find().countDocuments();
+    const admins: number = await this.userModel.find({ roles: Role.ADMIN, ...dates }).countDocuments();
     const members: number = await this.userModel.find({ roles: [Role.MEMBER], ...dates }).countDocuments();
     const mentors: number = await this.userModel.find({ roles: Role.MENTOR, ...dates }).countDocuments();
 
     return {
-      total: members + mentors,
+      total,
+      admins,
       members,
       mentors,
     } as Totals;

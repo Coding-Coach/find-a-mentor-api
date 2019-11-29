@@ -37,19 +37,20 @@ describe('modules/users/UsersController', () => {
         {
           provide: UsersService,
           useValue: new ServiceMock(),
-      }, {
-        provide: EmailService,
-        useValue: new ServiceMock(),
-      }, {
-        provide: MentorsService,
-        useValue: new ServiceMock(),
-      }, {
-        provide: Auth0Service,
-        useValue: new ServiceMock(),
-      }, {
-        provide: ListsService,
-        useValue: new ServiceMock(),
-      }],
+        }, {
+          provide: EmailService,
+          useValue: new ServiceMock(),
+        }, {
+          provide: MentorsService,
+          useValue: new ServiceMock(),
+        }, {
+          provide: Auth0Service,
+          useValue: new ServiceMock(),
+        }, {
+          provide: ListsService,
+          useValue: new ServiceMock(),
+        },
+      ],
     }).compile();
 
     usersService = module.get<UsersService>(UsersService);
