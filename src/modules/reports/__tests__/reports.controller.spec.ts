@@ -73,6 +73,7 @@ describe('modules/reports/ReportsController', () => {
     it('should return total number of users', async () => {
       const data: Totals = {
         total: 2500,
+        admins: 2,
         members: 2000,
         mentors: 500,
       };
@@ -86,6 +87,7 @@ describe('modules/reports/ReportsController', () => {
     it('should return total number of users by date range', async () => {
       const data: Totals = {
         total: 2500,
+        admins: 2,
         members: 2000,
         mentors: 500,
       };
