@@ -25,6 +25,10 @@ const config = {
   email: {
     FROM: 'Coding Coach <no-reply@mail.codingcoach.io>',
   },
+  files: {
+    public: process.env.PUBLIC_FOLDER,
+    avatars: `${process.env.PUBLIC_FOLDER}/avatars`,
+  },
   pagination: {
     limit: 20,
   },

@@ -4,11 +4,14 @@ import {
   Controller,
   Get,
   Delete,
+  Post,
   Put,
   Body,
   Param,
   Req,
   UnauthorizedException,
+  UploadedFile,
+  UseInterceptors,
   BadRequestException,
   ValidationPipe,
   UsePipes,
@@ -19,6 +22,8 @@ import {
   ApiOperation,
   ApiUseTags,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import Config from '../../config';
 import { UserDto } from '../common/dto/user.dto';
 import { UsersService } from '../common/users.service';
 import { Auth0Service } from '../common/auth0.service';
@@ -28,6 +33,7 @@ import { EmailService } from '../email/email.service';
 import { Template } from '../email/interfaces/email.interface';
 import { ListDto } from '../lists/dto/list.dto';
 import { ListsService } from '../lists/lists.service';
+import { filterImages } from '../../utils/mimes';
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -247,5 +253,24 @@ export class UsersController {
         error: error.message,
       };
     }
+  }
+
+  @ApiOperation({ title: 'Upload an avatar for the given user' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
+  @Post(':id/avatar')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      dest: Config.files.avatars,
+      fileFilter: filterImages,
+    }),
+  )
+  uploadAvatar(@UploadedFile() image) {
+    if (!image) {
+      throw new BadRequestException('We only support JPEG, PNG and SVG files');
+    }
+
+    return {
+      success: true,
+    };
   }
 }
