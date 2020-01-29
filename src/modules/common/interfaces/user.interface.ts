@@ -1,4 +1,5 @@
 import { Document, ObjectID } from 'mongoose';
+import { FileMeta } from './filemeta.interface';
 
 export enum Role {
   ADMIN = 'Admin',
@@ -28,6 +29,7 @@ export interface User extends Document {
   readonly available: boolean;
   readonly name: string;
   readonly avatar: string;
+  readonly image: FileMeta;
   readonly title: string;
   readonly description: string;
   readonly country: string;

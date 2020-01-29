@@ -29,6 +29,7 @@ import { UsersService } from '../common/users.service';
 import { Auth0Service } from '../common/auth0.service';
 import { MentorsService } from '../common/mentors.service';
 import { Role, User } from '../common/interfaces/user.interface';
+import { FileMeta } from '../common/interfaces/filemeta.interface';
 import { EmailService } from '../email/email.service';
 import { Template } from '../email/interfaces/email.interface';
 import { ListDto } from '../lists/dto/list.dto';
@@ -264,13 +265,40 @@ export class UsersController {
       fileFilter: filterImages,
     }),
   )
-  uploadAvatar(@UploadedFile() image) {
+  async uploadAvatar(@Req() request, @Param() params, @UploadedFile() image) {
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
+    const user: User = await this.usersService.findById(params.id);
+
     if (!image) {
       throw new BadRequestException('We only support JPEG, PNG and SVG files');
     }
 
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    // Only own user or admins can remove the given user
+    if (!user._id.equals(current._id) && !current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
+    }
+
+    // Check if there's a previos avatar in disk, if so we need to remove it
+    if (user.image) {
+    }
+
+    const userDto: UserDto = new UserDto({
+      _id: user._id,
+      avatar: `/avatars/${image.filename}`,
+      image,
+    });
+    const res: any = await this.usersService.update(userDto);
+
     return {
-      success: true,
+      success: res.ok === 1,
     };
   }
 }
