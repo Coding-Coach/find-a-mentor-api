@@ -36,4 +36,6 @@ export interface User extends Document {
   readonly roles: Role[];
   readonly channels: Channel[];
   readonly createdAt: string;
+  readonly capacity: number;
+  readonly timezone: string;
 }
