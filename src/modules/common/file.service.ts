@@ -1,7 +1,18 @@
+import * as fs from 'fs';
 import { Injectable } from '@nestjs/common';
-import { FileMeta } from './interfaces/user.interface';
 
 @Injectable()
 export class FileService {
-  async removeFile(file: FileMeta) {}
+  async removeFile(path: string) {
+    try {
+      if (fs.existsSync(path)) {
+        fs.unlinkSync(path);
+      }
+
+      return Promise.resolve(true);
+    } catch (error) {
+      console.log('The file was not removed', error);
+      return Promise.resolve(false);
+    }
+  }
 }

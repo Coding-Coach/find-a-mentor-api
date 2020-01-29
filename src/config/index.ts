@@ -27,7 +27,7 @@ const config = {
   },
   files: {
     public: process.env.PUBLIC_FOLDER,
-    avatars: `${process.env.PUBLIC_FOLDER}/avatars`,
+    avatars: `avatars`,
   },
   pagination: {
     limit: 20,

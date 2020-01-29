@@ -27,6 +27,7 @@ import Config from '../../config';
 import { UserDto } from '../common/dto/user.dto';
 import { UsersService } from '../common/users.service';
 import { Auth0Service } from '../common/auth0.service';
+import { FileService } from '../common/file.service';
 import { MentorsService } from '../common/mentors.service';
 import { Role, User } from '../common/interfaces/user.interface';
 import { FileMeta } from '../common/interfaces/filemeta.interface';
@@ -46,6 +47,7 @@ export class UsersController {
     private readonly mentorService: MentorsService,
     private readonly auth0Service: Auth0Service,
     private readonly listsService: ListsService,
+    private readonly fileService: FileService,
   ) {}
 
   @ApiOperation({ title: 'Return all registered users' })
@@ -261,7 +263,7 @@ export class UsersController {
   @Post(':id/avatar')
   @UseInterceptors(
     FileInterceptor('image', {
-      dest: Config.files.avatars,
+      dest: `${Config.files.public}/${Config.files.avatars}`,
       fileFilter: filterImages,
     }),
   )
@@ -288,11 +290,14 @@ export class UsersController {
 
     // Check if there's a previos avatar in disk, if so we need to remove it
     if (user.image) {
+      await this.fileService.removeFile(
+        `${Config.files.public}/${Config.files.avatars}/${user.image.filename}`,
+      );
     }
 
     const userDto: UserDto = new UserDto({
       _id: user._id,
-      avatar: `/avatars/${image.filename}`,
+      avatar: `/${Config.files.avatars}/${image.filename}`,
       image,
     });
     const res: any = await this.usersService.update(userDto);
