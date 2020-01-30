@@ -10,6 +10,7 @@ import {
   IsArray,
   ArrayMinSize,
   ArrayMaxSize,
+  IsInt,
 } from 'class-validator';
 import { Role, Channel } from '../interfaces/user.interface';
 
@@ -52,6 +53,16 @@ export class UserDto {
   @IsOptional()
   @IsString()
   readonly country: string;
+
+  @ApiModelPropertyOptional()
+  @IsOptional()
+  @IsString()
+  readonly timezone: string;
+
+  @ApiModelPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  readonly capacity: number;
 
   @ApiModelPropertyOptional()
   @IsOptional()
