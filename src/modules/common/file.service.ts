@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class FileService {
-  async removeFile(path: string) {
+  async removeFile(path: string): Promise<boolean> {
     try {
       if (fs.existsSync(path)) {
         fs.unlinkSync(path);
@@ -11,7 +11,6 @@ export class FileService {
 
       return Promise.resolve(true);
     } catch (error) {
-      console.log('The file was not removed', error);
       return Promise.resolve(false);
     }
   }

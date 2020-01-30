@@ -1,10 +1,10 @@
 export interface FileMeta extends Document {
-  readonly fieldname: String;
-  readonly originalname: String;
-  readonly encoding: String;
-  readonly mimetype: String;
-  readonly destination: String;
-  readonly filename: String;
-  readonly path: String;
-  readonly size: Number;
+  readonly fieldname: string;
+  readonly originalname: string;
+  readonly encoding: string;
+  readonly mimetype: string;
+  readonly destination: string;
+  readonly filename: string;
+  readonly path: string;
+  readonly size: number;
 }

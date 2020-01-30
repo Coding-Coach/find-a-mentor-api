@@ -6,6 +6,7 @@ import { EmailService } from '../../email/email.service';
 import { MentorsService } from '../../common/mentors.service';
 import { ListsService } from '../../lists/lists.service';
 import { Auth0Service } from '../../common/auth0.service';
+import { FileService } from '../../common/file.service';
 import { UserDto } from '../../common/dto/user.dto';
 import { User } from '../../common/interfaces/user.interface';
 
@@ -29,6 +30,7 @@ describe('modules/users/UsersController', () => {
   let mentorsService: MentorsService;
   let auth0Service: Auth0Service;
   let listService: ListsService;
+  let fileService: FileService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -54,6 +56,10 @@ describe('modules/users/UsersController', () => {
           provide: ListsService,
           useValue: new ServiceMock(),
         },
+        {
+          provide: FileService,
+          useValue: new ServiceMock(),
+        },
       ],
     }).compile();
 
@@ -63,6 +69,7 @@ describe('modules/users/UsersController', () => {
     auth0Service = module.get<Auth0Service>(Auth0Service);
     emailService = module.get<EmailService>(EmailService);
     listService = module.get<ListsService>(ListsService);
+    fileService = module.get<FileService>(FileService);
   });
 
   describe('index', () => {
@@ -484,6 +491,79 @@ describe('modules/users/UsersController', () => {
       });
 
       expect(await usersController.remove(request, params)).toEqual(response);
+    });
+  });
+
+  describe('uploadAvatar', () => {
+    let request;
+    let params;
+    let response;
+    let image;
+
+    beforeEach(() => {
+      request = {
+        user: { auth0Id: '1234' },
+      };
+      params = { id: '1234' };
+      response = { success: true };
+      image = { filename: 'image.png' };
+
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(request.user.auth0Id),
+          roles: [],
+        }),
+      );
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
+      );
+    });
+
+    it('should throw an error if no valid image is received', async () => {
+      await expect(
+        usersController.uploadAvatar(request, params, undefined),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw an error if user not found', async () => {
+      usersService.findById = jest.fn(() => Promise.resolve(undefined));
+
+      await expect(
+        usersController.uploadAvatar(request, params, {}),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw an error if updating other member and NOT an admin', async () => {
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{ _id: new ObjectIdMock('432534') }),
+      );
+
+      await expect(
+        usersController.uploadAvatar(request, params, {}),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should update the users image', async () => {
+      usersService.update = jest.fn(() => Promise.resolve({ ok: 1 }));
+
+      expect(
+        await usersController.uploadAvatar(request, params, image),
+      ).toEqual(response);
+      expect(usersService.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('should remove previous image', async () => {
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id), image: {} }),
+      );
+      fileService.removeFile = jest.fn(() => Promise.resolve(true));
+      usersService.update = jest.fn(() => Promise.resolve({ ok: 1 }));
+
+      expect(
+        await usersController.uploadAvatar(request, params, image),
+      ).toEqual(response);
+      expect(fileService.removeFile).toHaveBeenCalledTimes(1);
+      expect(usersService.update).toHaveBeenCalledTimes(1);
     });
   });
 });

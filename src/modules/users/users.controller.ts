@@ -30,7 +30,6 @@ import { Auth0Service } from '../common/auth0.service';
 import { FileService } from '../common/file.service';
 import { MentorsService } from '../common/mentors.service';
 import { Role, User } from '../common/interfaces/user.interface';
-import { FileMeta } from '../common/interfaces/filemeta.interface';
 import { EmailService } from '../email/email.service';
 import { Template } from '../email/interfaces/email.interface';
 import { ListDto } from '../lists/dto/list.dto';
