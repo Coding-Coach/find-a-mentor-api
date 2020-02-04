@@ -16,6 +16,17 @@ export const ChannelSchema = new mongoose.Schema({
   },
 });
 
+export const AvatarSchema = new mongoose.Schema({
+  fieldname: String,
+  originalname: String,
+  encoding: String,
+  mimetype: String,
+  destination: String,
+  filename: String,
+  path: String,
+  size: Number,
+});
+
 export const UserSchema = new mongoose.Schema({
   auth0Id: {
     type: String,
@@ -34,6 +45,7 @@ export const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  image: AvatarSchema,
   title: String,
   description: String,
   country: String,

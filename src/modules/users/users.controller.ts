@@ -4,11 +4,14 @@ import {
   Controller,
   Get,
   Delete,
+  Post,
   Put,
   Body,
   Param,
   Req,
   UnauthorizedException,
+  UploadedFile,
+  UseInterceptors,
   BadRequestException,
   ValidationPipe,
   UsePipes,
@@ -19,15 +22,19 @@ import {
   ApiOperation,
   ApiUseTags,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import Config from '../../config';
 import { UserDto } from '../common/dto/user.dto';
 import { UsersService } from '../common/users.service';
 import { Auth0Service } from '../common/auth0.service';
+import { FileService } from '../common/file.service';
 import { MentorsService } from '../common/mentors.service';
 import { Role, User } from '../common/interfaces/user.interface';
 import { EmailService } from '../email/email.service';
 import { Template } from '../email/interfaces/email.interface';
 import { ListDto } from '../lists/dto/list.dto';
 import { ListsService } from '../lists/lists.service';
+import { filterImages } from '../../utils/mimes';
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -39,6 +46,7 @@ export class UsersController {
     private readonly mentorService: MentorsService,
     private readonly auth0Service: Auth0Service,
     private readonly listsService: ListsService,
+    private readonly fileService: FileService,
   ) {}
 
   @ApiOperation({ title: 'Return all registered users' })
@@ -247,5 +255,54 @@ export class UsersController {
         error: error.message,
       };
     }
+  }
+
+  @ApiOperation({ title: 'Upload an avatar for the given user' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
+  @Post(':id/avatar')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      dest: `${Config.files.public}/${Config.files.avatars}`,
+      fileFilter: filterImages,
+    }),
+  )
+  async uploadAvatar(@Req() request, @Param() params, @UploadedFile() image) {
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
+    const user: User = await this.usersService.findById(params.id);
+
+    if (!image) {
+      throw new BadRequestException('We only support JPEG, PNG and SVG files');
+    }
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    // Only own user or admins can remove the given user
+    if (!user._id.equals(current._id) && !current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
+    }
+
+    // Check if there's a previos avatar in disk, if so we need to remove it
+    if (user.image) {
+      await this.fileService.removeFile(
+        `${Config.files.public}/${Config.files.avatars}/${user.image.filename}`,
+      );
+    }
+
+    const userDto: UserDto = new UserDto({
+      _id: user._id,
+      avatar: `/${Config.files.avatars}/${image.filename}`,
+      image,
+    });
+    const res: any = await this.usersService.update(userDto);
+
+    return {
+      success: res.ok === 1,
+    };
   }
 }
