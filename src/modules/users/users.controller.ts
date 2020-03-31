@@ -267,6 +267,8 @@ export class UsersController {
     }),
   )
   async uploadAvatar(@Req() request, @Param() params, @UploadedFile() image) {
+    const imagePath = `${Config.files.public}/${Config.files.avatars}/${image &&
+      image.filename}`;
     const current: User = await this.usersService.findByAuth0Id(
       request.user.auth0Id,
     );
@@ -287,16 +289,37 @@ export class UsersController {
       );
     }
 
-    // Check if there's a previos avatar in disk, if so we need to remove it
+    // Check if there's a previous avatar in disk, if so we need to remove it
     if (user.image) {
       await this.fileService.removeFile(
         `${Config.files.public}/${Config.files.avatars}/${user.image.filename}`,
       );
+      await this.fileService.removeFile(
+        `${Config.files.public}/${Config.files.avatars}/tns/${
+          user.image.filename
+        }`,
+      );
+    }
+
+    let avatar = `/${Config.files.avatars}/tns/${image.filename}`;
+    try {
+      // Resize image to make sure we have avatars with the same size
+      await this.fileService.createThumbnail(
+        imagePath,
+        `${Config.files.public}${avatar}`,
+        {
+          width: 200,
+          height: 200,
+        },
+      );
+    } catch (error) {
+      console.log(error);
+      avatar = `/${Config.files.avatars}/${image.filename}`;
     }
 
     const userDto: UserDto = new UserDto({
       _id: user._id,
-      avatar: `/${Config.files.avatars}/${image.filename}`,
+      avatar,
       image,
     });
     const res: any = await this.usersService.update(userDto);

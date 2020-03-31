@@ -562,7 +562,7 @@ describe('modules/users/UsersController', () => {
       expect(
         await usersController.uploadAvatar(request, params, image),
       ).toEqual(response);
-      expect(fileService.removeFile).toHaveBeenCalledTimes(1);
+      expect(fileService.removeFile).toHaveBeenCalledTimes(2);
       expect(usersService.update).toHaveBeenCalledTimes(1);
     });
   });
