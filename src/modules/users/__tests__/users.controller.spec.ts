@@ -517,6 +517,7 @@ describe('modules/users/UsersController', () => {
       usersService.findById = jest.fn(() =>
         Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
       );
+      fileService.createThumbnail = jest.fn(() => Promise.resolve(true));
     });
 
     it('should throw an error if no valid image is received', async () => {
@@ -550,6 +551,7 @@ describe('modules/users/UsersController', () => {
         await usersController.uploadAvatar(request, params, image),
       ).toEqual(response);
       expect(usersService.update).toHaveBeenCalledTimes(1);
+      expect(fileService.createThumbnail).toHaveBeenCalledTimes(1);
     });
 
     it('should remove previous image', async () => {
@@ -562,8 +564,9 @@ describe('modules/users/UsersController', () => {
       expect(
         await usersController.uploadAvatar(request, params, image),
       ).toEqual(response);
-      expect(fileService.removeFile).toHaveBeenCalledTimes(1);
+      expect(fileService.removeFile).toHaveBeenCalledTimes(2);
       expect(usersService.update).toHaveBeenCalledTimes(1);
+      expect(fileService.createThumbnail).toHaveBeenCalledTimes(1);
     });
   });
 });
