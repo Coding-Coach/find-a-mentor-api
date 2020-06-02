@@ -51,7 +51,17 @@ export class UsersController {
 
   @ApiOperation({ title: 'Return all registered users' })
   @Get()
-  async index() {
+  async index(@Req() request) {
+    const userId: string = request.user.auth0Id;
+    const current: User = await this.usersService.findByAuth0Id(userId);
+
+    // Only admins can get the lists of all users
+    if (!current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
+    }
+
     const data: User[] = await this.usersService.findAll();
 
     return {
@@ -145,16 +155,29 @@ export class UsersController {
   @ApiOperation({ title: 'Returns a single user by ID' })
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Get(':id')
-  async show(@Param() params) {
-    const data: User = await this.usersService.findById(params.id);
+  async show(@Req() request, @Param() params) {
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
+    const user: User = await this.usersService.findById(params.id);
 
-    if (!data) {
+    if (!user) {
       throw new BadRequestException('User not found');
+    }
+
+    // Only admins can see the email
+    if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
+      const usr = { ...user };
+      delete usr.email;
+      return {
+        success: true,
+        data: usr,
+      };
     }
 
     return {
       success: true,
-      data,
+      data: user,
     };
   }
 
