@@ -8,7 +8,7 @@ import { ListsService } from '../../lists/lists.service';
 import { Auth0Service } from '../../common/auth0.service';
 import { FileService } from '../../common/file.service';
 import { UserDto } from '../../common/dto/user.dto';
-import { User } from '../../common/interfaces/user.interface';
+import { User, Role } from '../../common/interfaces/user.interface';
 
 class ServiceMock {}
 
@@ -73,12 +73,33 @@ describe('modules/users/UsersController', () => {
   });
 
   describe('index', () => {
+    it('should return an error if current user is not an admin', async () => {
+      const request = { user: { auth0Id: '123' } };
+
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{ _id: new ObjectIdMock('123'), roles: [] }),
+      );
+      usersService.findAll = jest.fn(() => Promise.resolve([]));
+
+      await expect(usersController.index(request)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
     it('should return all registered users', async () => {
+      const request = { user: { auth0Id: '123' } };
       const data: User[] = [<User>{ _id: 123, name: 'Crysfel Villa' }];
       const response = { success: true, data };
+
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('123'),
+          roles: [Role.ADMIN],
+        }),
+      );
       usersService.findAll = jest.fn(() => Promise.resolve(data));
 
-      expect(await usersController.index()).toEqual(response);
+      expect(await usersController.index(request)).toEqual(response);
     });
   });
 
@@ -138,22 +159,65 @@ describe('modules/users/UsersController', () => {
   describe('show', () => {
     it('should return a user', async () => {
       const params = { id: 123 };
-      const data: User = <User>{ _id: 123, name: 'Crysfel Villa' };
+      const data: User = <User>{
+        _id: 123,
+        name: 'Crysfel Villa',
+        email: 'test@testing.com',
+      };
       const response = { success: true, data };
+      const request = { user: { auth0Id: '456' } };
 
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('456'),
+          roles: [Role.ADMIN],
+        }),
+      );
       usersService.findById = jest.fn(() => Promise.resolve(data));
 
-      expect(await usersController.show(params)).toEqual(response);
+      expect(await usersController.show(request, params)).toEqual(response);
+      expect(usersService.findById).toHaveBeenCalledTimes(1);
+      expect(usersService.findById).toHaveBeenCalledWith(params.id);
+    });
+
+    it('should hide email if not admin or own user', async () => {
+      const params = { id: 123 };
+      const data: User = <User>{
+        _id: 123,
+        name: 'Crysfel Villa',
+        email: 'test@testing.com',
+      };
+      const request = { user: { auth0Id: '456' } };
+
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('456'),
+          roles: [Role.MEMBER],
+        }),
+      );
+      usersService.findById = jest.fn(() => Promise.resolve(data));
+
+      expect(await usersController.show(request, params)).toEqual({
+        success: true,
+        data: { _id: 123, name: 'Crysfel Villa' },
+      });
       expect(usersService.findById).toHaveBeenCalledTimes(1);
       expect(usersService.findById).toHaveBeenCalledWith(params.id);
     });
 
     it('should throw an error when user not found', async () => {
       const params = { id: 123 };
+      const request = { user: { auth0Id: '123' } };
 
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock('123'),
+          roles: [Role.ADMIN],
+        }),
+      );
       usersService.findById = jest.fn(() => Promise.resolve(undefined));
 
-      await expect(usersController.show(params)).rejects.toThrow(
+      await expect(usersController.show(request, params)).rejects.toThrow(
         BadRequestException,
       );
       expect(usersService.findById).toHaveBeenCalledTimes(1);
