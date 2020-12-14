@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { MentorshipsController } from '../mentorships.controller';
 import { UsersService } from '../../common/users.service';
 import { MentorsService } from '../../common/mentors.service';
+import { EmailService } from '../../email/email.service';
 import { MentorshipsService } from '../mentorships.service';
 import { Role, User } from '../../common/interfaces/user.interface';
 import { MentorshipDto } from '../dto/mentorship.dto';
@@ -27,6 +28,7 @@ describe('modules/mentorships/MentorshipsController', () => {
   let usersService: UsersService;
   let mentorsService: MentorsService;
   let mentorshipsService: MentorshipsService;
+  let emailService: EmailService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -44,12 +46,17 @@ describe('modules/mentorships/MentorshipsController', () => {
           provide: MentorshipsService,
           useValue: new ServiceMock(),
         },
+        {
+          provide: EmailService,
+          useValue: new ServiceMock(),
+        },
       ],
     }).compile();
 
     usersService = module.get<UsersService>(UsersService);
     mentorsService = module.get<MentorsService>(MentorsService);
     mentorshipsService = module.get<MentorshipsService>(MentorshipsService);
+    emailService = module.get<EmailService>(EmailService);
     mentorshipsController = module.get<MentorshipsController>(
       MentorshipsController,
     );
@@ -81,6 +88,7 @@ describe('modules/mentorships/MentorshipsController', () => {
       );
       mentorshipsService.findMentorship = jest.fn(() => Promise.resolve(null));
       mentorshipsService.createMentorship = jest.fn(() => Promise.resolve());
+      emailService.send = jest.fn(() => Promise.resolve(null));
     });
 
     it('should return a 400 error if mentor not found', async () => {

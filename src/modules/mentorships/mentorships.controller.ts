@@ -8,8 +8,14 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import * as Sentry from '@sentry/node';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { Request } from 'express';
+import {
+  Template,
+  SendDataMentorshipParams,
+} from '../email/interfaces/email.interface';
+import { EmailService } from '../email/email.service';
 import { MentorsService } from '../common/mentors.service';
 import { UsersService } from '../common/users.service';
 import { User } from '../common/interfaces/user.interface';
@@ -24,6 +30,7 @@ export class MentorshipsController {
     private readonly mentorsService: MentorsService,
     private readonly usersService: UsersService,
     private readonly mentorshipsService: MentorshipsService,
+    private readonly emailService: EmailService,
   ) {}
 
   @Post(':mentorId/apply')
@@ -64,6 +71,18 @@ export class MentorshipsController {
       status: Status.NEW,
       ...data,
     });
+
+    try {
+      const emailData = {
+        to: mentor.email,
+        templateId: Template.MENTORSHIP_REQUEST,
+        name: current.name,
+        message: data.message,
+      };
+      await this.emailService.send<SendDataMentorshipParams>(emailData);
+    } catch (error) {
+      Sentry.captureException(error);
+    }
 
     return {
       success: true,
