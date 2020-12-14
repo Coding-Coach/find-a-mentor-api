@@ -15,8 +15,8 @@ export class MentorshipDto {
   readonly mentor: String;
   readonly mentee: String;
 
-  @ApiModelProperty()
-  @IsDefined()
+  @ApiModelPropertyOptional()
+  @IsOptional()
   @IsString()
   @IsIn([
     Status.NEW,
@@ -28,6 +28,7 @@ export class MentorshipDto {
   readonly status: Status;
 
   @ApiModelProperty()
+  @IsDefined()
   @IsString()
   @Length(3, 400)
   readonly message: string;

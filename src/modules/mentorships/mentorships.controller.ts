@@ -15,6 +15,7 @@ import { UsersService } from '../common/users.service';
 import { User } from '../common/interfaces/user.interface';
 import { MentorshipsService } from './mentorships.service';
 import { MentorshipDto } from './dto/mentorship.dto';
+import { Mentorship, Status } from './interfaces/mentorship.interface';
 
 @ApiUseTags('/mentorships')
 @Controller('mentorships')
@@ -31,7 +32,7 @@ export class MentorshipsController {
   })
   @ApiBearerAuth()
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
-  async apply(
+  async applyForMentorship(
     @Req() request: Request,
     @Param('mentorId') mentorId: string,
     @Body() data: MentorshipDto,
@@ -49,9 +50,18 @@ export class MentorshipsController {
       throw new BadRequestException('Mentor is not available');
     }
 
+    const mentorship: Mentorship = await this.mentorshipsService.findMentorship(
+      mentor._id,
+      current._id,
+    );
+    if (mentorship) {
+      throw new BadRequestException('A mentorship request already exist.');
+    }
+
     await this.mentorshipsService.createMentorship({
       mentor: mentor._id,
       mentee: current._id,
+      status: Status.NEW,
       ...data,
     });
 
