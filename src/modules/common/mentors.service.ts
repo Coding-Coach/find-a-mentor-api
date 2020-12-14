@@ -4,8 +4,9 @@ import { MentorFiltersDto } from './dto/mentorfilters.dto';
 import { ApplicationDto } from './dto/application.dto';
 import { FilterDto } from './dto/filter.dto';
 import { PaginationDto } from './dto/pagination.dto';
-import { User } from './interfaces/user.interface';
+import { Role, User } from './interfaces/user.interface';
 import { Application, Status } from './interfaces/application.interface';
+import { isObjectId } from '../../utils/objectid';
 
 @Injectable()
 export class MentorsService {
@@ -16,12 +17,24 @@ export class MentorsService {
   ) {}
 
   /**
+   * Finds a mentor by ID
+   * @param _id
+   */
+  async findById(_id: string): Promise<User> {
+    if (isObjectId(_id)) {
+      return await this.userModel.findOne({ _id, roles: Role.MENTOR }).exec();
+    }
+
+    return Promise.resolve(null);
+  }
+
+  /**
    * Search for mentors by the given filters
    * @param filters filters to apply
    */
   async findAll(filters: MentorFiltersDto, isLoggedIn: boolean): Promise<any> {
     const onlyMentors: any = {
-      roles: 'Mentor',
+      roles: Role.MENTOR,
     };
     const projections = this.getMentorFields();
 

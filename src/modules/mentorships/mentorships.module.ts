@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { MentorshipController } from './mentorships.controller';
+import { MentorshipsController } from './mentorships.controller';
 import { CommonModule } from '../common/common.module';
 import { MentorsService } from '../common/mentors.service';
 import { UsersService } from '../common/users.service';
 import { DatabaseModule } from '../../database/database.module';
 import { EmailService } from '../email/email.service';
+import { MentorshipsService } from './mentorships.service';
+import { mentorshipsProviders } from './mentorships.providers';
 
 /**
  * Mentorships module, Endpoints in this module are
@@ -14,7 +16,13 @@ import { EmailService } from '../email/email.service';
  */
 @Module({
   imports: [DatabaseModule, CommonModule, EmailService],
-  controllers: [MentorshipController],
-  providers: [MentorsService, EmailService, UsersService],
+  controllers: [MentorshipsController],
+  providers: [
+    MentorsService,
+    EmailService,
+    UsersService,
+    MentorshipsService,
+    ...mentorshipsProviders,
+  ],
 })
 export class MentorshipsModule {}
