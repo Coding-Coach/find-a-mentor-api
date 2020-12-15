@@ -20,9 +20,9 @@ export class MentorsService {
    * Finds a mentor by ID
    * @param _id
    */
-  async findById(_id: string): Promise<User> {
+  findById(_id: string): Promise<User> {
     if (isObjectId(_id)) {
-      return await this.userModel.findOne({ _id, roles: Role.MENTOR }).exec();
+      return this.userModel.findOne({ _id, roles: Role.MENTOR }).exec();
     }
 
     return Promise.resolve(null);
@@ -105,8 +105,8 @@ export class MentorsService {
     };
   }
 
-  async findApplications(filters): Promise<Application[]> {
-    return await this.applicationModel
+  findApplications(filters): Promise<Application[]> {
+    return this.applicationModel
       .find(filters)
       .populate({
         path: 'user',
@@ -132,13 +132,13 @@ export class MentorsService {
    * Creates a new application for a user to become a mentor
    * @param applicationDto user's application
    */
-  async createApplication(applicationDto: ApplicationDto): Promise<Query<any>> {
+  createApplication(applicationDto: ApplicationDto): Promise<Query<any>> {
     const application = new this.applicationModel(applicationDto);
-    return await application.save();
+    return application.save();
   }
 
-  async updateApplication(application: ApplicationDto): Promise<Query<any>> {
-    return await this.applicationModel.updateOne(
+  updateApplication(application: ApplicationDto): Promise<Query<any>> {
+    return this.applicationModel.updateOne(
       { _id: application._id },
       application,
     );
@@ -148,8 +148,8 @@ export class MentorsService {
    * Find a single application by the given user and status
    * @param user
    */
-  async findActiveApplicationByUser(user: User): Promise<Application> {
-    return await this.applicationModel
+  findActiveApplicationByUser(user: User): Promise<Application> {
+    return this.applicationModel
       .findOne({
         user: user._id,
         status: { $in: [Status.PENDING, Status.APPROVED] },
@@ -157,8 +157,8 @@ export class MentorsService {
       .exec();
   }
 
-  async findApplicationById(id: string): Promise<Application> {
-    return await this.applicationModel.findOne({ _id: id }).exec();
+  findApplicationById(id: string): Promise<Application> {
+    return this.applicationModel.findOne({ _id: id }).exec();
   }
 
   /**
@@ -171,15 +171,15 @@ export class MentorsService {
     const total: number = await this.userModel.find(filter).countDocuments();
     const random: number = Math.floor(Math.random() * total);
 
-    return await this.userModel
+    return this.userModel
       .findOne(filter)
       .select(projections)
       .skip(random)
       .exec();
   }
 
-  async removeAllApplicationsByUserId(user: string) {
-    return await this.applicationModel.deleteMany({ user }).exec();
+  removeAllApplicationsByUserId(user: string) {
+    return this.applicationModel.deleteMany({ user }).exec();
   }
 
   getMentorFields(): any {
