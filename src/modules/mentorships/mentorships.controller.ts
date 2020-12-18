@@ -62,7 +62,7 @@ export class MentorshipsController {
       current._id,
     );
     if (mentorship) {
-      throw new BadRequestException('A mentorship request already exist.');
+      throw new BadRequestException('A mentorship request already exists');
     }
 
     await this.mentorshipsService.createMentorship({
