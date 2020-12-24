@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import { Status } from '../interfaces/mentorship.interface';
 
 export const MentorshipSchema = new mongoose.Schema({
   mentor: {
@@ -14,6 +15,7 @@ export const MentorshipSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
+    enum: Object.values(Status),
   },
   message: {
     type: String,
