@@ -12,8 +12,8 @@ import { Status } from '../interfaces/mentorship.interface';
 export class MentorshipDto {
   readonly _id: string;
 
-  readonly mentor: String;
-  readonly mentee: String;
+  readonly mentor: string;
+  readonly mentee: string;
 
   @ApiModelPropertyOptional()
   @IsOptional()
@@ -36,19 +36,19 @@ export class MentorshipDto {
   @ApiModelPropertyOptional()
   @IsOptional()
   @IsArray()
-  readonly goals: String[];
+  readonly goals: string[];
 
   @ApiModelPropertyOptional()
   @IsOptional()
   @IsString()
   @Length(3, 400)
-  readonly expectation: String;
+  readonly expectation: string;
 
   @ApiModelPropertyOptional()
   @IsOptional()
   @IsString()
   @Length(3, 400)
-  readonly background: String;
+  readonly background: string;
 
   @ApiModelPropertyOptional()
   @IsOptional()
