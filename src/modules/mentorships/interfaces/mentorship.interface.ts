@@ -5,6 +5,7 @@ export enum Status {
   VIEWED = 'Viewed',
   APPROVED = 'Approved',
   REJECTED = 'Rejected',
+  CANCELLED = 'Cancelled',
   TERMINATED = 'Terminated',
 }
 
