@@ -18,13 +18,7 @@ export class MentorshipDto {
   @ApiModelPropertyOptional()
   @IsOptional()
   @IsString()
-  @IsIn([
-    Status.NEW,
-    Status.VIEWED,
-    Status.APPROVED,
-    Status.REJECTED,
-    Status.TERMINATED,
-  ])
+  @IsIn(Object.values(Status))
   readonly status: Status;
 
   @ApiModelProperty()
