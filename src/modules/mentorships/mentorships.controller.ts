@@ -7,6 +7,7 @@ import {
   Req,
   UsePipes,
   ValidationPipe,
+  Get,
 } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
@@ -83,6 +84,24 @@ export class MentorshipsController {
     } catch (error) {
       Sentry.captureException(error);
     }
+
+    return {
+      success: true,
+    };
+  }
+
+  @Get(':mentorId/requests')
+  async getMentorshipRequests(
+    @Req() request: Request,
+    @Param('mentorId') mentorId: string,
+  ) {
+    // get the user id
+
+    // get the mentorship requests to that user id
+
+    // get the mentorship requests from that user id
+
+    // format as array and respond
 
     return {
       success: true,

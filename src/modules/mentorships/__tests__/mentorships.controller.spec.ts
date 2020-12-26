@@ -128,5 +128,14 @@ describe('modules/mentorships/MentorshipsController', () => {
       );
       expect(data.success).toBe(true);
     });
+
+    it('should return mentorship requests for a given user', async () => {
+      const data = await mentorshipsController.getMentorshipRequests(
+        <Request>request,
+        mentorId,
+      );
+
+      expect(data.success).toBe(true);
+    });
   });
 });
