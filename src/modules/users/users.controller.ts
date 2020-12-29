@@ -336,7 +336,7 @@ export class UsersController {
         },
       );
     } catch (error) {
-      console.log(error);
+      console.log(error); // tslint:disable-line no-console
       avatar = `/${Config.files.avatars}/${image.filename}`;
     }
 

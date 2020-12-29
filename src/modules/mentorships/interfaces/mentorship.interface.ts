@@ -14,11 +14,11 @@ export interface Mentorship extends Document {
   readonly mentor: ObjectID;
   readonly mentee: ObjectID;
   readonly status: Status;
-  readonly message: String;
-  readonly goals: String[];
-  readonly expectation: String;
-  readonly background: String;
-  readonly reason: String;
+  readonly message: string;
+  readonly goals: string[];
+  readonly expectation: string;
+  readonly background: string;
+  readonly reason: string;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
