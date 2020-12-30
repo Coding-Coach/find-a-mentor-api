@@ -110,16 +110,16 @@ export class MentorshipsController {
     // Only an admin or same user can view the requests
     if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
       throw new UnauthorizedException(
-        'Not authorized to perform this operation',
+        'You are not authorized to perform this operation',
       );
     }
 
-    // get the mentorship requests from and to to that user
+    // Get the mentorship requests from and to to that user
     const mentorshipRequests: Mentorship[] = await this.mentorshipsService.findMentorshipsByUser(
       userId,
     );
 
-    // format the response data
+    // Format the response data
     let requests = mentorshipRequests.map(item => {
       const mentorshipSummary = new MentorshipSummaryDto({
         id: item._id,

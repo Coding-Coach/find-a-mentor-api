@@ -151,7 +151,7 @@ describe('modules/mentorships/MentorshipsController', () => {
       mentorshipsService.findMentorshipsByUser = jest.fn(() =>
         Promise.resolve([
           <Mentorship>{
-            _id: new ObjectIdMock('mentorshipId'),
+            _id: new ObjectIdMock('1'),
             mentor: new ObjectIdMock(mentorId),
             mentee: new ObjectIdMock('ANYMENTEEID'),
             status: Status.NEW,
@@ -196,7 +196,7 @@ describe('modules/mentorships/MentorshipsController', () => {
       mentorshipsService.findMentorshipsByUser = jest.fn(() =>
         Promise.resolve([
           <Mentorship>{
-            _id: new ObjectIdMock('mentorshipId'),
+            _id: new ObjectIdMock('1'),
             mentor: new ObjectIdMock('ANYMENTORID'),
             mentee: new ObjectIdMock(menteeId),
             status: Status.NEW,
@@ -264,7 +264,7 @@ describe('modules/mentorships/MentorshipsController', () => {
       mentorshipsService.findMentorshipsByUser = jest.fn(() =>
         Promise.resolve([
           <Mentorship>{
-            _id: new ObjectIdMock('mentorshipId'),
+            _id: new ObjectIdMock('1'),
             mentor: new ObjectIdMock(mentorId),
             mentee: new ObjectIdMock(menteeId),
             status: Status.NEW,

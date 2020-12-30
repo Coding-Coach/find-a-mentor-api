@@ -43,7 +43,7 @@ export class MentorshipsService {
 
   /**
    * Finds mentorhip requests from or to a user
-   * @param mentorId
+   * @param userId
    */
   async findMentorshipsByUser(userId: string): Promise<Mentorship[]> {
     if (isObjectId(userId)) {
