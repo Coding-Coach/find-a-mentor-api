@@ -2,6 +2,7 @@ import { UserDto } from './../common/dto/user.dto';
 import {
   Body,
   BadRequestException,
+  NotFoundException,
   Controller,
   Param,
   Post,
@@ -9,10 +10,16 @@ import {
   UsePipes,
   ValidationPipe,
   Get,
+  Patch,
   UnauthorizedException,
 } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
-import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiImplicitParam,
+  ApiUseTags,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import {
   Template,
@@ -26,6 +33,8 @@ import { MentorshipsService } from './mentorships.service';
 import { MentorshipDto } from './dto/mentorship.dto';
 import { MentorshipSummaryDto } from './dto/mentorshipSummary.dto';
 import { Mentorship, Status } from './interfaces/mentorship.interface';
+import { FindOneParams } from '../common/classes/findOneParams';
+import { MentorshipUpdatePayload } from './classes/mentorshipUpdatePayload';
 
 @ApiUseTags('/mentorships')
 @Controller('mentorships')
@@ -155,5 +164,56 @@ export class MentorshipsController {
       success: true,
       data: requests,
     };
+  }
+
+  @Patch(':id')
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async updateMentorship(
+    @Req() request: Request,
+    @Param() params: FindOneParams,
+    @Body() data: MentorshipUpdatePayload,
+  ) {
+    const { reason, status } = data;
+    const mentorship = await this.mentorshipsService.findMentorshipById(
+      params.id,
+    );
+
+    if (!mentorship) {
+      throw new NotFoundException('Mentorship not found');
+    }
+
+    const currentUser = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
+
+    const currentUserIsMentor = currentUser._id.equals(mentorship.mentor);
+    const currentUserIsMentee = currentUser._id.equals(mentorship.mentee);
+
+    if (!currentUserIsMentee && !currentUserIsMentor) {
+      throw new UnauthorizedException();
+    }
+
+    const menteeUpdatableStatuses = [Status.CANCELLED] as string[];
+    const mentorUpdatableStatuses = [
+      Status.VIEWED,
+      Status.APPROVED,
+      Status.REJECTED,
+    ] as string[];
+
+    if (currentUserIsMentee && !menteeUpdatableStatuses.includes(status)) {
+      throw new BadRequestException();
+    }
+
+    if (currentUserIsMentor && !mentorUpdatableStatuses.includes(status)) {
+      throw new BadRequestException();
+    }
+
+    mentorship.status = status;
+    if (status === Status.REJECTED && reason) {
+      mentorship.reason = reason;
+    }
+
+    await mentorship.save();
+    return mentorship;
   }
 }
