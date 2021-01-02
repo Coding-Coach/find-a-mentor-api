@@ -167,6 +167,11 @@ export class MentorshipsController {
   }
 
   @Patch(':id')
+  @ApiOperation({
+    title: 'Updates a mentorship',
+  })
+  @ApiBearerAuth()
+  @ApiImplicitParam({ name: 'id', description: 'Mentorship id' })
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async updateMentorship(
     @Req() request: Request,
