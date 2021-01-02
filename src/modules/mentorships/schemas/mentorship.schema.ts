@@ -32,7 +32,7 @@ export const MentorshipSchema = new mongoose.Schema({
   },
   // In case the mentorship gets terminated or rejected
   // it would be nice to leave a message to the other party
-  // explaining why the mentorhip was terminated/rejected.
+  // explaining why the mentorship was terminated/rejected.
   reason: {
     type: String,
   },

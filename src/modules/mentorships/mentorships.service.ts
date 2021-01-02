@@ -21,7 +21,7 @@ export class MentorshipsService {
   }
 
   /**
-   * Finds a mentorhip between a mentor and mentee
+   * Finds a mentorship between a mentor and mentee
    * @param mentorId
    * @param menteeId
    */
