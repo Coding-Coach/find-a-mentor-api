@@ -35,7 +35,7 @@ export class MentorshipsController {
 
   @Post(':mentorId/apply')
   @ApiOperation({
-    title: 'Creates a new mentorhip request for the given mentor',
+    title: 'Creates a new mentorship request for the given mentor',
   })
   @ApiBearerAuth()
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
