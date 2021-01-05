@@ -94,6 +94,9 @@ export class MentorshipsController {
   }
 
   @Get(':userId/requests')
+  @ApiOperation({
+    title: 'Returns the mentorship requests for a mentor or a mentee.',
+  })
   async getMentorshipRequests(
     @Req() request: Request,
     @Param('userId') userId: string,
