@@ -1,3 +1,4 @@
+import { UserDto } from './../common/dto/user.dto';
 import {
   Body,
   BadRequestException,
@@ -25,7 +26,6 @@ import { MentorshipsService } from './mentorships.service';
 import { MentorshipDto } from './dto/mentorship.dto';
 import { MentorshipSummaryDto } from './dto/mentorshipSummary.dto';
 import { Mentorship, Status } from './interfaces/mentorship.interface';
-import { UserSummaryDto } from './dto/userSummary.dto';
 
 @ApiUseTags('/mentorships')
 @Controller('mentorships')
@@ -101,6 +101,7 @@ export class MentorshipsController {
     @Req() request: Request,
     @Param('userId') userId: string,
   ) {
+    console.log(request.user.auth0Id);
     const current: User = await this.usersService.findByAuth0Id(
       request.user.auth0Id,
     );
@@ -132,10 +133,17 @@ export class MentorshipsController {
         expectation: item.expectation,
         date: item.createdAt,
         isMine: item.mentee.equals(current._id),
-        user: new UserSummaryDto({
+        mentee: new UserDto({
           id: item.mentee._id,
+          name: item.mentee.name,
           avatar: item.mentee.avatar,
           title: item.mentee.title,
+        }),
+        mentor: new UserDto({
+          id: item.mentor._id,
+          name: item.mentor.name,
+          avatar: item.mentor.avatar,
+          title: item.mentor.title,
         }),
       });
 

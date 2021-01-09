@@ -59,6 +59,7 @@ export class MentorshipsService {
           ],
         })
         .populate('mentee')
+        .populate('mentor')
         .exec();
     }
 

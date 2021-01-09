@@ -1,6 +1,5 @@
+import { UserDto } from './../../common/dto/user.dto';
 import { Status } from '../interfaces/mentorship.interface';
-
-import { UserSummaryDto } from './userSummary.dto';
 
 export class MentorshipSummaryDto {
   readonly id: string;
@@ -10,7 +9,8 @@ export class MentorshipSummaryDto {
   readonly expectation: string;
   readonly date: Date;
   readonly isMine: Boolean;
-  readonly user: UserSummaryDto;
+  readonly mentor: UserDto;
+  readonly mentee: UserDto;
 
   constructor(values) {
     Object.assign(this, values);
