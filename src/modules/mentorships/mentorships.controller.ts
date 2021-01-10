@@ -101,7 +101,6 @@ export class MentorshipsController {
     @Req() request: Request,
     @Param('userId') userId: string,
   ) {
-    console.log(request.user.auth0Id);
     const current: User = await this.usersService.findByAuth0Id(
       request.user.auth0Id,
     );
