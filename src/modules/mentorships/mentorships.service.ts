@@ -40,4 +40,29 @@ export class MentorshipsService {
 
     return Promise.resolve(null);
   }
+
+  /**
+   * Finds mentorhip requests from or to a user
+   * @param userId
+   */
+  async findMentorshipsByUser(userId: string): Promise<Mentorship[]> {
+    if (isObjectId(userId)) {
+      return this.mentorshipModel
+        .find({
+          $or: [
+            {
+              mentor: userId,
+            },
+            {
+              mentee: userId,
+            },
+          ],
+        })
+        .populate('mentee')
+        .populate('mentor')
+        .exec();
+    }
+
+    return Promise.resolve([]);
+  }
 }

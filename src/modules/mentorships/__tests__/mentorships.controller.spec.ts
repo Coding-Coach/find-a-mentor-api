@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { Request } from 'express';
 import { MentorshipsController } from '../mentorships.controller';
@@ -8,7 +8,7 @@ import { EmailService } from '../../email/email.service';
 import { MentorshipsService } from '../mentorships.service';
 import { Role, User } from '../../common/interfaces/user.interface';
 import { MentorshipDto } from '../dto/mentorship.dto';
-import { Mentorship } from '../interfaces/mentorship.interface';
+import { Mentorship, Status } from '../interfaces/mentorship.interface';
 
 class ServiceMock {}
 
@@ -64,11 +64,13 @@ describe('modules/mentorships/MentorshipsController', () => {
 
   describe('apply', () => {
     let mentorId: string;
+    let menteeId: string;
     let mentorship: MentorshipDto;
     let request;
 
     beforeEach(() => {
       mentorId = '5678';
+      menteeId = '91011';
       request = { user: { auth0Id: '1234' } };
       mentorship = <MentorshipDto>{
         message: `Hi there! I'd like to learn from you!`,
@@ -127,6 +129,164 @@ describe('modules/mentorships/MentorshipsController', () => {
         mentorship,
       );
       expect(data.success).toBe(true);
+    });
+
+    it('should return mentorship requests for a given mentor', async () => {
+      request = { user: { _id: mentorId, auth0Id: '1234' } };
+
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(mentorId),
+          roles: [Role.MENTOR],
+        }),
+      );
+
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(mentorId),
+          roles: [Role.MENTOR],
+        }),
+      );
+
+      mentorshipsService.findMentorshipsByUser = jest.fn(() =>
+        Promise.resolve([
+          <Mentorship>{
+            _id: new ObjectIdMock('1'),
+            mentor: new ObjectIdMock(mentorId),
+            mentee: new ObjectIdMock('ANYMENTEEID'),
+            status: Status.NEW,
+            goals: [],
+            message: 'MESSAGE',
+            expectation: 'EXPECTATION',
+            background: 'BACKGROUND',
+            reason: 'REASON',
+            updatedAt: new Date(),
+            createdAt: new Date(),
+          },
+        ]),
+      );
+
+      const response = await mentorshipsController.getMentorshipRequests(
+        <Request>request,
+        mentorId,
+      );
+
+      expect(response.success).toBe(true);
+      expect(response.data.length).toBe(1);
+      expect(response.data[0].isMine).toBe(false);
+    });
+
+    it('should return mentorship applications for a given mentee', async () => {
+      request = { user: { _id: menteeId, auth0Id: '1234' } };
+
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(menteeId),
+          roles: [Role.MEMBER],
+        }),
+      );
+
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(menteeId),
+          roles: [Role.MEMBER],
+        }),
+      );
+
+      mentorshipsService.findMentorshipsByUser = jest.fn(() =>
+        Promise.resolve([
+          <Mentorship>{
+            _id: new ObjectIdMock('1'),
+            mentor: new ObjectIdMock('ANYMENTORID'),
+            mentee: new ObjectIdMock(menteeId),
+            status: Status.NEW,
+            goals: [],
+            message: 'MESSAGE',
+            expectation: 'EXPECTATION',
+            background: 'BACKGROUND',
+            reason: 'REASON',
+            updatedAt: new Date(),
+            createdAt: new Date(),
+          },
+        ]),
+      );
+
+      const response = await mentorshipsController.getMentorshipRequests(
+        <Request>request,
+        menteeId,
+      );
+
+      expect(response.success).toBe(true);
+      expect(response.data.length).toBe(1);
+      expect(response.data[0].isMine).toBe(true);
+    });
+
+    it("should return unauthorised if user is not admin and requesting another user's applications", async () => {
+      request = { user: { _id: menteeId, auth0Id: '1234' } };
+
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(menteeId),
+          roles: [Role.MEMBER],
+        }),
+      );
+
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(mentorId),
+          roles: [Role.MENTOR],
+        }),
+      );
+
+      await expect(
+        mentorshipsController.getMentorshipRequests(<Request>request, mentorId),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should return mentorship applications for any given mentor/mentee if user is admin', async () => {
+      const adminId = '0000';
+      request = { user: { _id: adminId, auth0Id: '1234' } };
+
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(adminId),
+          roles: [Role.ADMIN],
+        }),
+      );
+
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(mentorId),
+          roles: [Role.MENTOR],
+        }),
+      );
+
+      mentorshipsService.findMentorshipsByUser = jest.fn(() =>
+        Promise.resolve([
+          <Mentorship>{
+            _id: new ObjectIdMock('1'),
+            mentor: new ObjectIdMock(mentorId),
+            mentee: new ObjectIdMock(menteeId),
+            status: Status.NEW,
+            goals: [],
+            message: 'MESSAGE',
+            expectation: 'EXPECTATION',
+            background: 'BACKGROUND',
+            reason: 'REASON',
+            updatedAt: new Date(),
+            createdAt: new Date(),
+          },
+        ]),
+      );
+
+      const response = await mentorshipsController.getMentorshipRequests(
+        <Request>request,
+        mentorId,
+      );
+
+      expect(response.success).toBe(true);
+      expect(response.data.length).toBe(1);
+      expect(response.data[0].isMine).toBe(false);
     });
   });
 });

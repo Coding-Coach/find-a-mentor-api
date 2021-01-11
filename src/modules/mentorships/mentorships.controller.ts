@@ -1,3 +1,4 @@
+import { UserDto } from './../common/dto/user.dto';
 import {
   Body,
   BadRequestException,
@@ -7,6 +8,8 @@ import {
   Req,
   UsePipes,
   ValidationPipe,
+  Get,
+  UnauthorizedException,
 } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
@@ -18,9 +21,10 @@ import {
 import { EmailService } from '../email/email.service';
 import { MentorsService } from '../common/mentors.service';
 import { UsersService } from '../common/users.service';
-import { User } from '../common/interfaces/user.interface';
+import { User, Role } from '../common/interfaces/user.interface';
 import { MentorshipsService } from './mentorships.service';
 import { MentorshipDto } from './dto/mentorship.dto';
+import { MentorshipSummaryDto } from './dto/mentorshipSummary.dto';
 import { Mentorship, Status } from './interfaces/mentorship.interface';
 
 @ApiUseTags('/mentorships')
@@ -86,6 +90,68 @@ export class MentorshipsController {
 
     return {
       success: true,
+    };
+  }
+
+  @Get(':userId/requests')
+  @ApiOperation({
+    title: 'Returns the mentorship requests for a mentor or a mentee.',
+  })
+  async getMentorshipRequests(
+    @Req() request: Request,
+    @Param('userId') userId: string,
+  ) {
+    const current: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
+    const user: User = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    // Only an admin or same user can view the requests
+    if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException(
+        'You are not authorized to perform this operation',
+      );
+    }
+
+    // Get the mentorship requests from and to to that user
+    const mentorshipRequests: Mentorship[] = await this.mentorshipsService.findMentorshipsByUser(
+      userId,
+    );
+
+    // Format the response data
+    let requests = mentorshipRequests.map(item => {
+      const mentorshipSummary = new MentorshipSummaryDto({
+        id: item._id,
+        status: item.status,
+        message: item.message,
+        background: item.background,
+        expectation: item.expectation,
+        date: item.createdAt,
+        isMine: item.mentee.equals(current._id),
+        mentee: new UserDto({
+          id: item.mentee._id,
+          name: item.mentee.name,
+          avatar: item.mentee.avatar,
+          title: item.mentee.title,
+        }),
+        mentor: new UserDto({
+          id: item.mentor._id,
+          name: item.mentor.name,
+          avatar: item.mentor.avatar,
+          title: item.mentor.title,
+        }),
+      });
+
+      return mentorshipSummary;
+    });
+
+    return {
+      success: true,
+      data: requests,
     };
   }
 }
