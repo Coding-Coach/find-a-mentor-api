@@ -5,6 +5,7 @@ import { INestApplication } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env.test' });
 import { AppModule } from '../../src/app.module';
+import { EmailService } from '../../src/modules/email/email.service';
 import { Role } from '../../src/modules/common/interfaces/user.interface';
 import { Status } from '../../src/modules/mentorships/interfaces/mentorship.interface';
 import { createUser, createMentorship } from '../utils/seeder';
@@ -13,11 +14,15 @@ import { getToken } from '../utils/jwt';
 describe('Mentorships', () => {
   let app: INestApplication;
   let server;
+  const emailService = { send: jest.fn() };
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(EmailService)
+      .useValue(emailService)
+      .compile();
 
     app = module.createNestApplication();
     await app.init();
@@ -31,6 +36,7 @@ describe('Mentorships', () => {
 
   beforeEach(async () => {
     await mongoose.connection.dropDatabase();
+    emailService.send.mockClear();
   });
 
   describe('PATCH /mentorships/:id', () => {
@@ -149,7 +155,10 @@ describe('Mentorships', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({ status: Status.APPROVED })
           .expect(200);
+        expect(emailService.send).toHaveBeenCalledTimes(1);
         expect(body.status).toBe(Status.APPROVED);
+
+        emailService.send.mockClear();
 
         const {
           body: { status, reason },
@@ -160,6 +169,7 @@ describe('Mentorships', () => {
           .expect(200);
         expect(status).toBe(Status.REJECTED);
         expect(reason).toBe('Other commitments');
+        expect(emailService.send).toHaveBeenCalledTimes(1);
       });
 
       it('allows a mentee in the mentorship to cancel', async () => {

@@ -24,11 +24,13 @@ import { Request } from 'express';
 import {
   Template,
   SendDataMentorshipParams,
+  SendDataMentorshipRequestApprovalParams,
+  SendDataMentorshipRequestRejectionParams,
 } from '../email/interfaces/email.interface';
 import { EmailService } from '../email/email.service';
 import { MentorsService } from '../common/mentors.service';
 import { UsersService } from '../common/users.service';
-import { User, Role } from '../common/interfaces/user.interface';
+import { ChannelName, User, Role } from '../common/interfaces/user.interface';
 import { MentorshipsService } from './mentorships.service';
 import { MentorshipDto } from './dto/mentorship.dto';
 import { MentorshipSummaryDto } from './dto/mentorshipSummary.dto';
@@ -187,9 +189,10 @@ export class MentorshipsController {
       throw new NotFoundException('Mentorship not found');
     }
 
-    const currentUser = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
+    const [currentUser, mentee] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(mentorship.mentee),
+    ]);
 
     const currentUserIsMentor = currentUser._id.equals(mentorship.mentor);
     const currentUserIsMentee = currentUser._id.equals(mentorship.mentee);
@@ -218,7 +221,44 @@ export class MentorshipsController {
       mentorship.reason = reason;
     }
 
-    await mentorship.save();
-    return mentorship;
+    try {
+      await mentorship.save();
+      const [menteeFirstName] = mentee.name.split(' ');
+
+      if (mentorship.status === Status.APPROVED) {
+        const slack = currentUser.channels.find(
+          channel => channel.type === ChannelName.SLACK,
+        );
+        const contactURL = slack
+          ? `https://coding-coach.slack.com/team/${slack.id}`
+          : `mailto:${currentUser.email}`;
+
+        await this.emailService.send<SendDataMentorshipRequestApprovalParams>({
+          to: mentee.email,
+          templateId: Template.MENTORSHIP_REQUEST_APPROVED,
+          dynamic_template_data: {
+            menteeName: menteeFirstName,
+            mentorName: currentUser.name,
+            contactURL,
+          },
+        });
+      }
+
+      if (mentorship.status === Status.REJECTED) {
+        await this.emailService.send<SendDataMentorshipRequestRejectionParams>({
+          to: mentee.email,
+          templateId: Template.MENTORSHIP_REQUEST_REJECTED,
+          dynamic_template_data: {
+            menteeName: menteeFirstName,
+            mentorName: currentUser.name,
+            reason: reason || '',
+          },
+        });
+      }
+
+      return mentorship;
+    } catch (error) {
+      Sentry.captureException(error);
+    }
   }
 }
