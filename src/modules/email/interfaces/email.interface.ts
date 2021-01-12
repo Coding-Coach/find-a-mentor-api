@@ -26,5 +26,4 @@ export interface SendDataRejectParams {
 export interface SendDataMentorshipParams {
   name: string;
   message: string;
-  reason: string;
 }

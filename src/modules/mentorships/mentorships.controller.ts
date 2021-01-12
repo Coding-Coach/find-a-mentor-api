@@ -80,8 +80,10 @@ export class MentorshipsController {
       const emailData = {
         to: mentor.email,
         templateId: Template.MENTORSHIP_REQUEST,
-        name: current.name,
-        message: data.message,
+        dynamic_template_data: {
+          name: current.name,
+          message: data.message,
+        },
       };
       await this.emailService.send<SendDataMentorshipParams>(emailData);
     } catch (error) {
