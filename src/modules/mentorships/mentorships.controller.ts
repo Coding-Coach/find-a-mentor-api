@@ -194,10 +194,13 @@ export class MentorshipsController {
       this.usersService.findById(mentorship.mentee),
     ]);
 
+    const currentUserIsAdmin = currentUser.roles.includes(Role.ADMIN);
     const currentUserIsMentor = currentUser._id.equals(mentorship.mentor);
     const currentUserIsMentee = currentUser._id.equals(mentorship.mentee);
 
-    if (!currentUserIsMentee && !currentUserIsMentor) {
+    const canAccess =
+      currentUserIsAdmin || currentUserIsMentee || currentUserIsMentor;
+    if (!canAccess) {
       throw new UnauthorizedException();
     }
 

@@ -190,6 +190,42 @@ describe('Mentorships', () => {
           .expect(200);
         expect(body.status).toBe(Status.CANCELLED);
       });
+
+      it('allows an admin to update the mentorship', async () => {
+        const [mentee, mentor, admin] = await Promise.all([
+          createUser(),
+          createUser(),
+          createUser({
+            roles: [Role.ADMIN],
+          }),
+        ]);
+        const mentorship = await createMentorship({
+          mentor: mentor._id,
+          mentee: mentee._id,
+        });
+
+        const token = getToken(admin);
+        const { body } = await request(server)
+          .patch(`/mentorships/${mentorship._id}`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ status: Status.APPROVED })
+          .expect(200);
+        expect(emailService.send).toHaveBeenCalledTimes(1);
+        expect(body.status).toBe(Status.APPROVED);
+
+        emailService.send.mockClear();
+
+        const {
+          body: { status, reason },
+        } = await request(server)
+          .patch(`/mentorships/${mentorship._id}`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ status: Status.REJECTED, reason: 'Lack of time' })
+          .expect(200);
+        expect(status).toBe(Status.REJECTED);
+        expect(reason).toBe('Lack of time');
+        expect(emailService.send).toHaveBeenCalledTimes(1);
+      });
     });
   });
 });
