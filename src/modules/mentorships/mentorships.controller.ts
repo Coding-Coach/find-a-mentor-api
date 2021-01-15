@@ -35,8 +35,8 @@ import { MentorshipsService } from './mentorships.service';
 import { MentorshipDto } from './dto/mentorship.dto';
 import { MentorshipSummaryDto } from './dto/mentorshipSummary.dto';
 import { Mentorship, Status } from './interfaces/mentorship.interface';
-import { FindOneParams } from '../common/classes/findOneParams';
-import { MentorshipUpdatePayload } from './classes/mentorshipUpdatePayload';
+import { FindOneParams } from '../common/dto/findOneParams.dto';
+import { MentorshipUpdatePayload } from './dto/mentorshipUpdatePayload.dto';
 
 @ApiUseTags('/mentorships')
 @Controller('mentorships')
