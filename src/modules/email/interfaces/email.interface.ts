@@ -1,3 +1,5 @@
+import { Channel } from '../../common/interfaces/user.interface';
+
 export enum Template {
   WELCOME_MESSAGE = 'd-1434be390e1b4288b8011507f1c8d786',
   MENTOR_APPLICATION_RECEIVED = 'd-bf78306901e747a7b3f92761b9884f2e',
@@ -30,13 +32,14 @@ export interface SendDataMentorshipParams {
   message: string;
 }
 
-export interface SendDataMentorshipRequestApprovalParams {
+export interface SendDataMentorshipApprovalParams {
   menteeName: string;
   mentorName: string;
   contactURL: string;
+  channels: Channel[];
 }
 
-export interface SendDataMentorshipRequestRejectionParams {
+export interface SendDataMentorshipRejectionParams {
   menteeName: string;
   mentorName: string;
   reason: string;
