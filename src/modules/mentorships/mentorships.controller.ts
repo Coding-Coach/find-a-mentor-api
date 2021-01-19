@@ -10,7 +10,7 @@ import {
   UsePipes,
   ValidationPipe,
   Get,
-  Patch,
+  Put,
   UnauthorizedException,
 } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
@@ -24,8 +24,8 @@ import { Request } from 'express';
 import {
   Template,
   SendDataMentorshipParams,
-  SendDataMentorshipRequestApprovalParams,
-  SendDataMentorshipRequestRejectionParams,
+  SendDataMentorshipApprovalParams,
+  SendDataMentorshipRejectionParams,
 } from '../email/interfaces/email.interface';
 import { EmailService } from '../email/email.service';
 import { MentorsService } from '../common/mentors.service';
@@ -107,6 +107,7 @@ export class MentorshipsController {
   }
 
   @Get(':userId/requests')
+  @ApiBearerAuth()
   @ApiOperation({
     title: 'Returns the mentorship requests for a mentor or a mentee.',
   })
@@ -168,12 +169,13 @@ export class MentorshipsController {
     };
   }
 
-  @Patch(':id')
+  @Put(':userId/requests/:id')
   @ApiOperation({
-    title: 'Updates a mentorship',
+    title: 'Updates the mentorship status by the mentor or mentee',
   })
   @ApiBearerAuth()
-  @ApiImplicitParam({ name: 'id', description: 'Mentorship id' })
+  @ApiImplicitParam({ name: 'userId', description: `Mentor's id` })
+  @ApiImplicitParam({ name: 'id', description: `Mentorship's id` })
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async updateMentorship(
     @Req() request: Request,
@@ -226,6 +228,15 @@ export class MentorshipsController {
 
     try {
       await mentorship.save();
+    } catch (error) {
+      Sentry.captureException(error);
+      return {
+        success: false,
+        error,
+      };
+    }
+
+    try {
       const [menteeFirstName] = mentee.name.split(' ');
 
       if (mentorship.status === Status.APPROVED) {
@@ -236,19 +247,20 @@ export class MentorshipsController {
           ? `https://coding-coach.slack.com/team/${slack.id}`
           : `mailto:${currentUser.email}`;
 
-        await this.emailService.send<SendDataMentorshipRequestApprovalParams>({
+        await this.emailService.send<SendDataMentorshipApprovalParams>({
           to: mentee.email,
           templateId: Template.MENTORSHIP_REQUEST_APPROVED,
           dynamic_template_data: {
             menteeName: menteeFirstName,
             mentorName: currentUser.name,
             contactURL,
+            channels: currentUser.channels,
           },
         });
       }
 
       if (mentorship.status === Status.REJECTED) {
-        await this.emailService.send<SendDataMentorshipRequestRejectionParams>({
+        await this.emailService.send<SendDataMentorshipRejectionParams>({
           to: mentee.email,
           templateId: Template.MENTORSHIP_REQUEST_REJECTED,
           dynamic_template_data: {
@@ -259,9 +271,16 @@ export class MentorshipsController {
         });
       }
 
-      return mentorship;
+      return {
+        success: true,
+        mentorship,
+      };
     } catch (error) {
       Sentry.captureException(error);
+      return {
+        success: false,
+        error,
+      };
     }
   }
 }

@@ -14,6 +14,7 @@ import { getToken } from '../utils/jwt';
 describe('Mentorships', () => {
   let app: INestApplication;
   let server;
+  let mentorId;
   const emailService = { send: jest.fn() };
 
   beforeAll(async () => {
@@ -36,14 +37,15 @@ describe('Mentorships', () => {
 
   beforeEach(async () => {
     await mongoose.connection.dropDatabase();
+    mentorId = mongoose.Types.ObjectId();
     emailService.send.mockClear();
   });
 
-  describe('PATCH /mentorships/:id', () => {
+  describe('PUT /mentorships/:mentorId/requests/:id', () => {
     describe('unauthenticated requests', () => {
       it('returns a status code of 401', async () => {
         return request(server)
-          .patch('/mentorships/abc')
+          .put('/mentorships/1234/requests/abc')
           .expect(401);
       });
     });
@@ -53,7 +55,7 @@ describe('Mentorships', () => {
       const token = getToken();
 
       return request(server)
-        .patch(`/mentorships/${id}`)
+        .put(`/mentorships/${mentorId}/requests/${id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({ status: Status.APPROVED })
         .expect(404);
@@ -64,7 +66,7 @@ describe('Mentorships', () => {
         const id = mongoose.Types.ObjectId();
         const token = getToken();
         return request(server)
-          .patch(`/mentorships/${id}`)
+          .put(`/mentorships/${mentorId}/requests/${id}`)
           .set('Authorization', `Bearer ${token}`)
           .expect(400);
       });
@@ -72,7 +74,7 @@ describe('Mentorships', () => {
       it('returns a status code of 400 if the mentorship id is invalid', () => {
         const token = getToken();
         return request(server)
-          .patch('/mentorships/abc')
+          .put(`/mentorships/${mentorId}/requests/abc`)
           .set('Authorization', `Bearer ${token}`)
           .send({ status: Status.APPROVED })
           .expect(400);
@@ -90,7 +92,7 @@ describe('Mentorships', () => {
 
         const token = getToken(mentee);
         return request(server)
-          .patch(`/mentorships/${mentorship._id}`)
+          .put(`/mentorships/${mentor._id}/requests/${mentorship._id}`)
           .set('Authorization', `Bearer ${token}`)
           .send({ status: Status.APPROVED })
           .expect(400);
@@ -108,7 +110,7 @@ describe('Mentorships', () => {
 
         const token = getToken(mentor);
         return request(server)
-          .patch(`/mentorships/${mentorship._id}`)
+          .put(`/mentorships/${mentor._id}/requests/${mentorship._id}`)
           .set('Authorization', `Bearer ${token}`)
           .send({ status: Status.CANCELLED })
           .expect(400);
@@ -131,7 +133,7 @@ describe('Mentorships', () => {
 
         const token = getToken(mentee2);
         return request(server)
-          .patch(`/mentorships/${mentorship._id}`)
+          .put(`/mentorships/${mentor._id}/requests/${mentorship._id}`)
           .set('Authorization', `Bearer ${token}`)
           .send({ status: Status.APPROVED })
           .expect(401);
@@ -151,19 +153,21 @@ describe('Mentorships', () => {
 
         const token = getToken(mentor);
         const { body } = await request(server)
-          .patch(`/mentorships/${mentorship._id}`)
+          .put(`/mentorships/${mentor._id}/requests/${mentorship._id}`)
           .set('Authorization', `Bearer ${token}`)
           .send({ status: Status.APPROVED })
           .expect(200);
         expect(emailService.send).toHaveBeenCalledTimes(1);
-        expect(body.status).toBe(Status.APPROVED);
+        expect(body.mentorship.status).toBe(Status.APPROVED);
 
         emailService.send.mockClear();
 
         const {
-          body: { status, reason },
+          body: {
+            mentorship: { status, reason },
+          },
         } = await request(server)
-          .patch(`/mentorships/${mentorship._id}`)
+          .put(`/mentorships/${mentor._id}/requests/${mentorship._id}`)
           .set('Authorization', `Bearer ${token}`)
           .send({ status: Status.REJECTED, reason: 'Other commitments' })
           .expect(200);
@@ -184,11 +188,11 @@ describe('Mentorships', () => {
 
         const token = getToken(mentee);
         const { body } = await request(server)
-          .patch(`/mentorships/${mentorship._id}`)
+          .put(`/mentorships/${mentor._id}/requests/${mentorship._id}`)
           .set('Authorization', `Bearer ${token}`)
           .send({ status: Status.CANCELLED })
           .expect(200);
-        expect(body.status).toBe(Status.CANCELLED);
+        expect(body.mentorship.status).toBe(Status.CANCELLED);
       });
 
       it('allows an admin to update the mentorship', async () => {
@@ -206,19 +210,21 @@ describe('Mentorships', () => {
 
         const token = getToken(admin);
         const { body } = await request(server)
-          .patch(`/mentorships/${mentorship._id}`)
+          .put(`/mentorships/${mentor._id}/requests/${mentorship._id}`)
           .set('Authorization', `Bearer ${token}`)
           .send({ status: Status.APPROVED })
           .expect(200);
         expect(emailService.send).toHaveBeenCalledTimes(1);
-        expect(body.status).toBe(Status.APPROVED);
+        expect(body.mentorship.status).toBe(Status.APPROVED);
 
         emailService.send.mockClear();
 
         const {
-          body: { status, reason },
+          body: {
+            mentorship: { status, reason },
+          },
         } = await request(server)
-          .patch(`/mentorships/${mentorship._id}`)
+          .put(`/mentorships/${mentor._id}/requests/${mentorship._id}`)
           .set('Authorization', `Bearer ${token}`)
           .send({ status: Status.REJECTED, reason: 'Lack of time' })
           .expect(200);
