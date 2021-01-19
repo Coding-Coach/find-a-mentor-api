@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Query, Model } from 'mongoose';
+import { Query, Model, Types } from 'mongoose';
 import { Mentorship } from './interfaces/mentorship.interface';
 import { MentorshipDto } from './dto/mentorship.dto';
 import { isObjectId } from '../../utils/objectid';
@@ -18,6 +18,20 @@ export class MentorshipsService {
   async createMentorship(mentorshipDto: MentorshipDto): Promise<Query<any>> {
     const mentorship = new this.mentorshipModel(mentorshipDto);
     return mentorship.save();
+  }
+
+  /**
+   * Finds a mentorship by id
+   * @param id
+   */
+  async findMentorshipById(id: string) {
+    const { ObjectId } = Types;
+
+    if (!ObjectId.isValid(id)) {
+      return null;
+    }
+
+    return this.mentorshipModel.findById(id);
   }
 
   /**

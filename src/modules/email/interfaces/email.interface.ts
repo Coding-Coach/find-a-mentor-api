@@ -5,6 +5,8 @@ export enum Template {
   MENTOR_APPLICATION_REJECTED = 'd-ad08366d02654587916a41bb3270afed',
   MENTORSHIP_REQUEST = 'd-f2547d9191624163b1dd6dad40afa777',
   USER_DELETED = 'de2e0c5217b6422a88274a6affd327e7',
+  MENTORSHIP_REQUEST_APPROVED = 'd-f92a1768d23842818335d54ec5bb96e1',
+  MENTORSHIP_REQUEST_REJECTED = 'd-8521ac50737f4b0384a95552dc02db9f',
 }
 
 export interface SendData<T> {
@@ -26,4 +28,16 @@ export interface SendDataRejectParams {
 export interface SendDataMentorshipParams {
   name: string;
   message: string;
+}
+
+export interface SendDataMentorshipRequestApprovalParams {
+  menteeName: string;
+  mentorName: string;
+  contactURL: string;
+}
+
+export interface SendDataMentorshipRequestRejectionParams {
+  menteeName: string;
+  mentorName: string;
+  reason: string;
 }
