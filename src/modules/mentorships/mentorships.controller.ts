@@ -115,10 +115,10 @@ export class MentorshipsController {
     @Req() request: Request,
     @Param('userId') userId: string,
   ) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(userId);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(userId),
+    ]);
 
     if (!user) {
       throw new BadRequestException('User not found');
