@@ -109,10 +109,10 @@ export class MentorsController {
     @Param('userId') userId: string,
     @Query('status') status: string,
   ) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(userId);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(userId),
+    ]);
 
     if (!user) {
       throw new BadRequestException('User not found');
