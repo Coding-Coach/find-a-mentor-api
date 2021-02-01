@@ -17,6 +17,10 @@ export class PaginationDto {
   readonly hasMore: boolean;
 
   constructor(values) {
+    if (!values) {
+      return;
+    }
+
     Object.assign(this, values);
     this.hasMore =
       (values.page - 1) * values.limit + values.limit < values.total;
