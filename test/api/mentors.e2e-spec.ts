@@ -99,10 +99,14 @@ describe('Mentors', () => {
       const responseMentor1 = body.data.find(
         mentor => mentor.name === mentor1.name,
       );
+      const responseMentor2 = body.data.find(
+        mentor => mentor.name === mentor2.name,
+      );
       expect(responseMentor1.channels[0].id).toEqual(mentor1.channels[0].id);
       expect(responseMentor1.channels[0].type).toEqual(
         mentor1.channels[0].type,
       );
+      expect(responseMentor2.channels).toEqual([]);
     });
   });
 });
