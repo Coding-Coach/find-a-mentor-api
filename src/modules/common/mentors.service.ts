@@ -35,9 +35,6 @@ export class MentorsService {
   async findAll(filters: MentorFiltersDto, isLoggedIn: boolean): Promise<any> {
     const onlyMentors: any = {
       roles: Role.MENTOR,
-      ...('available' in filters && {
-        available: filters.available,
-      }),
     };
     const projections = this.getMentorFields();
 
@@ -47,6 +44,10 @@ export class MentorsService {
 
     if (filters.name) {
       onlyMentors.name = { $regex: filters.name, $options: 'i' };
+    }
+
+    if ('available' in filters) {
+      onlyMentors.available = filters.available;
     }
 
     if (filters.tags) {
