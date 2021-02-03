@@ -24,6 +24,12 @@ const publicUrls = ['/mentors', '/mentors/featured'];
 export class AuthMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     middleware(req, res, error => {
+      // Adding the user id
+      if (req.user) {
+        // @ts-ignore
+        req.user.auth0Id = req.user.sub;
+      }
+
       // For public endpoints we don't need to require authentication
       if (publicUrls.indexOf(req.baseUrl) >= 0) {
         next();
@@ -39,11 +45,6 @@ export class AuthMiddleware implements NestMiddleware {
             errors: [message],
           });
         }
-
-        // Adding the user id
-        // @ts-ignore
-        req.user.auth0Id = req.user.sub;
-
         next();
       }
     });

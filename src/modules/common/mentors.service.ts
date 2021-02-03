@@ -7,6 +7,7 @@ import { PaginationDto } from './dto/pagination.dto';
 import { Role, User } from './interfaces/user.interface';
 import { Application, Status } from './interfaces/application.interface';
 import { isObjectId } from '../../utils/objectid';
+import { Mentorship } from '../mentorships/interfaces/mentorship.interface';
 
 @Injectable()
 export class MentorsService {
@@ -14,6 +15,8 @@ export class MentorsService {
     @Inject('USER_MODEL') private readonly userModel: Model<User>,
     @Inject('APPLICATION_MODEL')
     private readonly applicationModel: Model<Application>,
+    @Inject('MENTORSHIP_MODEL')
+    private readonly mentorshipModel: Model<Mentorship>,
   ) {}
 
   /**
@@ -32,12 +35,13 @@ export class MentorsService {
    * Search for mentors by the given filters
    * @param filters filters to apply
    */
-  async findAll(filters: MentorFiltersDto, isLoggedIn: boolean): Promise<any> {
+  async findAll(filters: MentorFiltersDto, userAuth0Id: string): Promise<any> {
     const onlyMentors: any = {
       roles: Role.MENTOR,
     };
     const projections = this.getMentorFields();
 
+    const isLoggedIn = !!userAuth0Id;
     if (isLoggedIn) {
       projections.channels = true;
     }
@@ -78,20 +82,49 @@ export class MentorsService {
       .sort({ createdAt: 'desc' })
       .exec();
 
+    const mentorsForCurrentUser = new Set();
+
+    // determine if we have a logged in user
+    if (userAuth0Id) {
+      const user = await this.userModel
+        .findOne({ auth0Id: userAuth0Id })
+        .exec();
+
+      if (user) {
+        // find all of their mentorships
+        const mentorships: Mentorship[] = await this.mentorshipModel
+          .find({ mentee: user._id })
+          .exec();
+
+        // flatten the mentors into a set
+        mentorships.forEach(mentorship =>
+          mentorsForCurrentUser.add(mentorship.mentor.toString()),
+        );
+      }
+    }
+
     return {
-      mentors: mentors.map(mentor => ({
-        _id: mentor._id,
-        available: mentor.available,
-        spokenLanguages: mentor.spokenLanguages,
-        tags: mentor.tags,
-        name: mentor.name,
-        avatar: mentor.avatar,
-        title: mentor.title,
-        description: mentor.description,
-        country: mentor.country,
-        createdAt: mentor.createdAt,
-        channels: mentor.available ? mentor.channels : [],
-      })),
+      mentors: mentors.map(mentor => {
+        // channels are only visible to a mentee if they have a mentorship with the mentor
+        let showChannels = false;
+        if (mentorsForCurrentUser.has(mentor._id.toString())) {
+          showChannels = true;
+        }
+
+        return {
+          _id: mentor._id,
+          available: mentor.available,
+          spokenLanguages: mentor.spokenLanguages,
+          tags: mentor.tags,
+          name: mentor.name,
+          avatar: mentor.avatar,
+          title: mentor.title,
+          description: mentor.description,
+          country: mentor.country,
+          createdAt: mentor.createdAt,
+          channels: showChannels ? mentor.channels : [],
+        };
+      }),
       pagination: new PaginationDto({
         total,
         page: filters.page,
