@@ -85,7 +85,7 @@ export class MentorsService {
     const mentorsForCurrentUser = new Set();
 
     // determine if we have a logged in user
-    if (userAuth0Id) {
+    if (isLoggedIn) {
       const user = await this.userModel
         .findOne({ auth0Id: userAuth0Id })
         .exec();
