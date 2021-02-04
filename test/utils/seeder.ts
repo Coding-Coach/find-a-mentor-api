@@ -12,7 +12,7 @@ export const createUser = ({
   avatar = faker.internet.avatar(),
   roles = [],
   channels = [],
-  available = false,
+  available = true,
 } = {}) => {
   const User = mongoose.connection.model('User', UserSchema);
   return new User({

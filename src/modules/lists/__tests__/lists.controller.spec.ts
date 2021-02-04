@@ -291,9 +291,12 @@ describe('modules/lists/ListsController', () => {
         public: true,
       };
       await expect(
-        listsController.updateList(<Request>request, userId, listId, <ListDto>(
-          data
-        )),
+        listsController.updateList(
+          <Request>request,
+          userId,
+          listId,
+          <ListDto>data,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -315,9 +318,12 @@ describe('modules/lists/ListsController', () => {
         public: true,
       };
       await expect(
-        listsController.updateList(<Request>request, userId, listId, <ListDto>(
-          data
-        )),
+        listsController.updateList(
+          <Request>request,
+          userId,
+          listId,
+          <ListDto>data,
+        ),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -340,9 +346,12 @@ describe('modules/lists/ListsController', () => {
         public: true,
       };
       await expect(
-        listsController.updateList(<Request>request, userId, listId, <ListDto>(
-          data
-        )),
+        listsController.updateList(
+          <Request>request,
+          userId,
+          listId,
+          <ListDto>data,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -367,9 +376,12 @@ describe('modules/lists/ListsController', () => {
         name: 'some random name',
         public: true,
       };
-      await listsController.updateList(<Request>request, userId, listId, <
-        ListDto
-      >data);
+      await listsController.updateList(
+        <Request>request,
+        userId,
+        listId,
+        <ListDto>data,
+      );
       expect(listsService.update).toBeCalledTimes(1);
       expect(listsService.update).toHaveBeenCalledWith({
         _id: listId,
@@ -495,9 +507,12 @@ describe('modules/lists/ListsController', () => {
         mentors: [{ _id: '123456' }],
       };
       await expect(
-        listsController.addMentorToList(<Request>request, userId, listId, <
-          ListDto
-        >data),
+        listsController.addMentorToList(
+          <Request>request,
+          userId,
+          listId,
+          <ListDto>data,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -518,9 +533,12 @@ describe('modules/lists/ListsController', () => {
         mentors: [{ _id: '123456' }],
       };
       await expect(
-        listsController.addMentorToList(<Request>request, userId, listId, <
-          ListDto
-        >data),
+        listsController.addMentorToList(
+          <Request>request,
+          userId,
+          listId,
+          <ListDto>data,
+        ),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -542,9 +560,12 @@ describe('modules/lists/ListsController', () => {
         mentors: [{ _id: '123456' }],
       };
       await expect(
-        listsController.addMentorToList(<Request>request, userId, listId, <
-          ListDto
-        >data),
+        listsController.addMentorToList(
+          <Request>request,
+          userId,
+          listId,
+          <ListDto>data,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -568,9 +589,12 @@ describe('modules/lists/ListsController', () => {
       const data = {
         mentors: [{ _id: '123456' }],
       };
-      await listsController.addMentorToList(<Request>request, userId, listId, <
-        ListDto
-      >data);
+      await listsController.addMentorToList(
+        <Request>request,
+        userId,
+        listId,
+        <ListDto>data,
+      );
       expect(listsService.update).toBeCalledTimes(1);
       expect(listsService.update).toHaveBeenCalledWith({
         _id: listId,

@@ -106,10 +106,7 @@ export class MentorsService {
     return {
       mentors: mentors.map(mentor => {
         // channels are only visible to a mentee if they have a mentorship with the mentor
-        let showChannels = false;
-        if (mentorsForCurrentUser.has(mentor._id.toString())) {
-          showChannels = true;
-        }
+        const showChannels = mentorsForCurrentUser.has(mentor._id.toString());
 
         return {
           _id: mentor._id,

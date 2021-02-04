@@ -318,9 +318,7 @@ export class UsersController {
         `${Config.files.public}/${Config.files.avatars}/${user.image.filename}`,
       );
       await this.fileService.removeFile(
-        `${Config.files.public}/${Config.files.avatars}/tns/${
-          user.image.filename
-        }`,
+        `${Config.files.public}/${Config.files.avatars}/tns/${user.image.filename}`,
       );
     }
 

@@ -36,6 +36,32 @@ describe('Mentors', () => {
   });
 
   describe('GET /mentors', () => {
+    it('contains no channels if there is not an authenticated user', async () => {
+      await Promise.all([
+        createUser({
+          name: 'Mentor One',
+          roles: [Role.MENTOR],
+          channels: [{ type: ChannelName.EMAIL, id: 'mentor1@codingcoach.io' }],
+          available: true,
+        }),
+        createUser({
+          name: 'Mentor Two',
+          roles: [Role.MENTOR],
+          channels: [{ type: ChannelName.TWITTER, id: '@cc_mentor1' }],
+          available: true,
+        }),
+      ]);
+
+      const response = await request(server)
+        .get('/mentors')
+        .expect(200);
+
+      const { body } = response;
+
+      body.data.forEach(mentor => {
+        expect(mentor.channels).toEqual([]);
+      });
+    });
     it('contains no channels if none of the mentors are mentoring the requesting user', async () => {
       const [mentee, mentor1, mentor2] = await Promise.all([
         createUser(),
