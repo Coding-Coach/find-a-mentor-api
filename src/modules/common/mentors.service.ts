@@ -46,6 +46,10 @@ export class MentorsService {
       onlyMentors.name = { $regex: filters.name, $options: 'i' };
     }
 
+    if ('available' in filters) {
+      onlyMentors.available = filters.available;
+    }
+
     if (filters.tags) {
       onlyMentors.tags = { $all: filters.tags.split(',') };
     }

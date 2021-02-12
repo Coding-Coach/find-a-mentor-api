@@ -1,12 +1,14 @@
 import { ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { PaginationDto } from './pagination.dto';
 
 export class MentorFiltersDto extends PaginationDto {
-  // Private fields used internally only
+  @ApiModelPropertyOptional()
+  @IsOptional()
+  @Transform((val: string) => val === 'true')
   readonly available: boolean;
 
-  // Public filters that can be set from clients
   @ApiModelPropertyOptional()
   @IsOptional()
   readonly tags: string;

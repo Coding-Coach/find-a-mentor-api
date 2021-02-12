@@ -11,6 +11,7 @@ export const createUser = ({
   name = faker.name.findName(),
   avatar = faker.internet.avatar(),
   roles = [],
+  available = true,
 } = {}) => {
   const User = mongoose.connection.model('User', UserSchema);
   return new User({
@@ -19,6 +20,7 @@ export const createUser = ({
     name,
     avatar,
     roles: [...new Set([...roles, Role.MEMBER])],
+    available,
   }).save();
 };
 

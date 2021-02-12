@@ -44,7 +44,10 @@ export class MentorsController {
     title: 'Return all mentors in the platform by the given filters',
   })
   @Get()
-  @UsePipes(new PaginationPipe())
+  @UsePipes(
+    new PaginationPipe(),
+    new ValidationPipe({ transform: true, whitelist: true }),
+  )
   async index(@Req() request: Request, @Query() filters: MentorFiltersDto) {
     const data = await this.mentorsService.findAll(filters, !!request.user);
 
