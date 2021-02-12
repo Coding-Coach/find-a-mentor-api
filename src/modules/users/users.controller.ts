@@ -156,10 +156,10 @@ export class UsersController {
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Get(':id')
   async show(@Req() request, @Param() params) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(params.id);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(params.id),
+    ]);
 
     if (!user) {
       throw new BadRequestException('User not found');
@@ -192,10 +192,10 @@ export class UsersController {
     }),
   )
   async update(@Req() request, @Param() params, @Body() data: UserDto) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(params.id);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      await this.usersService.findById(params.id),
+    ]);
 
     // Users should only update their own data
     if (!user) {
@@ -232,10 +232,10 @@ export class UsersController {
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Delete(':id')
   async remove(@Req() request, @Param() params) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(params.id);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(params.id),
+    ]);
 
     if (!user) {
       throw new BadRequestException('User not found');

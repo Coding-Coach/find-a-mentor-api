@@ -37,10 +37,10 @@ export class ListsController {
     @Param('userid') userId: string,
     @Body() data: ListDto,
   ) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(userId);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(userId),
+    ]);
 
     // Make sure user exist
     if (!user) {
@@ -68,10 +68,10 @@ export class ListsController {
   @ApiOperation({ title: `Gets mentor's list for the given user` })
   @Get()
   async myList(@Req() request, @Param('userid') userId: string) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(userId);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(userId),
+    ]);
 
     // check if user exists
     if (!user) {
@@ -101,10 +101,10 @@ export class ListsController {
     @Param('listid') listId: string,
     @Body() data: ListDto,
   ) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(userId);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(userId),
+    ]);
 
     // check if user exists
     if (!user) {
@@ -149,10 +149,10 @@ export class ListsController {
     @Param('userid') userId: string,
     @Param('listId') listId: string,
   ) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(userId);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(userId),
+    ]);
 
     if (!user) {
       throw new BadRequestException('User not found');
@@ -185,10 +185,10 @@ export class ListsController {
     @Param('listid') listId: string,
     @Body() data: ListDto,
   ) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(userId);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(userId),
+    ]);
 
     // check if user exists
     if (!user) {
