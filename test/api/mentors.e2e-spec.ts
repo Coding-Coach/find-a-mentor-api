@@ -134,5 +134,47 @@ describe('Mentors', () => {
       );
       expect(responseMentor2.channels).toEqual([]);
     });
+    describe('availability filter', () => {
+      it('returns all mentors if available query param does not exist', async () => {
+        const [availableMentor, unavailableMentor] = await Promise.all([
+          createUser({ roles: [Role.MENTOR], available: true }),
+          createUser({ roles: [Role.MENTOR], available: false }),
+          createUser({ roles: [Role.MEMBER] }),
+        ]);
+        const { body } = await request(server)
+          .get('/mentors')
+          .expect(200);
+        expect(body.data.length).toBe(2);
+        const ids = body.data.map(mentor => mentor._id);
+        expect(ids).toContain(availableMentor._id.toString());
+        expect(ids).toContain(unavailableMentor._id.toString());
+      });
+
+      it('returns only available mentors if available is true', async () => {
+        const [availableMentor] = await Promise.all([
+          createUser({ roles: [Role.MENTOR], available: true }),
+          createUser({ roles: [Role.MENTOR], available: false }),
+          createUser({ roles: [Role.MEMBER] }),
+        ]);
+        const { body } = await request(server)
+          .get('/mentors?available=true')
+          .expect(200);
+        expect(body.data.length).toBe(1);
+        expect(body.data[0]._id).toBe(availableMentor._id.toString());
+      });
+
+      it('returns only unavailable mentors if available is false', async () => {
+        const [_, unavailableMentor] = await Promise.all([
+          createUser({ roles: [Role.MENTOR], available: true }),
+          createUser({ roles: [Role.MENTOR], available: false }),
+          createUser({ roles: [Role.MEMBER] }),
+        ]);
+        const { body } = await request(server)
+          .get('/mentors?available=false')
+          .expect(200);
+        expect(body.data.length).toBe(1);
+        expect(body.data[0]._id).toBe(unavailableMentor._id.toString());
+      });
+    });
   });
 });

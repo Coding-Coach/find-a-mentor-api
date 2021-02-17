@@ -29,10 +29,10 @@ export class FavoritesController {
   @ApiOperation({ title: 'Returns the favorite list for the given user' })
   @Get()
   async list(@Req() request: Request, @Param('userid') userId: string) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(userId);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(userId),
+    ]);
 
     // Make sure user exist
     if (!user) {
@@ -62,11 +62,11 @@ export class FavoritesController {
     @Param('userid') userId: string,
     @Param('mentorid') mentorId: string,
   ) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(userId);
-    const mentor: User = await this.usersService.findById(mentorId);
+    const [current, user, mentor]: [User, User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(userId),
+      this.usersService.findById(mentorId),
+    ]);
 
     // Make sure user exist
     if (!user) {

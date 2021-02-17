@@ -44,7 +44,10 @@ export class MentorsController {
     title: 'Return all mentors in the platform by the given filters',
   })
   @Get()
-  @UsePipes(new PaginationPipe())
+  @UsePipes(
+    new PaginationPipe(),
+    new ValidationPipe({ transform: true, whitelist: true }),
+  )
   async index(@Req() request: Request, @Query() filters: MentorFiltersDto) {
     const userId: string = request.user?.auth0Id;
     const data = await this.mentorsService.findAll(filters, userId);
@@ -110,10 +113,10 @@ export class MentorsController {
     @Param('userId') userId: string,
     @Query('status') status: string,
   ) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(userId);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(userId),
+    ]);
 
     if (!user) {
       throw new BadRequestException('User not found');
