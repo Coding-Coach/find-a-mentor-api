@@ -49,7 +49,8 @@ export class MentorsController {
     new ValidationPipe({ transform: true, whitelist: true }),
   )
   async index(@Req() request: Request, @Query() filters: MentorFiltersDto) {
-    const data = await this.mentorsService.findAll(filters, !!request.user);
+    const userId: string = request.user?.auth0Id;
+    const data = await this.mentorsService.findAll(filters, userId);
 
     return {
       success: true,

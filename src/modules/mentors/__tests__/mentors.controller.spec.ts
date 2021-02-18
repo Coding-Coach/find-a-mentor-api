@@ -306,9 +306,10 @@ describe('modules/mentors/MentorsController', () => {
         Promise.resolve(<Application>testApplication),
       );
       await expect(
-        mentorsController.applyToBecomeMentor(req, <ApplicationDto>(
-          testApplication
-        )),
+        mentorsController.applyToBecomeMentor(
+          req,
+          <ApplicationDto>testApplication,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -330,9 +331,10 @@ describe('modules/mentors/MentorsController', () => {
         Promise.resolve(<Application>testApplication),
       );
       await expect(
-        mentorsController.applyToBecomeMentor(req, <ApplicationDto>(
-          testApplication
-        )),
+        mentorsController.applyToBecomeMentor(
+          req,
+          <ApplicationDto>testApplication,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -355,9 +357,10 @@ describe('modules/mentors/MentorsController', () => {
         Promise.resolve(<ApplicationDto>testApplication),
       );
       emailService.send = jest.fn();
-      const data = await mentorsController.applyToBecomeMentor(req, <
-        ApplicationDto
-      >testApplication);
+      const data = await mentorsController.applyToBecomeMentor(
+        req,
+        <ApplicationDto>testApplication,
+      );
       expect(emailService.send).toBeCalledTimes(1);
       expect(data.success).toBe(true);
     });
@@ -382,9 +385,11 @@ describe('modules/mentors/MentorsController', () => {
         }),
       );
       await expect(
-        mentorsController.reviewApplication(req, '1234', <ApplicationDto>(
-          testApplication
-        )),
+        mentorsController.reviewApplication(
+          req,
+          '1234',
+          <ApplicationDto>testApplication,
+        ),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -404,9 +409,11 @@ describe('modules/mentors/MentorsController', () => {
       );
       mentorsService.findApplicationById = jest.fn(() => undefined);
       await expect(
-        mentorsController.reviewApplication(req, '1234', <ApplicationDto>(
-          testApplication
-        )),
+        mentorsController.reviewApplication(
+          req,
+          '1234',
+          <ApplicationDto>testApplication,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -428,9 +435,11 @@ describe('modules/mentors/MentorsController', () => {
         Promise.resolve(<Application>testApplication),
       );
       await expect(
-        mentorsController.reviewApplication(req, '1234', <ApplicationDto>(
-          testApplication
-        )),
+        mentorsController.reviewApplication(
+          req,
+          '1234',
+          <ApplicationDto>testApplication,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -463,9 +472,11 @@ describe('modules/mentors/MentorsController', () => {
       mentorsService.updateApplication = jest.fn(() =>
         Promise.resolve({ ok: 1 }),
       );
-      const data = await mentorsController.reviewApplication(req, '1234', <
-        ApplicationDto
-      >testApplication);
+      const data = await mentorsController.reviewApplication(
+        req,
+        '1234',
+        <ApplicationDto>testApplication,
+      );
       expect(emailService.send).toBeCalledTimes(1);
       expect(emailService.addMentor).toBeCalledTimes(1);
       expect(data.success).toBe(true);
@@ -501,9 +512,11 @@ describe('modules/mentors/MentorsController', () => {
       mentorsService.updateApplication = jest.fn(() =>
         Promise.resolve({ ok: 1 }),
       );
-      const data = await mentorsController.reviewApplication(req, '1234', <
-        ApplicationDto
-      >testApplication);
+      const data = await mentorsController.reviewApplication(
+        req,
+        '1234',
+        <ApplicationDto>testApplication,
+      );
       expect(emailService.send).toBeCalledTimes(1);
       expect(emailService.addMentor).toBeCalledTimes(1);
       expect(data.success).toBe(true);

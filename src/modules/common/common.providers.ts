@@ -1,6 +1,7 @@
 import { Connection } from 'mongoose';
 import { ApplicationSchema } from './schemas/application.schema';
 import { UserSchema } from './schemas/user.schema';
+import { MentorshipSchema } from '../mentorships/schemas/mentorship.schema';
 
 export const commonProviders = [
   {
@@ -13,6 +14,12 @@ export const commonProviders = [
     provide: 'APPLICATION_MODEL',
     useFactory: (connection: Connection) =>
       connection.model('Application', ApplicationSchema),
+    inject: ['DATABASE_CONNECTION'],
+  },
+  {
+    provide: 'MENTORSHIP_MODEL',
+    useFactory: (connection: Connection) =>
+      connection.model('Mentorship', MentorshipSchema),
     inject: ['DATABASE_CONNECTION'],
   },
 ];
