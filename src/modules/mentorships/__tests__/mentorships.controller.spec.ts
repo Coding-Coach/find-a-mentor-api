@@ -176,6 +176,47 @@ describe('modules/mentorships/MentorshipsController', () => {
       expect(response.data[0].isMine).toBe(false);
     });
 
+    it('should filter out requests of deleted users', async () => {
+      usersService.findByAuth0Id = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(mentorId),
+          roles: [Role.MENTOR],
+        }),
+      );
+
+      usersService.findById = jest.fn(() =>
+        Promise.resolve(<User>{
+          _id: new ObjectIdMock(mentorId),
+          roles: [Role.MENTOR],
+        }),
+      );
+
+      mentorshipsService.findMentorshipsByUser = jest.fn(() =>
+        Promise.resolve([
+          <Mentorship>{
+            _id: new ObjectIdMock('1'),
+            mentor: new ObjectIdMock('ANYMENTORID'),
+            mentee: null,
+            status: Status.NEW,
+            goals: [],
+            message: 'MESSAGE',
+            expectation: 'EXPECTATION',
+            background: 'BACKGROUND',
+            reason: 'REASON',
+            updatedAt: new Date(),
+            createdAt: new Date(),
+          },
+        ]),
+      );
+
+      const response = await mentorshipsController.getMentorshipRequests(
+        <Request>request,
+        mentorId,
+      );
+
+      expect(response.data).toEqual([]);
+    });
+
     it('should return mentorship applications for a given mentee', async () => {
       request = { user: { _id: menteeId, auth0Id: '1234' } };
 

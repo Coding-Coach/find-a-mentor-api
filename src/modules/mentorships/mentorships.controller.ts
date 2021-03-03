@@ -137,31 +137,33 @@ export class MentorshipsController {
     );
 
     // Format the response data
-    let requests = mentorshipRequests.map(item => {
-      const mentorshipSummary = new MentorshipSummaryDto({
-        id: item._id,
-        status: item.status,
-        message: item.message,
-        background: item.background,
-        expectation: item.expectation,
-        date: item.createdAt,
-        isMine: item.mentee.equals(current._id),
-        mentee: new UserDto({
-          id: item.mentee._id,
-          name: item.mentee.name,
-          avatar: item.mentee.avatar,
-          title: item.mentee.title,
-        }),
-        mentor: new UserDto({
-          id: item.mentor._id,
-          name: item.mentor.name,
-          avatar: item.mentor.avatar,
-          title: item.mentor.title,
-        }),
-      });
+    const requests = mentorshipRequests
+      .filter(item => item.mentee && item.mentor)
+      .map(item => {
+        const mentorshipSummary = new MentorshipSummaryDto({
+          id: item._id,
+          status: item.status,
+          message: item.message,
+          background: item.background,
+          expectation: item.expectation,
+          date: item.createdAt,
+          isMine: item.mentee.equals(current._id),
+          mentee: new UserDto({
+            id: item.mentee._id,
+            name: item.mentee.name,
+            avatar: item.mentee.avatar,
+            title: item.mentee.title,
+          }),
+          mentor: new UserDto({
+            id: item.mentor._id,
+            name: item.mentor.name,
+            avatar: item.mentor.avatar,
+            title: item.mentor.title,
+          }),
+        });
 
-      return mentorshipSummary;
-    });
+        return mentorshipSummary;
+      });
 
     return {
       success: true,
