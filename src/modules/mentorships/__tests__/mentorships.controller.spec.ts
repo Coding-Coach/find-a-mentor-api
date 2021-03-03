@@ -89,7 +89,9 @@ describe('modules/mentorships/MentorshipsController', () => {
         }),
       );
       mentorshipsService.findMentorship = jest.fn(() => Promise.resolve(null));
-      mentorshipsService.createMentorship = jest.fn(() => Promise.resolve());
+      mentorshipsService.createMentorship = jest.fn(() =>
+        Promise.resolve(null),
+      );
       emailService.send = jest.fn(() => Promise.resolve(null));
     });
 
@@ -214,7 +216,8 @@ describe('modules/mentorships/MentorshipsController', () => {
         mentorId,
       );
 
-      expect(response.data).toEqual([]);
+      expect(response.data.length).toBe(1);
+      expect(response.data[0].mentee).toEqual(null);
     });
 
     it('should return mentorship applications for a given mentee', async () => {
