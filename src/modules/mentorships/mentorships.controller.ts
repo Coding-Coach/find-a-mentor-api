@@ -137,7 +137,7 @@ export class MentorshipsController {
     );
 
     // Format the response data
-    let requests = mentorshipRequests.map(item => {
+    const requests = mentorshipRequests.map(item => {
       const mentorshipSummary = new MentorshipSummaryDto({
         id: item._id,
         status: item.status,
@@ -145,19 +145,23 @@ export class MentorshipsController {
         background: item.background,
         expectation: item.expectation,
         date: item.createdAt,
-        isMine: item.mentee.equals(current._id),
-        mentee: new UserDto({
-          id: item.mentee._id,
-          name: item.mentee.name,
-          avatar: item.mentee.avatar,
-          title: item.mentee.title,
-        }),
-        mentor: new UserDto({
-          id: item.mentor._id,
-          name: item.mentor.name,
-          avatar: item.mentor.avatar,
-          title: item.mentor.title,
-        }),
+        isMine: !!item.mentee?.equals(current._id),
+        mentee: item.mentee
+          ? new UserDto({
+              id: item.mentee._id,
+              name: item.mentee.name,
+              avatar: item.mentee.avatar,
+              title: item.mentee.title,
+            })
+          : null,
+        mentor: item.mentor
+          ? new UserDto({
+              id: item.mentor._id,
+              name: item.mentor.name,
+              avatar: item.mentor.avatar,
+              title: item.mentor.title,
+            })
+          : null,
       });
 
       return mentorshipSummary;

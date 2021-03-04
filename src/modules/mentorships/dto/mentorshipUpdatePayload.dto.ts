@@ -5,7 +5,7 @@ import { Status } from '../interfaces/mentorship.interface';
 export class MentorshipUpdatePayload {
   @ApiModelProperty()
   @IsIn([Status.VIEWED, Status.APPROVED, Status.REJECTED, Status.CANCELLED])
-  status: string;
+  status: Status;
 
   @ApiModelPropertyOptional()
   @IsOptional()
