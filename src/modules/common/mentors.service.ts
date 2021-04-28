@@ -97,7 +97,7 @@ export class MentorsService {
       if (user) {
         // find all of their mentorships
         const mentorships: Mentorship[] = await this.mentorshipModel
-          .find({ mentee: user._id })
+          .find({ mentee: user._id, status: Status.APPROVED })
           .exec();
 
         // flatten the mentors into a set

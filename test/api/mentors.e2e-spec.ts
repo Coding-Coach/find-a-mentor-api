@@ -9,7 +9,11 @@ import {
   Role,
   ChannelName,
 } from '../../src/modules/common/interfaces/user.interface';
-import { createUser, createMentorship } from '../utils/seeder';
+import {
+  createUser,
+  createMentorship,
+  approveMentorship,
+} from '../utils/seeder';
 import { getToken } from '../utils/jwt';
 
 describe('Mentors', () => {
@@ -113,6 +117,8 @@ describe('Mentors', () => {
         mentor: mentor1._id,
         mentee: mentee._id,
       });
+
+      await approveMentorship({ mentorship });
 
       const token = getToken(mentee);
 
