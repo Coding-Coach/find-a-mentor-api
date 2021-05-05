@@ -40,3 +40,8 @@ export const createMentorship = ({
     status,
   }).save();
 };
+
+export const approveMentorship = async ({ mentorship }) => {
+  mentorship.status = 'Approved';
+  await mentorship.save();
+};
