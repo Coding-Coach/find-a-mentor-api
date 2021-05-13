@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
+import { MyLogger } from './logger';
 dotenv.config();
 
 import Config from './config';
@@ -12,7 +13,9 @@ import { AppModule } from './app.module';
 import { version } from 'package.json';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new MyLogger(),
+  });
   app.enableCors({ origin: process.env.CORS_ORIGIN || /codingcoach\.io$/ });
   const options = new DocumentBuilder()
     .setTitle('Coding Coach')
@@ -30,7 +33,7 @@ async function bootstrap() {
 
     SwaggerModule.setup('/docs', app, document);
   }
-
+  console.log(`Server is up on port: ${process.env.PORT || 3000}`);
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
