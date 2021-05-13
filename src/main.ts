@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import { MyLogger } from './logger';
+import { ErrorFilter } from './filters/errors.filter';
 dotenv.config();
 
 import Config from './config';
@@ -17,6 +18,8 @@ async function bootstrap() {
     logger: new MyLogger(),
   });
   app.enableCors({ origin: process.env.CORS_ORIGIN || /codingcoach\.io$/ });
+  app.useGlobalFilters(new ErrorFilter());
+
   const options = new DocumentBuilder()
     .setTitle('Coding Coach')
     .setDescription('A REST API for the coding coach platform')
