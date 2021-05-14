@@ -115,62 +115,69 @@ export class MentorshipsController {
     @Req() request: Request,
     @Param('userId') userId: string,
   ) {
-    const [current, user]: [User, User] = await Promise.all([
-      this.usersService.findByAuth0Id(request.user.auth0Id),
-      this.usersService.findById(userId),
-    ]);
+    try {
+      const [current, user]: [User, User] = await Promise.all([
+        this.usersService.findByAuth0Id(request.user.auth0Id),
+        this.usersService.findById(userId),
+      ]);
 
-    if (!user) {
-      throw new BadRequestException('User not found');
-    }
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
 
-    // Only an admin or same user can view the requests
-    if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
-      throw new UnauthorizedException(
-        'You are not authorized to perform this operation',
+      // Only an admin or same user can view the requests
+      if (
+        !current._id.equals(user._id) &&
+        !current.roles.includes(Role.ADMIN)
+      ) {
+        throw new UnauthorizedException(
+          'You are not authorized to perform this operation',
+        );
+      }
+
+      // Get the mentorship requests from and to to that user
+      const mentorshipRequests: Mentorship[] = await this.mentorshipsService.findMentorshipsByUser(
+        userId,
       );
-    }
 
-    // Get the mentorship requests from and to to that user
-    const mentorshipRequests: Mentorship[] = await this.mentorshipsService.findMentorshipsByUser(
-      userId,
-    );
+      // Format the response data
+      const requests = mentorshipRequests.map(item => {
+        const mentorshipSummary = new MentorshipSummaryDto({
+          id: item._id,
+          status: item.status,
+          message: item.message,
+          background: item.background,
+          expectation: item.expectation,
+          date: item.createdAt,
+          isMine: !!item.mentee?.equals(current._id),
+          mentee: item.mentee
+            ? new UserDto({
+                id: item.mentee._id,
+                name: item.mentee.name,
+                avatar: item.mentee.avatar,
+                title: item.mentee.title,
+              })
+            : null,
+          mentor: item.mentor
+            ? new UserDto({
+                id: item.mentor._id,
+                name: item.mentor.name,
+                avatar: item.mentor.avatar,
+                title: item.mentor.title,
+              })
+            : null,
+        });
 
-    // Format the response data
-    const requests = mentorshipRequests.map(item => {
-      const mentorshipSummary = new MentorshipSummaryDto({
-        id: item._id,
-        status: item.status,
-        message: item.message,
-        background: item.background,
-        expectation: item.expectation,
-        date: item.createdAt,
-        isMine: !!item.mentee?.equals(current._id),
-        mentee: item.mentee
-          ? new UserDto({
-              id: item.mentee._id,
-              name: item.mentee.name,
-              avatar: item.mentee.avatar,
-              title: item.mentee.title,
-            })
-          : null,
-        mentor: item.mentor
-          ? new UserDto({
-              id: item.mentor._id,
-              name: item.mentor.name,
-              avatar: item.mentor.avatar,
-              title: item.mentor.title,
-            })
-          : null,
+        return mentorshipSummary;
       });
 
-      return mentorshipSummary;
-    });
-
-    return {
-      success: true,
-      data: requests,
-    };
+      return {
+        success: true,
+        data: requests,
+      };
+    } catch (error) {
+      Sentry.captureException(error);
+    }
   }
 
   @Put(':userId/requests/:id')
