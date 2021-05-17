@@ -10,7 +10,6 @@ Sentry.init({ dsn: Config.sentry.DSN });
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { version } from 'package.json';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -21,7 +20,7 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle('Coding Coach')
     .setDescription('A REST API for the coding coach platform')
-    .setVersion(version)
+    .setVersion(process.env.DOCS_VERSION || '1.0')
     .addBearerAuth()
     .build();
 
