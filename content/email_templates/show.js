@@ -6,15 +6,15 @@ const port = 3003;
 const layout = fs.readFileSync('content/email_templates/layout.html', {encoding: 'utf8'});
 
 function injectData(template, data) {
-  return template.replace(/{{(.*?)}}/, (_,prop) => data[prop]);
+  return template.replace(/{{(.*?)}}/gm, (_,prop) => data[prop] || `{{${prop}}}`);
 }
 
 app.get('/:templateName', function (req, res) {
   const {templateName} = req.params;
+  if (templateName.includes('.')) return;
+  const {data} = req.query;
   const template = fs.readFileSync(`content/email_templates/${templateName}.html`, {encoding: 'utf8'});
-  const content = injectData(layout.replace('$$$Content$$$', template), {
-    name: 'Brent'
-  });
+  const content = injectData(layout.replace('$$$Content$$$', template), JSON.parse(data));
   res.send(content);
 });
 

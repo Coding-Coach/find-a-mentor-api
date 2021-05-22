@@ -88,6 +88,6 @@ export class EmailService {
     const template = await this.getTemplateContent(name);
     return (await this.layout)
       .replace('$$$Content$$$', template)
-      .replace(/{{(.*?)}}/, (_, prop) => data[prop]);
+      .replace(/{{(.*?)}}/gm, (_, prop) => data[prop]);
   }
 }
