@@ -63,7 +63,7 @@
     "mongodb-memory-server": "^6.9.2",
     "nock": "^13.0.5",
     "nodemon": "^1.18.9",
-    "prettier": "^1.15.3",
+    "prettier": "^2.3.0",
     "supertest": "^3.4.1",
     "ts-jest": "^26.4.4",
     "ts-node": "8.1.0",
