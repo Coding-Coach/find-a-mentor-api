@@ -12,12 +12,72 @@ export enum Template {
   MENTORSHIP_REQUEST_REJECTED = 'd-8521ac50737f4b0384a95552dc02db9f',
 }
 
-export type EmailParams = Required<Pick<MailData, 'to' | 'subject'>> & {
+type WelcomePayload = {
   name: 'welcome';
   data: {
     name: string;
   };
 };
+
+type MentorshipAccepted = {
+  name: 'mentorship-accepted';
+  data: {
+    menteeName: string;
+    mentorName: string;
+    contactURL: string;
+  };
+};
+
+type MentorshipDeclined = {
+  name: 'mentorship-declined';
+  data: {
+    menteeName: string;
+    mentorName: string;
+    reason: string;
+  };
+};
+
+type MentorshipRequested = {
+  name: 'mentorship-requested';
+  data: {
+    menteeName: string;
+    mentorName: string;
+    message: string;
+  };
+};
+
+type MentorApplicationReceived = {
+  name: 'mentor-application-received';
+  data: {
+    name: string;
+  };
+};
+
+type MentorApplicationDenied = {
+  name: 'mentor-application-denied';
+  data: {
+    name: string;
+    reason: string;
+  };
+};
+
+type MentorApplicationApproved = {
+  name: 'mentor-application-approved';
+  data: {
+    name: string;
+  };
+};
+
+export type EmailParams = Required<Pick<MailData, 'to' | 'subject'>> &
+  (
+    | WelcomePayload
+    | MentorshipAccepted
+    | MentorshipDeclined
+    | MentorshipRequested
+    | MentorApplicationReceived
+    | MentorApplicationDenied
+    | MentorApplicationApproved
+  );
 
 export interface SendData<T> {
   to: string;

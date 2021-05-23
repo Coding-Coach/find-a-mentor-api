@@ -124,12 +124,14 @@ export class UsersController {
 
           await this.listsService.createList(favorites);
 
-          const emailData = {
+          this.emailService.sendLocalTemplate({
             to: userDto.email,
-            templateId: Template.WELCOME_MESSAGE,
-          };
-
-          this.emailService.send(emailData);
+            name: 'welcome',
+            subject: 'Welcome to Coding Coach!',
+            data: {
+              name: userDto.name,
+            },
+          });
 
           response.data = newUser;
         }
@@ -141,7 +143,7 @@ export class UsersController {
       }
     }
 
-    Sentry.configureScope(scope => {
+    Sentry.configureScope((scope) => {
       scope.setUser({
         id: response.data._id,
         email: response.data.email,
@@ -290,8 +292,9 @@ export class UsersController {
     }),
   )
   async uploadAvatar(@Req() request, @Param() params, @UploadedFile() image) {
-    const imagePath = `${Config.files.public}/${Config.files.avatars}/${image &&
-      image.filename}`;
+    const imagePath = `${Config.files.public}/${Config.files.avatars}/${
+      image && image.filename
+    }`;
     const current: User = await this.usersService.findByAuth0Id(
       request.user.auth0Id,
     );
