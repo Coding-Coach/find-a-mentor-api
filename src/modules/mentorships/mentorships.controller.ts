@@ -273,7 +273,7 @@ export class MentorshipsController {
         await this.emailService.sendLocalTemplate({
           to: mentee.email,
           name: 'mentorship-accepted',
-          subject: 'Mentor Application Approved',
+          subject: 'Mentorship Approved 👏',
           data: {
             menteeName: menteeFirstName,
             mentorName: currentUser.name,

@@ -127,7 +127,7 @@ export class UsersController {
           this.emailService.sendLocalTemplate({
             to: userDto.email,
             name: 'welcome',
-            subject: 'Welcome to Coding Coach!',
+            subject: 'Welcome to Coding Coach! 🥳',
             data: {
               name: userDto.name,
             },

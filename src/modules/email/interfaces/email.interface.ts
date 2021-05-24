@@ -54,7 +54,7 @@ type MentorApplicationReceived = {
 };
 
 type MentorApplicationDenied = {
-  name: 'mentor-application-denied';
+  name: 'mentor-application-declined';
   data: {
     name: string;
     reason: string;

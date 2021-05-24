@@ -256,7 +256,7 @@ export class MentorsController {
     if (applicationDto.status === Status.REJECTED) {
       sendEmailParams = {
         to: user.email,
-        name: 'mentor-application-denied',
+        name: 'mentor-application-declined',
         subject: 'Mentor Application Denied',
         data: {
           name: user.name,
@@ -268,7 +268,7 @@ export class MentorsController {
       sendEmailParams = {
         to: user.email,
         name: 'mentor-application-approved',
-        subject: 'Mentor Application Approved',
+        subject: 'Mentor Application Approved 🏅',
         data: {
           name: user.name,
         },
