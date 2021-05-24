@@ -185,10 +185,7 @@ export class MentorshipsController {
       };
     } catch (error) {
       Sentry.captureException(error);
-      return {
-        success: false,
-        error,
-      };
+      throw error;
     }
   }
 

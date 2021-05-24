@@ -92,7 +92,7 @@ describe('modules/mentorships/MentorshipsController', () => {
       mentorshipsService.createMentorship = jest.fn(() =>
         Promise.resolve(null),
       );
-      emailService.send = jest.fn(() => Promise.resolve(null));
+      emailService.sendLocalTemplate = jest.fn(() => Promise.resolve(null));
     });
 
     it('should return a 400 error if mentor not found', async () => {
@@ -265,7 +265,7 @@ describe('modules/mentorships/MentorshipsController', () => {
       expect(response.data[0].isMine).toBe(true);
     });
 
-    it("should return unauthorised if user is not admin and requesting another user's applications", async () => {
+    it.only("should return unauthorised if user is not admin and requesting another user's applications", async () => {
       request = { user: { _id: menteeId, auth0Id: '1234' } };
 
       usersService.findByAuth0Id = jest.fn(() =>

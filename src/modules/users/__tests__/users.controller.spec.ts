@@ -124,7 +124,7 @@ describe('modules/users/UsersController', () => {
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(undefined));
       usersService.findByEmail = jest.fn(() => Promise.resolve(undefined));
       usersService.create = jest.fn(() => Promise.resolve(data));
-      emailService.send = jest.fn();
+      emailService.sendLocalTemplate = jest.fn();
       listService.createList = jest.fn();
       auth0Service.getAdminAccessToken = jest.fn(() =>
         Promise.resolve({ access_token: 'abc' }),
@@ -135,7 +135,7 @@ describe('modules/users/UsersController', () => {
 
       expect(await usersController.currentUser(request)).toEqual(response);
       expect(usersService.create).toHaveBeenCalledTimes(1);
-      expect(emailService.send).toHaveBeenCalledTimes(1);
+      expect(emailService.sendLocalTemplate).toHaveBeenCalledTimes(1);
       expect(listService.createList).toHaveBeenCalledTimes(1);
     });
 
