@@ -14,7 +14,7 @@ app.get('/:templateName', function (req, res) {
   if (templateName.includes('.')) return;
   const {data} = req.query;
   const template = fs.readFileSync(`content/email_templates/${templateName}.html`, {encoding: 'utf8'});
-  const content = injectData(layout.replace('$$$Content$$$', template), JSON.parse(data));
+  const content = injectData(layout.replace('$$$Content$$$', template), JSON.parse(data || '{}'));
   res.send(content);
 });
 

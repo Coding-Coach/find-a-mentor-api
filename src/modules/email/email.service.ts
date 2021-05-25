@@ -46,7 +46,7 @@ export class EmailService {
   }
 
   async sendLocalTemplate(params: EmailParams) {
-    const { to, subject, data, name } = params;
+    const { to, subject, data = {}, name } = params;
     const content = await this.injectData(name, data);
     try {
       await sgMail.send({
