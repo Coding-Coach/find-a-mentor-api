@@ -1,4 +1,5 @@
 import { Channel } from '../../common/interfaces/user.interface';
+import type { MailData } from '@sendgrid/helpers/classes/mail';
 
 export enum Template {
   WELCOME_MESSAGE = 'd-1434be390e1b4288b8011507f1c8d786',
@@ -10,6 +11,73 @@ export enum Template {
   MENTORSHIP_REQUEST_APPROVED = 'd-f92a1768d23842818335d54ec5bb96e1',
   MENTORSHIP_REQUEST_REJECTED = 'd-8521ac50737f4b0384a95552dc02db9f',
 }
+
+type WelcomePayload = {
+  name: 'welcome';
+  data: {
+    name: string;
+  };
+};
+
+type MentorshipAccepted = {
+  name: 'mentorship-accepted';
+  data: {
+    menteeName: string;
+    mentorName: string;
+    contactURL: string;
+  };
+};
+
+type MentorshipDeclined = {
+  name: 'mentorship-declined';
+  data: {
+    menteeName: string;
+    mentorName: string;
+    reason: string;
+  };
+};
+
+type MentorshipRequested = {
+  name: 'mentorship-requested';
+  data: {
+    menteeName: string;
+    mentorName: string;
+    message: string;
+  };
+};
+
+type MentorApplicationReceived = {
+  name: 'mentor-application-received';
+  data: {
+    name: string;
+  };
+};
+
+type MentorApplicationDenied = {
+  name: 'mentor-application-declined';
+  data: {
+    name: string;
+    reason: string;
+  };
+};
+
+type MentorApplicationApproved = {
+  name: 'mentor-application-approved';
+  data: {
+    name: string;
+  };
+};
+
+export type EmailParams = Required<Pick<MailData, 'to' | 'subject'>> &
+  (
+    | WelcomePayload
+    | MentorshipAccepted
+    | MentorshipDeclined
+    | MentorshipRequested
+    | MentorApplicationReceived
+    | MentorApplicationDenied
+    | MentorApplicationApproved
+  );
 
 export interface SendData<T> {
   to: string;

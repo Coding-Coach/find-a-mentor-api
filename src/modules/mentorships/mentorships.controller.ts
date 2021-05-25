@@ -96,7 +96,16 @@ export class MentorshipsController {
           message: data.message,
         },
       };
-      await this.emailService.send<SendDataMentorshipParams>(emailData);
+      await this.emailService.sendLocalTemplate({
+        name: 'mentorship-requested',
+        to: mentor.email,
+        subject: 'Mentorship Requested',
+        data: {
+          mentorName: mentor.name,
+          menteeName: current.name,
+          message: data.message,
+        },
+      });
     } catch (error) {
       Sentry.captureException(error);
     }
@@ -136,12 +145,11 @@ export class MentorshipsController {
       }
 
       // Get the mentorship requests from and to to that user
-      const mentorshipRequests: Mentorship[] = await this.mentorshipsService.findMentorshipsByUser(
-        userId,
-      );
+      const mentorshipRequests: Mentorship[] =
+        await this.mentorshipsService.findMentorshipsByUser(userId);
 
       // Format the response data
-      const requests = mentorshipRequests.map(item => {
+      const requests = mentorshipRequests.map((item) => {
         const mentorshipSummary = new MentorshipSummaryDto({
           id: item._id,
           status: item.status,
@@ -177,10 +185,7 @@ export class MentorshipsController {
       };
     } catch (error) {
       Sentry.captureException(error);
-      return {
-        success: false,
-        error,
-      };
+      throw error;
     }
   }
 
@@ -256,29 +261,30 @@ export class MentorshipsController {
 
       if (mentorship.status === Status.APPROVED) {
         const slack = currentUser.channels.find(
-          channel => channel.type === ChannelName.SLACK,
+          (channel) => channel.type === ChannelName.SLACK,
         );
         const contactURL = slack
           ? `https://coding-coach.slack.com/team/${slack.id}`
           : `mailto:${currentUser.email}`;
 
-        await this.emailService.send<SendDataMentorshipApprovalParams>({
+        await this.emailService.sendLocalTemplate({
           to: mentee.email,
-          templateId: Template.MENTORSHIP_REQUEST_APPROVED,
-          dynamic_template_data: {
+          name: 'mentorship-accepted',
+          subject: 'Mentorship Approved 👏',
+          data: {
             menteeName: menteeFirstName,
             mentorName: currentUser.name,
             contactURL,
-            channels: currentUser.channels,
           },
         });
       }
 
       if (mentorship.status === Status.REJECTED) {
-        await this.emailService.send<SendDataMentorshipRejectionParams>({
+        await this.emailService.sendLocalTemplate({
+          name: 'mentorship-declined',
+          subject: 'Mentorship Declined',
           to: mentee.email,
-          templateId: Template.MENTORSHIP_REQUEST_REJECTED,
-          dynamic_template_data: {
+          data: {
             menteeName: menteeFirstName,
             mentorName: currentUser.name,
             reason: reason || '',

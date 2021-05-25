@@ -12,7 +12,7 @@ const middleware = jwt({
     jwksUri: `https://${Config.auth0.frontend.DOMAIN}/.well-known/jwks.json`,
   }),
   issuer: `https://${Config.auth0.frontend.DOMAIN}/`,
-  algorithm: 'RS256',
+  algorithms: ['RS256'],
 });
 
 /**

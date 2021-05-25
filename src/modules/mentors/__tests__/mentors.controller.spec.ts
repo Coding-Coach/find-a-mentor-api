@@ -356,12 +356,12 @@ describe('modules/mentors/MentorsController', () => {
       mentorsService.createApplication = jest.fn(() =>
         Promise.resolve(<ApplicationDto>testApplication),
       );
-      emailService.send = jest.fn();
+      emailService.sendLocalTemplate = jest.fn();
       const data = await mentorsController.applyToBecomeMentor(
         req,
         <ApplicationDto>testApplication,
       );
-      expect(emailService.send).toBeCalledTimes(1);
+      expect(emailService.sendLocalTemplate).toBeCalledTimes(1);
       expect(data.success).toBe(true);
     });
   });
@@ -467,7 +467,7 @@ describe('modules/mentors/MentorsController', () => {
         Promise.resolve(<Application>testApplication),
       );
       usersService.update = jest.fn();
-      emailService.send = jest.fn();
+      emailService.sendLocalTemplate = jest.fn();
       emailService.addMentor = jest.fn();
       mentorsService.updateApplication = jest.fn(() =>
         Promise.resolve({ ok: 1 }),
@@ -477,7 +477,7 @@ describe('modules/mentors/MentorsController', () => {
         '1234',
         <ApplicationDto>testApplication,
       );
-      expect(emailService.send).toBeCalledTimes(1);
+      expect(emailService.sendLocalTemplate).toBeCalledTimes(1);
       expect(emailService.addMentor).toBeCalledTimes(1);
       expect(data.success).toBe(true);
       expect(usersService.update).toBeCalledTimes(1);
@@ -507,7 +507,7 @@ describe('modules/mentors/MentorsController', () => {
         Promise.resolve(<Application>testApplication),
       );
       usersService.update = jest.fn();
-      emailService.send = jest.fn();
+      emailService.sendLocalTemplate = jest.fn();
       emailService.addMentor = jest.fn();
       mentorsService.updateApplication = jest.fn(() =>
         Promise.resolve({ ok: 1 }),
@@ -517,7 +517,7 @@ describe('modules/mentors/MentorsController', () => {
         '1234',
         <ApplicationDto>testApplication,
       );
-      expect(emailService.send).toBeCalledTimes(1);
+      expect(emailService.sendLocalTemplate).toBeCalledTimes(1);
       expect(emailService.addMentor).toBeCalledTimes(1);
       expect(data.success).toBe(true);
     });
