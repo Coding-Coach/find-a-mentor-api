@@ -31,13 +31,9 @@ export class EmailService {
   };
 
   private getTemplateContent(name: string) {
-    return promises.readFile(`content/email_templates/${name}.html`, {
+    return promises.readFile(`emails/full/${name}.html`, {
       encoding: 'utf8',
     });
-  }
-
-  get layout() {
-    return this.getTemplateContent('layout');
   }
 
   async send<TemplateParams>(data: SendData<TemplateParams>) {
@@ -86,8 +82,6 @@ export class EmailService {
 
   private async injectData(name: string, data: Record<string, string>) {
     const template = await this.getTemplateContent(name);
-    return (await this.layout)
-      .replace('$$$Content$$$', template)
-      .replace(/{{(.*?)}}/gm, (_, prop) => data[prop]);
+    return template.replace(/{{(.*?)}}/gm, (_, prop) => data[prop]);
   }
 }

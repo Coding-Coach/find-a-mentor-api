@@ -39,3 +39,7 @@ local-mongo
 
 # Environment configurations
 .env
+
+# Emails
+
+emails/full

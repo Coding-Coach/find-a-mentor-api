@@ -5,7 +5,7 @@
   "author": "",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && yarn emails:build",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
     "start:dev": "concurrently --handle-input \"wait-on dist/main.js && nodemon\" \"tsc -w -p tsconfig.build.json\" ",
@@ -20,7 +20,9 @@
     "test:e2e": "jest --verbose --runInBand --config ./test/jest-e2e.json",
     "user:availability": "node ./scripts/set-availability",
     "user:import": "ts-node -r tsconfig-paths/register ./scripts/import-mentors.ts",
-    "user:roles": "node ./scripts/addroles"
+    "user:roles": "node ./scripts/addroles",
+    "emails:start": "nodemon --config nodemon-emails.json",
+    "emails:build": "node emails/build.js"
   },
   "dependencies": {
     "@nestjs/common": "^6.5.3",
