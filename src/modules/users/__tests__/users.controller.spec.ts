@@ -268,7 +268,7 @@ describe('modules/users/UsersController', () => {
       const data = new UserDto({
         name: 'Crysfel Villa',
         avatar: 'test.jpg',
-        roles: ['Admin', 'SomethingElse'],
+        roles: [Role.ADMIN, Role.MENTOR],
       });
 
       usersService.findByAuth0Id = jest.fn(() =>
@@ -302,7 +302,7 @@ describe('modules/users/UsersController', () => {
       const data = new UserDto({
         name: 'Crysfel Villa',
         avatar: 'test.jpg',
-        roles: ['Member', 'Admin'],
+        roles: [Role.MEMBER, Role.ADMIN],
       });
 
       usersService.findByAuth0Id = jest.fn(() =>
@@ -336,7 +336,7 @@ describe('modules/users/UsersController', () => {
         name: 'Crysfel Villa',
         email: 'should@ignore.com',
         avatar: 'test.jpg',
-        roles: ['Member', 'Admin'],
+        roles: [Role.MEMBER, Role.ADMIN],
       });
 
       usersService.findByAuth0Id = jest.fn(() =>

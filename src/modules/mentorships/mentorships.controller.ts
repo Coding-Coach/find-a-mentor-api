@@ -68,6 +68,10 @@ export class MentorshipsController {
       throw new BadRequestException('Mentor not found');
     }
 
+    if (mentor._id.equals(current._id)) {
+      throw new BadRequestException(`Are you planning to mentor yourself?`);
+    }
+
     if (!mentor.available) {
       throw new BadRequestException('Mentor is not available');
     }
@@ -76,6 +80,7 @@ export class MentorshipsController {
       mentor._id,
       current._id,
     );
+
     if (mentorship) {
       throw new BadRequestException('A mentorship request already exists');
     }
@@ -164,6 +169,7 @@ export class MentorshipsController {
                 name: item.mentee.name,
                 avatar: item.mentee.avatar,
                 title: item.mentee.title,
+                email: item.mentee.email,
               })
             : null,
           mentor: item.mentor
