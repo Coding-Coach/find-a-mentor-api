@@ -18,6 +18,7 @@ class ObjectIdMock {
   constructor(current: string) {
     this.current = current;
   }
+
   equals(value) {
     return this.current === value.current;
   }
@@ -265,7 +266,7 @@ describe('modules/mentorships/MentorshipsController', () => {
       expect(response.data[0].isMine).toBe(true);
     });
 
-    it.only("should return unauthorised if user is not admin and requesting another user's applications", async () => {
+    it("should return unauthorised if user is not admin and requesting another user's applications", async () => {
       request = { user: { _id: menteeId, auth0Id: '1234' } };
 
       usersService.findByAuth0Id = jest.fn(() =>
