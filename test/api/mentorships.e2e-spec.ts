@@ -13,9 +13,11 @@ import { getToken } from '../utils/jwt';
 
 describe('Mentorships', () => {
   let app: INestApplication;
-  let server;
-  let mentorId;
-  const emailService = { send: jest.fn() };
+  let server: unknown;
+  let mentorId: string;
+  const emailService: { [k in keyof EmailService]?: jest.SpyInstance } = {
+    sendLocalTemplate: jest.fn(),
+  };
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
@@ -38,7 +40,7 @@ describe('Mentorships', () => {
   beforeEach(async () => {
     await mongoose.connection.dropDatabase();
     mentorId = mongoose.Types.ObjectId();
-    emailService.send.mockClear();
+    emailService.sendLocalTemplate.mockClear();
   });
 
   describe('PUT /mentorships/:mentorId/requests/:id', () => {
@@ -157,10 +159,10 @@ describe('Mentorships', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({ status: Status.APPROVED })
           .expect(200);
-        expect(emailService.send).toHaveBeenCalledTimes(1);
+        expect(emailService.sendLocalTemplate).toHaveBeenCalledTimes(1);
         expect(body.mentorship.status).toBe(Status.APPROVED);
 
-        emailService.send.mockClear();
+        emailService.sendLocalTemplate.mockClear();
 
         const {
           body: {
@@ -173,7 +175,7 @@ describe('Mentorships', () => {
           .expect(200);
         expect(status).toBe(Status.REJECTED);
         expect(reason).toBe('Other commitments');
-        expect(emailService.send).toHaveBeenCalledTimes(1);
+        expect(emailService.sendLocalTemplate).toHaveBeenCalledTimes(1);
       });
 
       it('allows a mentee in the mentorship to cancel', async () => {
@@ -214,10 +216,10 @@ describe('Mentorships', () => {
           .set('Authorization', `Bearer ${token}`)
           .send({ status: Status.APPROVED })
           .expect(200);
-        expect(emailService.send).toHaveBeenCalledTimes(1);
+        expect(emailService.sendLocalTemplate).toHaveBeenCalledTimes(1);
         expect(body.mentorship.status).toBe(Status.APPROVED);
 
-        emailService.send.mockClear();
+        emailService.sendLocalTemplate.mockClear();
 
         const {
           body: {
@@ -230,7 +232,7 @@ describe('Mentorships', () => {
           .expect(200);
         expect(status).toBe(Status.REJECTED);
         expect(reason).toBe('Lack of time');
-        expect(emailService.send).toHaveBeenCalledTimes(1);
+        expect(emailService.sendLocalTemplate).toHaveBeenCalledTimes(1);
       });
     });
   });
