@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.org/Coding-Coach/find-a-mentor-api.svg?branch=master)](https://travis-ci.org/Coding-Coach/find-a-mentor-api)
+[![Tests](https://github.com/Coding-Coach/find-a-mentor-api/actions/workflows/main.yml/badge.svg)](https://github.com/Coding-Coach/find-a-mentor-api/actions/workflows/main.yml)
 
 ## Description
 
