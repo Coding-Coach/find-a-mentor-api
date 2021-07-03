@@ -28,6 +28,15 @@ type MentorshipAccepted = {
   };
 };
 
+type MentorshipCancelled = {
+  name: 'mentorship-cancelled';
+  data: {
+    mentorName: string;
+    menteeName: string;
+    reason: string;
+  };
+};
+
 type MentorshipDeclined = {
   name: 'mentorship-declined';
   data: {
@@ -53,7 +62,7 @@ type MentorApplicationReceived = {
   };
 };
 
-type MentorApplicationDenied = {
+type MentorApplicationDeclined = {
   name: 'mentor-application-declined';
   data: {
     name: string;
@@ -72,10 +81,11 @@ export type EmailParams = Required<Pick<MailData, 'to' | 'subject'>> &
   (
     | WelcomePayload
     | MentorshipAccepted
+    | MentorshipCancelled
     | MentorshipDeclined
     | MentorshipRequested
     | MentorApplicationReceived
-    | MentorApplicationDenied
+    | MentorApplicationDeclined
     | MentorApplicationApproved
   );
 

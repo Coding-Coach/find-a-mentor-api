@@ -217,9 +217,10 @@ export class MentorshipsController {
       throw new NotFoundException('Mentorship not found');
     }
 
-    const [currentUser, mentee] = await Promise.all([
+    const [currentUser, mentee, mentor] = await Promise.all([
       this.usersService.findByAuth0Id(request.user.auth0Id),
       this.usersService.findById(mentorship.mentee),
+      this.usersService.findById(mentorship.mentor),
     ]);
 
     const currentUserIsAdmin = currentUser.roles.includes(Role.ADMIN);
@@ -248,7 +249,7 @@ export class MentorshipsController {
     }
 
     mentorship.status = status;
-    if (status === Status.REJECTED && reason) {
+    if ([Status.CANCELLED, Status.REJECTED].includes(status) && reason) {
       mentorship.reason = reason;
     }
 
@@ -293,6 +294,19 @@ export class MentorshipsController {
           data: {
             menteeName: menteeFirstName,
             mentorName: currentUser.name,
+            reason: reason || '',
+          },
+        });
+      }
+
+      if (mentorship.status === Status.CANCELLED) {
+        await this.emailService.sendLocalTemplate({
+          name: 'mentorship-cancelled',
+          to: mentor.email,
+          subject: 'Mentorship Cancelled',
+          data: {
+            menteeName: currentUser.name,
+            mentorName: mentor.name,
             reason: reason || '',
           },
         });

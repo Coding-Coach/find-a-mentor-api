@@ -189,11 +189,23 @@ describe('Mentorships', () => {
         });
 
         const token = getToken(mentee);
+        const reason = `I've already found a mentor`;
         const { body } = await request(server)
           .put(`/mentorships/${mentor._id}/requests/${mentorship._id}`)
           .set('Authorization', `Bearer ${token}`)
-          .send({ status: Status.CANCELLED })
+          .send({ status: Status.CANCELLED, reason })
           .expect(200);
+
+        expect(emailService.sendLocalTemplate).toHaveBeenNthCalledWith(1, {
+          name: 'mentorship-cancelled',
+          to: mentor.email,
+          subject: 'Mentorship Cancelled',
+          data: {
+            menteeName: mentee.name,
+            mentorName: mentor.name,
+            reason: reason,
+          },
+        });
         expect(body.mentorship.status).toBe(Status.CANCELLED);
       });
 
