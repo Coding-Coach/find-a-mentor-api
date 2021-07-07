@@ -35,6 +35,13 @@ export class MentorshipsService {
   }
 
   /**
+   * Retruns all the mentorship reqeusts
+   */
+  async getAllMentorships() {
+    return this.mentorshipModel.find({}).populate('mentee').populate('mentor');
+  }
+
+  /**
    * Finds a mentorship between a mentor and mentee
    * @param mentorId
    * @param menteeId

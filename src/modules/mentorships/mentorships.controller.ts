@@ -120,6 +120,33 @@ export class MentorshipsController {
     };
   }
 
+  @Get('requests')
+  @ApiBearerAuth()
+  @ApiOperation({
+    title: 'Returns all the mentorship requests',
+  })
+  async getAllMentorshipRequests(@Req() request: Request) {
+    try {
+      const currentUser = await this.usersService.findByAuth0Id(
+        request.user.auth0Id,
+      );
+      if (!currentUser.roles.includes(Role.ADMIN)) {
+        throw new UnauthorizedException(
+          'You are not authorized to perform this operation',
+        );
+      }
+
+      const requests = await this.mentorshipsService.getAllMentorships();
+      return {
+        success: true,
+        data: requests,
+      };
+    } catch (error) {
+      Sentry.captureException(error);
+      throw error;
+    }
+  }
+
   @Get(':userId/requests')
   @ApiBearerAuth()
   @ApiOperation({
