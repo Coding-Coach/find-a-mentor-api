@@ -56,7 +56,7 @@ export class EmailService {
         from: Config.email.FROM,
       });
     } catch (error) {
-      console.log(JSON.stringify(error, null, 2));
+      console.log('Send email error', params, JSON.stringify(error, null, 2));
     }
   }
 

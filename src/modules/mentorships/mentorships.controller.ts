@@ -33,10 +33,10 @@ import { UsersService } from '../common/users.service';
 import { ChannelName, User, Role } from '../common/interfaces/user.interface';
 import { MentorshipsService } from './mentorships.service';
 import { MentorshipDto } from './dto/mentorship.dto';
-import { MentorshipSummaryDto } from './dto/mentorshipSummary.dto';
 import { Mentorship, Status } from './interfaces/mentorship.interface';
 import { FindOneParams } from '../common/dto/findOneParams.dto';
 import { MentorshipUpdatePayload } from './dto/mentorshipUpdatePayload.dto';
+import { mentorshipsToDtos } from './mentorshipsToDto';
 
 @ApiUseTags('/mentorships')
 @Controller('mentorships')
@@ -120,33 +120,6 @@ export class MentorshipsController {
     };
   }
 
-  @Get('requests')
-  @ApiBearerAuth()
-  @ApiOperation({
-    title: 'Returns all the mentorship requests',
-  })
-  async getAllMentorshipRequests(@Req() request: Request) {
-    try {
-      const currentUser = await this.usersService.findByAuth0Id(
-        request.user.auth0Id,
-      );
-      if (!currentUser.roles.includes(Role.ADMIN)) {
-        throw new UnauthorizedException(
-          'You are not authorized to perform this operation',
-        );
-      }
-
-      const requests = await this.mentorshipsService.getAllMentorships();
-      return {
-        success: true,
-        data: requests,
-      };
-    } catch (error) {
-      Sentry.captureException(error);
-      throw error;
-    }
-  }
-
   @Get(':userId/requests')
   @ApiBearerAuth()
   @ApiOperation({
@@ -181,37 +154,7 @@ export class MentorshipsController {
         await this.mentorshipsService.findMentorshipsByUser(userId);
 
       // Format the response data
-      const requests = mentorshipRequests.map((item) => {
-        const mentorshipSummary = new MentorshipSummaryDto({
-          id: item._id,
-          status: item.status,
-          message: item.message,
-          background: item.background,
-          expectation: item.expectation,
-          date: item.createdAt,
-          isMine: !!item.mentee?.equals(current._id),
-          mentee: item.mentee
-            ? new UserDto({
-                id: item.mentee._id,
-                name: item.mentee.name,
-                avatar: item.mentee.avatar,
-                title: item.mentee.title,
-                email: item.mentee.email,
-              })
-            : null,
-          mentor: item.mentor
-            ? new UserDto({
-                id: item.mentor._id,
-                name: item.mentor.name,
-                avatar: item.mentor.avatar,
-                title: item.mentor.title,
-              })
-            : null,
-        });
-
-        return mentorshipSummary;
-      });
-
+      const requests = mentorshipsToDtos(mentorshipRequests, current);
       return {
         success: true,
         data: requests,
@@ -351,4 +294,80 @@ export class MentorshipsController {
       };
     }
   }
+
+  //#region Admin
+  @Get('requests')
+  @ApiBearerAuth()
+  @ApiOperation({
+    title: 'Returns all the mentorship requests',
+  })
+  async getAllMentorshipRequests(@Req() request: Request) {
+    try {
+      const currentUser = await this.usersService.findByAuth0Id(
+        request.user.auth0Id,
+      );
+      if (!currentUser.roles.includes(Role.ADMIN)) {
+        throw new UnauthorizedException(
+          'You are not authorized to perform this operation',
+        );
+      }
+
+      const requests = await this.mentorshipsService.getAllMentorships();
+      const mentorshipRequests = mentorshipsToDtos(requests, currentUser);
+      return {
+        success: true,
+        data: mentorshipRequests,
+      };
+    } catch (error) {
+      Sentry.captureException(error);
+      throw error;
+    }
+  }
+
+  @Put('requests/:id/reminder')
+  @ApiBearerAuth()
+  @ApiOperation({
+    title: 'Send mentor a reminder about an open mentorship',
+  })
+  async sendMentorMentorshipReminder(
+    @Req() request: Request,
+    @Param() params: FindOneParams,
+  ) {
+    try {
+      const currentUser = await this.usersService.findByAuth0Id(
+        request.user.auth0Id,
+      );
+
+      if (!currentUser.roles.includes(Role.ADMIN)) {
+        throw new UnauthorizedException(
+          'You are not authorized to perform this operation',
+        );
+      }
+
+      const mentorshipRequest =
+        await this.mentorshipsService.findMentorshipById(params.id, true);
+
+      const { mentor, mentee, message } = mentorshipRequest;
+      mentorshipRequest.reminderSent = new Date();
+      this.emailService.sendLocalTemplate({
+        name: 'mentorship-reminder',
+        to: mentor.email,
+        subject: `Reminder - Mentorship requested`,
+        data: {
+          menteeName: mentee.name,
+          mentorName: mentor.name,
+          message,
+        },
+      });
+      await mentorshipRequest.save();
+
+      return {
+        success: true,
+      };
+    } catch (error) {
+      Sentry.captureException(error);
+      throw error;
+    }
+  }
+  //#endregion
 }
