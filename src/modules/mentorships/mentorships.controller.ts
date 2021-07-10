@@ -348,7 +348,7 @@ export class MentorshipsController {
         await this.mentorshipsService.findMentorshipById(params.id, true);
 
       const { mentor, mentee, message } = mentorshipRequest;
-      mentorshipRequest.reminderSent = new Date();
+      mentorshipRequest.reminderSentAt = new Date();
       this.emailService.sendLocalTemplate({
         name: 'mentorship-reminder',
         to: mentor.email,

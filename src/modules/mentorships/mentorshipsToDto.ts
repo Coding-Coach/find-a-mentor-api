@@ -15,6 +15,7 @@ export function mentorshipsToDtos(
       background: item.background,
       expectation: item.expectation,
       date: item.createdAt,
+      reminderSentAt: item.reminderSentAt,
       isMine: !!item.mentee?.equals(current._id),
       mentee: item.mentee
         ? new UserDto({

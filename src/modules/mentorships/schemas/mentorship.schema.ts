@@ -36,6 +36,9 @@ export const MentorshipSchema = new mongoose.Schema({
   reason: {
     type: String,
   },
+  reminderSentAt: {
+    type: Date,
+  },
 });
 
 MentorshipSchema.set('timestamps', true);
