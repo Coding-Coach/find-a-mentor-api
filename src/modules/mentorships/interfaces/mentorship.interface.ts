@@ -22,4 +22,5 @@ export interface Mentorship extends Document {
   reason: string;
   readonly createdAt: Date;
   readonly updatedAt: Date;
+  readonly reminderSentAt?: Date;
 }

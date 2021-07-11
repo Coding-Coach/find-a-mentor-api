@@ -24,14 +24,17 @@ export class MentorshipsService {
    * Finds a mentorship by id
    * @param id
    */
-  async findMentorshipById(id: string) {
+  async findMentorshipById(id: string, full = false) {
     const { ObjectId } = Types;
 
     if (!ObjectId.isValid(id)) {
       return null;
     }
-
-    return this.mentorshipModel.findById(id);
+    let mentorship = this.mentorshipModel.findById(id);
+    if (full) {
+      mentorship = mentorship.populate('mentee').populate('mentor');
+    }
+    return mentorship;
   }
 
   /**

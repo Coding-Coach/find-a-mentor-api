@@ -55,6 +55,15 @@ type MentorshipRequested = {
   };
 };
 
+type MentorshipReminder = {
+  name: 'mentorship-reminder';
+  data: {
+    menteeName: string;
+    mentorName: string;
+    message: string;
+  };
+};
+
 type MentorApplicationReceived = {
   name: 'mentor-application-received';
   data: {
@@ -84,6 +93,7 @@ export type EmailParams = Required<Pick<MailData, 'to' | 'subject'>> &
     | MentorshipCancelled
     | MentorshipDeclined
     | MentorshipRequested
+    | MentorshipReminder
     | MentorApplicationReceived
     | MentorApplicationDeclined
     | MentorApplicationApproved
