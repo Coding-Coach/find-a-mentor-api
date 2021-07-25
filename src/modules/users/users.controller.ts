@@ -160,17 +160,17 @@ export class UsersController {
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Get(':id')
   async show(@Req() request, @Param() params) {
-    const [current, { channels, email, ...user }]: [User, User] =
-      await Promise.all([
-        request.user
-          ? this.usersService.findByAuth0Id(request.user.auth0Id)
-          : Promise.resolve(null),
-        this.usersService.findById(params.id),
-      ]);
+    const [current, requestedUser]: [User, User] = await Promise.all([
+      request.user
+        ? this.usersService.findByAuth0Id(request.user.auth0Id)
+        : Promise.resolve(null),
+      this.usersService.findById(params.id),
+    ]);
 
-    if (!user) {
+    if (!requestedUser) {
       throw new BadRequestException('User not found');
     }
+    const { channels, email, ...user } = requestedUser;
 
     let showChannels = false;
     if (current) {
