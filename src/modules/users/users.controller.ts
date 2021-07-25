@@ -35,6 +35,7 @@ import { Template } from '../email/interfaces/email.interface';
 import { ListDto } from '../lists/dto/list.dto';
 import { ListsService } from '../lists/lists.service';
 import { filterImages } from '../../utils/mimes';
+import { MentorshipsService } from '../mentorships/mentorships.service';
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -47,6 +48,7 @@ export class UsersController {
     private readonly auth0Service: Auth0Service,
     private readonly listsService: ListsService,
     private readonly fileService: FileService,
+    private readonly mentorshipsService: MentorshipsService,
   ) {}
 
   @ApiOperation({ title: 'Return all registered users' })
@@ -158,28 +160,38 @@ export class UsersController {
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Get(':id')
   async show(@Req() request, @Param() params) {
-    const [current, user]: [User, User] = await Promise.all([
-      this.usersService.findByAuth0Id(request.user.auth0Id),
-      this.usersService.findById(params.id),
-    ]);
+    const [current, { channels, email, ...user }]: [User, User] =
+      await Promise.all([
+        request.user
+          ? this.usersService.findByAuth0Id(request.user.auth0Id)
+          : Promise.resolve(null),
+        this.usersService.findById(params.id),
+      ]);
 
     if (!user) {
       throw new BadRequestException('User not found');
     }
 
-    // Only admins can see the email
-    if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
-      const usr = { ...user };
-      delete usr.email;
-      return {
-        success: true,
-        data: usr,
-      };
+    let showChannels = false;
+    if (current) {
+      const mentorships = await this.mentorshipsService.findMentorshipsByUser(
+        current._id,
+      );
+      showChannels = mentorships.some(
+        ({ mentee, mentor }) =>
+          mentor._id.equals(user._id) || mentee._id.equals(user._id),
+      );
     }
+
+    const data = {
+      ...user,
+      email: current?.roles?.includes(Role.ADMIN) ? email : undefined,
+      channels: showChannels ? channels : [],
+    };
 
     return {
       success: true,
-      data: user,
+      data,
     };
   }
 

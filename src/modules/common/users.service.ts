@@ -15,7 +15,7 @@ export class UsersService {
 
   async findById(_id: string): Promise<User> {
     if (isObjectId(_id)) {
-      return await this.userModel.findOne({ _id }).exec();
+      return await this.userModel.findOne({ _id }).lean().exec();
     }
 
     return Promise.resolve(null);
