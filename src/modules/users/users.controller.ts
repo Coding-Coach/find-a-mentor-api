@@ -179,7 +179,7 @@ export class UsersController {
       );
       showChannels = mentorships.some(
         ({ mentee, mentor }) =>
-          mentor._id.equals(user._id) || mentee._id.equals(user._id),
+          mentor?._id.equals(user._id) || mentee?._id.equals(user._id),
       );
     }
 
