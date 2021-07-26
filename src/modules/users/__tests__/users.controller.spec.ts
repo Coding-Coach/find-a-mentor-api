@@ -9,6 +9,7 @@ import { Auth0Service } from '../../common/auth0.service';
 import { FileService } from '../../common/file.service';
 import { UserDto } from '../../common/dto/user.dto';
 import { User, Role } from '../../common/interfaces/user.interface';
+import { MentorshipsService } from '../../mentorships/mentorships.service';
 
 class ServiceMock {}
 
@@ -31,6 +32,7 @@ describe('modules/users/UsersController', () => {
   let auth0Service: Auth0Service;
   let listService: ListsService;
   let fileService: FileService;
+  let mentorshipsService: MentorshipsService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -60,6 +62,10 @@ describe('modules/users/UsersController', () => {
           provide: FileService,
           useValue: new ServiceMock(),
         },
+        {
+          provide: MentorshipsService,
+          useValue: new ServiceMock(),
+        },
       ],
     }).compile();
 
@@ -70,6 +76,7 @@ describe('modules/users/UsersController', () => {
     emailService = module.get<EmailService>(EmailService);
     listService = module.get<ListsService>(ListsService);
     fileService = module.get<FileService>(FileService);
+    mentorshipsService = module.get<MentorshipsService>(MentorshipsService);
   });
 
   describe('index', () => {
@@ -163,6 +170,7 @@ describe('modules/users/UsersController', () => {
         _id: 123,
         name: 'Crysfel Villa',
         email: 'test@testing.com',
+        channels: [],
       };
       const response = { success: true, data };
       const request = { user: { auth0Id: '456' } };
@@ -174,6 +182,9 @@ describe('modules/users/UsersController', () => {
         }),
       );
       usersService.findById = jest.fn(() => Promise.resolve(data));
+      mentorshipsService.findMentorshipsByUser = jest.fn(() =>
+        Promise.resolve([]),
+      );
 
       expect(await usersController.show(request, params)).toEqual(response);
       expect(usersService.findById).toHaveBeenCalledTimes(1);
@@ -196,10 +207,18 @@ describe('modules/users/UsersController', () => {
         }),
       );
       usersService.findById = jest.fn(() => Promise.resolve(data));
+      mentorshipsService.findMentorshipsByUser = jest.fn(() =>
+        Promise.resolve([]),
+      );
 
       expect(await usersController.show(request, params)).toEqual({
         success: true,
-        data: { _id: 123, name: 'Crysfel Villa' },
+        data: {
+          _id: 123,
+          name: 'Crysfel Villa',
+          channels: [],
+          email: undefined,
+        },
       });
       expect(usersService.findById).toHaveBeenCalledTimes(1);
       expect(usersService.findById).toHaveBeenCalledWith(params.id);

@@ -7,10 +7,17 @@ import { MentorsService } from '../common/mentors.service';
 import { ListsModule } from '../lists/lists.module';
 import { ListsService } from '../lists/lists.service';
 import { EmailService } from '../email/email.service';
+import { MentorshipsService } from '../mentorships/mentorships.service';
 
 @Module({
   imports: [DatabaseModule, EmailService, CommonModule, ListsModule],
   controllers: [UsersController],
-  providers: [MentorsService, UsersService, EmailService, ListsService],
+  providers: [
+    MentorsService,
+    UsersService,
+    EmailService,
+    ListsService,
+    MentorshipsService,
+  ],
 })
 export class UsersModule {}

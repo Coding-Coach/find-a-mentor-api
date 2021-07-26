@@ -1,3 +1,4 @@
+import 'source-map-support/register';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import { MyLogger } from './logger';
