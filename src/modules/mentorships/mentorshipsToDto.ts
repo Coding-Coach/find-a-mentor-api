@@ -1,7 +1,7 @@
 import type { Mentorship } from './interfaces/mentorship.interface';
 import { MentorshipSummaryDto } from './dto/mentorshipSummary.dto';
 import { UserDto } from '../common/dto/user.dto';
-import { User } from '../common/interfaces/user.interface';
+import { Role, User } from '../common/interfaces/user.interface';
 
 export function mentorshipsToDtos(
   mentorshipRequests: Mentorship[],
@@ -32,6 +32,9 @@ export function mentorshipsToDtos(
             name: item.mentor.name,
             avatar: item.mentor.avatar,
             title: item.mentor.title,
+            ...(current.roles.includes(Role.ADMIN)
+              ? { channels: item.mentor.channels, email: item.mentor.email }
+              : {}),
           })
         : null,
     });
