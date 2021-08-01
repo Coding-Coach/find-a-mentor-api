@@ -10,6 +10,7 @@ import { MentorshipsModule } from './modules/mentorships/mentorships.module';
 import { ListsModule } from './modules/lists/lists.module';
 import { UsersModule } from './modules/users/users.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ReportsModule } from './modules/reports/reports.module';
     ListsModule,
     UsersModule,
     ReportsModule,
+    AdminModule,
   ],
 })
 export class AppModule implements NestModule {

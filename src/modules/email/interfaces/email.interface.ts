@@ -86,6 +86,21 @@ type MentorApplicationApproved = {
   };
 };
 
+type MentorNotActive = {
+  name: 'mentor-not-active';
+  data: {
+    mentorName: string;
+    numOfMentorshipRequests: number;
+  };
+};
+
+type MentorFreeze = {
+  name: 'mentor-freeze';
+  data: {
+    mentorName: string;
+  };
+};
+
 export type EmailParams = Required<Pick<MailData, 'to' | 'subject'>> &
   (
     | WelcomePayload
@@ -97,6 +112,8 @@ export type EmailParams = Required<Pick<MailData, 'to' | 'subject'>> &
     | MentorApplicationReceived
     | MentorApplicationDeclined
     | MentorApplicationApproved
+    | MentorNotActive
+    | MentorFreeze
   );
 
 export interface SendData<T> {
