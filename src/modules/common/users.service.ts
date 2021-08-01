@@ -3,10 +3,15 @@ import { Query, Model } from 'mongoose';
 import { UserDto } from './dto/user.dto';
 import { User, Role } from './interfaces/user.interface';
 import { isObjectId } from '../../utils/objectid';
+import { UserRecord } from './interfaces/user-record.interface';
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject('USER_MODEL') private readonly userModel: Model<User>) {}
+  constructor(
+    @Inject('USER_MODEL') private readonly userModel: Model<User>,
+    @Inject('USER_RECORD_MODEL')
+    private readonly userRecordModel: Model<UserRecord>,
+  ) {}
 
   async create(userDto: UserDto): Promise<User> {
     const user = new this.userModel(userDto);
@@ -47,5 +52,14 @@ export class UsersService {
     return Promise.resolve({
       ok: 0,
     });
+  }
+
+  addRecord(userRecordDto: UserRecord): Promise<UserRecord> {
+    const userRecord = new this.userRecordModel(userRecordDto);
+    return userRecord.save();
+  }
+
+  getRecords(user: string): Promise<UserRecord[]> {
+    return this.userRecordModel.find({ user }).exec();
   }
 }

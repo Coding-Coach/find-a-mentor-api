@@ -25,6 +25,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import Config from '../../config';
 import { UserDto } from '../common/dto/user.dto';
+import { UserRecordDto } from '../common/dto/user-record.dto';
 import { UsersService } from '../common/users.service';
 import { Auth0Service } from '../common/auth0.service';
 import { FileService } from '../common/file.service';
@@ -364,4 +365,78 @@ export class UsersController {
       success: res.ok === 1,
     };
   }
+
+  //#region admin
+  @ApiOperation({ title: 'Add a record to user' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
+  @Post(':id/records')
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      skipMissingProperties: true,
+      whitelist: true,
+    }),
+  )
+  async addRecord(
+    @Req() request,
+    @Param() _params,
+    @Body() data: UserRecordDto,
+  ) {
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      await this.usersService.findById(data.user),
+    ]);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (!current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
+    }
+
+    const res = await this.usersService.addRecord(data);
+
+    return {
+      success: true,
+      data: res,
+    };
+  }
+
+  @ApiOperation({ title: 'Get user records' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
+  @Get(':id/records')
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      skipMissingProperties: true,
+      whitelist: true,
+    }),
+  )
+  async getRecords(@Req() request, @Param() params) {
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      await this.usersService.findById(params.id),
+    ]);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (!current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
+    }
+
+    const res = await this.usersService.getRecords(params.id);
+
+    return {
+      success: true,
+      data: res,
+    };
+  }
+  //#endregion
 }
