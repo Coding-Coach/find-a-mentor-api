@@ -188,8 +188,7 @@ export class UsersController {
       throw new BadRequestException('User not found');
     }
     const { channels, email, ...user } = requestedUser;
-    const showChannels = this.shouldIncludeChannels(current);
-
+    const showChannels = await this.shouldIncludeChannels(current);
     const data = {
       ...user,
       email: current?.roles?.includes(Role.ADMIN) ? email : undefined,
