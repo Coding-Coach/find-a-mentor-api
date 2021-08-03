@@ -157,6 +157,22 @@ export class UsersController {
     return response;
   }
 
+  private async shouldIncludeChannels(user?: User) {
+    if (!user) {
+      return false;
+    }
+    if (user.roles.includes(Role.ADMIN)) {
+      return true;
+    }
+    const mentorships = await this.mentorshipsService.findMentorshipsByUser(
+      user._id,
+    );
+    return mentorships.some(
+      ({ mentee, mentor }) =>
+        mentor?._id.equals(user._id) || mentee?._id.equals(user._id),
+    );
+  }
+
   @ApiOperation({ title: 'Returns a single user by ID' })
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Get(':id')
@@ -172,17 +188,7 @@ export class UsersController {
       throw new BadRequestException('User not found');
     }
     const { channels, email, ...user } = requestedUser;
-
-    let showChannels = false;
-    if (current) {
-      const mentorships = await this.mentorshipsService.findMentorshipsByUser(
-        current._id,
-      );
-      showChannels = mentorships.some(
-        ({ mentee, mentor }) =>
-          mentor?._id.equals(user._id) || mentee?._id.equals(user._id),
-      );
-    }
+    const showChannels = this.shouldIncludeChannels(current);
 
     const data = {
       ...user,
