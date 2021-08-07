@@ -32,6 +32,7 @@ export function mentorshipsToDtos(
             name: item.mentor.name,
             avatar: item.mentor.avatar,
             title: item.mentor.title,
+            available: item.mentor.available,
             ...(current.roles.includes(Role.ADMIN)
               ? { channels: item.mentor.channels, email: item.mentor.email }
               : {}),
