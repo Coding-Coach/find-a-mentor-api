@@ -48,7 +48,7 @@ export class AdminController {
       throw new MethodNotAllowedException('Mentor responded to some requests');
     }
 
-    this.usersService.addRecord(
+    const record = this.usersService.addRecord(
       new UserRecordDto({
         user: mentor._id,
         type: UserRecordType.MentorNotResponding,
@@ -67,6 +67,7 @@ export class AdminController {
 
     return {
       success: true,
+      data: record,
     };
   }
 
