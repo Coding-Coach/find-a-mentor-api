@@ -137,9 +137,19 @@ describe('modules/mentorships/MentorshipsController', () => {
       mentorshipsService.getMenteeMentorshipsByStatus = jest.fn(() =>
         Promise.resolve(mentorships),
       );
-      await expect(
-        mentorshipsController.applyForMentorship(request, '123', mentorship),
-      ).rejects.toThrow(BadRequestException);
+      const expectedException = new BadRequestException(
+        `mentees pending/open mentorships request are limited to 5`,
+      );
+      expect.assertions(1);
+      try {
+        await mentorshipsController.applyForMentorship(
+          request,
+          '123',
+          mentorship,
+        );
+      } catch (e) {
+        expect(e.message).toStrictEqual(expectedException.message);
+      }
     });
 
     it('should return a successful response', async () => {
