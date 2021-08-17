@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Query, Model, Types } from 'mongoose';
-import { Mentorship } from './interfaces/mentorship.interface';
+import { Mentorship, Status } from './interfaces/mentorship.interface';
 import { MentorshipDto } from './dto/mentorship.dto';
 import { isObjectId } from '../../utils/objectid';
 
@@ -42,6 +42,25 @@ export class MentorshipsService {
    */
   async getAllMentorships() {
     return this.mentorshipModel.find({}).populate('mentee').populate('mentor');
+  }
+
+  /**
+   * Returns all mentorship by mentee by Mentorship status
+   */
+  // todo need to test this!
+  async getMenteeMentorshipsByStatus(
+    menteeId: string,
+    statuses: Status[],
+  ): Promise<Mentorship[]> {
+    if (!isObjectId(menteeId)) {
+      throw new BadRequestException('menteeId is not an objectId');
+    }
+    return this.mentorshipModel
+      .find({
+        mentee: menteeId,
+        status: { $in: statuses },
+      })
+      .exec();
   }
 
   /**
