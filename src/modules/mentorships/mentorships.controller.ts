@@ -132,7 +132,9 @@ export class MentorshipsController {
 
     return {
       success: true,
-      data: `mentees pending/open mentorships' request are limited to ${Config.maximumOpenMentorships}`,
+      remaining_mentorships: (
+        Config.maximumOpenMentorships - newMentorships.length
+      ).toString(),
     };
   }
 

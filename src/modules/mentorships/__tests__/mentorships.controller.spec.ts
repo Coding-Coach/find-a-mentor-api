@@ -149,6 +149,7 @@ describe('modules/mentorships/MentorshipsController', () => {
         mentorship,
       );
       expect(data.success).toBe(true);
+      expect(data.remaining_mentorships).toEqual('5');
     });
 
     it('should return mentorship requests for a given mentor', async () => {
