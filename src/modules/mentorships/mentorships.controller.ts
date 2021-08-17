@@ -1,17 +1,16 @@
-import { UserDto } from './../common/dto/user.dto';
 import {
-  Body,
   BadRequestException,
-  NotFoundException,
+  Body,
   Controller,
+  Get,
+  NotFoundException,
   Param,
   Post,
+  Put,
   Req,
+  UnauthorizedException,
   UsePipes,
   ValidationPipe,
-  Get,
-  Put,
-  UnauthorizedException,
 } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
 import {
@@ -83,6 +82,16 @@ export class MentorshipsController {
 
     if (mentorship) {
       throw new BadRequestException('A mentorship request already exists');
+    }
+
+    // before creating a new mentorship, check if the mentee has already 3 mentorship in NEW status
+    const newMentorships: Mentorship[] =
+      await this.mentorshipsService.getMenteeMentorshipsByStatus(current._id, [
+        Status.NEW,
+        Status.VIEWED,
+      ]);
+    if (newMentorships && newMentorships.length > 5) {
+      throw new BadRequestException('A mentee can have only 5  mentorship');
     }
 
     await this.mentorshipsService.createMentorship({

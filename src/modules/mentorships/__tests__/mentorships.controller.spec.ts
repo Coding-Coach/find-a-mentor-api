@@ -127,7 +127,7 @@ describe('modules/mentorships/MentorshipsController', () => {
 
     it('should return a 400 error if a mentee has already requested N mentorships', async () => {
       const mentorships = [];
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 6; i++) {
         mentorships.push(<Mentorship>{ _id: new ObjectIdMock(i.toString()) });
       }
       mentorshipsService.getMenteeMentorshipsByStatus = jest.fn(() =>
