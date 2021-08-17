@@ -131,7 +131,7 @@ describe('modules/mentorships/MentorshipsController', () => {
 
     it(`should return a 400 error if a mentee requested more mentorships than limit`, async () => {
       const mentorships = [];
-      for (let i = 0; i < Config.maximumOpenMentorships + 1; i++) {
+      for (let i = 0; i < Config.maximumOpenMentorships; i++) {
         mentorships.push(<Mentorship>{ _id: new ObjectIdMock(i.toString()) });
       }
       mentorshipsService.getMenteeMentorshipsByStatus = jest.fn(() =>
@@ -149,7 +149,7 @@ describe('modules/mentorships/MentorshipsController', () => {
         mentorship,
       );
       expect(data.success).toBe(true);
-      expect(data.remaining_mentorships).toEqual('5');
+      expect(data.remaining_mentorships).toEqual('4');
     });
 
     it('should return mentorship requests for a given mentor', async () => {

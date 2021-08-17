@@ -85,7 +85,7 @@ export class MentorshipsController {
       throw new BadRequestException('A mentorship request already exists');
     }
 
-    // before creating a new mentorship, check if the mentee has already 3 mentorship in NEW status
+    // check if the mentee has already Config.maximumOpenMentorships mentorships in NEW or VIEWED status
     const newMentorships: Mentorship[] =
       await this.mentorshipsService.getMenteeMentorshipsByStatus(current._id, [
         Status.NEW,
@@ -93,10 +93,10 @@ export class MentorshipsController {
       ]);
     if (
       newMentorships &&
-      newMentorships.length > Config.maximumOpenMentorships
+      newMentorships.length + 1 > Config.maximumOpenMentorships // +1 as we are attempting to create a mentorship
     ) {
       throw new BadRequestException(
-        `A mentee can have only ${Config.maximumOpenMentorships}  mentorship`,
+        `mentees pending/open mentorships request are limited to ${Config.maximumOpenMentorships}`,
       );
     }
 
@@ -133,7 +133,9 @@ export class MentorshipsController {
     return {
       success: true,
       remaining_mentorships: (
-        Config.maximumOpenMentorships - newMentorships.length
+        Config.maximumOpenMentorships -
+        newMentorships.length -
+        1
       ).toString(),
     };
   }
