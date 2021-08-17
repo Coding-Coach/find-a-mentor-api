@@ -125,6 +125,19 @@ describe('modules/mentorships/MentorshipsController', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
+    it('should return a 400 error if a mentee has already requested N mentorships', async () => {
+      const mentorships = [];
+      for (let i = 0; i < 5; i++) {
+        mentorships.push(<Mentorship>{ _id: new ObjectIdMock(i.toString()) });
+      }
+      mentorshipsService.getMenteeMentorshipsByStatus = jest.fn(() =>
+        Promise.resolve(mentorships),
+      );
+      await expect(
+        mentorshipsController.applyForMentorship(request, '123', mentorship),
+      ).rejects.toThrow(BadRequestException);
+    });
+
     it('should return a successful response', async () => {
       const data = await mentorshipsController.applyForMentorship(
         <Request>request,
