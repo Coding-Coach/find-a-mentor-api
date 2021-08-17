@@ -129,7 +129,7 @@ describe('modules/mentorships/MentorshipsController', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should return a 400 error if a mentee has already requested N mentorships', async () => {
+    it(`should return a 400 error if a mentee requested more mentorships than limit`, async () => {
       const mentorships = [];
       for (let i = 0; i < Config.maximumOpenMentorships + 1; i++) {
         mentorships.push(<Mentorship>{ _id: new ObjectIdMock(i.toString()) });

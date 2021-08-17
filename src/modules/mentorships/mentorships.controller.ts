@@ -95,7 +95,9 @@ export class MentorshipsController {
       newMentorships &&
       newMentorships.length > Config.maximumOpenMentorships
     ) {
-      throw new BadRequestException('A mentee can have only 5  mentorship');
+      throw new BadRequestException(
+        `A mentee can have only ${Config.maximumOpenMentorships}  mentorship`,
+      );
     }
 
     await this.mentorshipsService.createMentorship({
