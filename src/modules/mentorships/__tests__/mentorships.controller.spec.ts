@@ -94,6 +94,9 @@ describe('modules/mentorships/MentorshipsController', () => {
       mentorshipsService.createMentorship = jest.fn(() =>
         Promise.resolve(null),
       );
+      mentorshipsService.getMenteeMentorshipsByStatus = jest.fn(() =>
+        Promise.resolve([]),
+      );
       emailService.sendLocalTemplate = jest.fn(() => Promise.resolve(null));
     });
 
