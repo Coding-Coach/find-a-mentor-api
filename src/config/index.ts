@@ -32,6 +32,7 @@ const config = {
   pagination: {
     limit: 20,
   },
+  maximumOpenMentorships: 5,
 };
 
 export default config;

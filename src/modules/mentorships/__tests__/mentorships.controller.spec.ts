@@ -9,6 +9,7 @@ import { MentorshipsService } from '../mentorships.service';
 import { Role, User } from '../../common/interfaces/user.interface';
 import { MentorshipDto } from '../dto/mentorship.dto';
 import { Mentorship, Status } from '../interfaces/mentorship.interface';
+import Config from '../../../config';
 
 class ServiceMock {}
 
@@ -127,7 +128,7 @@ describe('modules/mentorships/MentorshipsController', () => {
 
     it('should return a 400 error if a mentee has already requested N mentorships', async () => {
       const mentorships = [];
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < Config.maximumOpenMentorships + 1; i++) {
         mentorships.push(<Mentorship>{ _id: new ObjectIdMock(i.toString()) });
       }
       mentorshipsService.getMenteeMentorshipsByStatus = jest.fn(() =>

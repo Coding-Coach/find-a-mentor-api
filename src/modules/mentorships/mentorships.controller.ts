@@ -36,6 +36,7 @@ import { Mentorship, Status } from './interfaces/mentorship.interface';
 import { FindOneParams } from '../common/dto/findOneParams.dto';
 import { MentorshipUpdatePayload } from './dto/mentorshipUpdatePayload.dto';
 import { mentorshipsToDtos } from './mentorshipsToDto';
+import Config from '../../config';
 
 @ApiUseTags('/mentorships')
 @Controller('mentorships')
@@ -90,7 +91,10 @@ export class MentorshipsController {
         Status.NEW,
         Status.VIEWED,
       ]);
-    if (newMentorships && newMentorships.length > 5) {
+    if (
+      newMentorships &&
+      newMentorships.length > Config.maximumOpenMentorships
+    ) {
       throw new BadRequestException('A mentee can have only 5  mentorship');
     }
 
