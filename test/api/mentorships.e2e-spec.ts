@@ -253,6 +253,14 @@ describe('Mentorships', () => {
 
   // TODO: [WIP] working on those e2e
   describe('POST /mentorships/:mentorId/apply', () => {
+    const mentorshipData = {
+      message: 'hello',
+      goals: ['a goal'],
+      expectation: 'an expectation',
+      background: 'a background',
+      reason: 'a reason',
+    };
+
     describe('unauthenticated requests', () => {
       it('returns a status code of 401', async () => {
         return request(server).put('/mentorships/1234/apply').expect(401);
@@ -260,14 +268,6 @@ describe('Mentorships', () => {
     });
 
     describe('bad requests', () => {
-      const mentorshipData = {
-        message: 'hello',
-        goals: ['a goal'],
-        expectation: 'an expectation',
-        background: 'a background',
-        reason: 'a reason',
-      };
-
       it('returns a status code of 400 if the current mentee has already more than N open mentorship', async () => {
         const [mentee, mentor] = await Promise.all([
           createUser(),
@@ -297,6 +297,49 @@ describe('Mentorships', () => {
       });
     });
 
-    // describe('successful requests', () => { });
+    describe('successful requests', () => {
+      it('returns a status code of 200 if the current mentee has some open mentorship', async () => {
+        const [mentee, mentor] = await Promise.all([
+          createUser(),
+          createUser(),
+        ]);
+
+        for (let i = 0; i < Config.maximumOpenMentorships - 3; i++) {
+          let mentorshipStatus = Status.NEW;
+          if (i % 2) {
+            mentorshipStatus = Status.VIEWED;
+          }
+          const [aMentor] = await Promise.all([createUser()]);
+          await createMentorship({
+            mentor: aMentor._id,
+            mentee: mentee._id,
+            status: mentorshipStatus,
+          });
+        }
+
+        const token = getToken(mentee);
+        const { body } = await request(server)
+          .post(`/mentorships/${mentor._id}/apply`)
+          .set('Authorization', `Bearer ${token}`)
+          .send(mentorshipData)
+          .expect(200);
+        // todo: assert over the success message?
+      });
+
+      it('returns a status code of 200 if the current mentee has never requested a mentorship', async () => {
+        const [mentee, mentor] = await Promise.all([
+          createUser(),
+          createUser(),
+        ]);
+
+        const token = getToken(mentee);
+        const { body } = await request(server)
+          .post(`/mentorships/${mentor._id}/apply`)
+          .set('Authorization', `Bearer ${token}`)
+          .send(mentorshipData)
+          .expect(200);
+        // todo: assert over the success message?
+      });
+    });
   });
 });
