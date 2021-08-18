@@ -288,12 +288,14 @@ describe('Mentorships', () => {
         }
 
         const token = getToken(mentee);
-        const { body } = await request(server)
+        const response = await request(server)
           .post(`/mentorships/${mentor._id}/apply`)
           .set('Authorization', `Bearer ${token}`)
           .send(mentorshipData)
           .expect(400);
         // todo: assert over the error message?
+        expect(response.body).toEqual('');
+        expect(response.text).toEqual('');
       });
     });
 
@@ -318,12 +320,14 @@ describe('Mentorships', () => {
         }
 
         const token = getToken(mentee);
-        const { body } = await request(server)
+        const response = await request(server)
           .post(`/mentorships/${mentor._id}/apply`)
           .set('Authorization', `Bearer ${token}`)
           .send(mentorshipData)
           .expect(200);
         // todo: assert over the success message?
+        expect(response.body).toEqual('');
+        expect(response.text).toEqual('');
       });
 
       it('returns a status code of 200 if the current mentee has never requested a mentorship', async () => {
@@ -333,12 +337,14 @@ describe('Mentorships', () => {
         ]);
 
         const token = getToken(mentee);
-        const { body } = await request(server)
+        const response = await request(server)
           .post(`/mentorships/${mentor._id}/apply`)
           .set('Authorization', `Bearer ${token}`)
           .send(mentorshipData)
           .expect(200);
         // todo: assert over the success message?
+        expect(response.body).toEqual('');
+        expect(response.text).toEqual('');
       });
     });
   });
