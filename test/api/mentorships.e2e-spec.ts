@@ -10,6 +10,8 @@ import { Role } from '../../src/modules/common/interfaces/user.interface';
 import { Status } from '../../src/modules/mentorships/interfaces/mentorship.interface';
 import { createUser, createMentorship } from '../utils/seeder';
 import { getToken } from '../utils/jwt';
+import * as faker from 'faker';
+import Config from '../../src/config';
 
 describe('Mentorships', () => {
   let app: INestApplication;
@@ -247,5 +249,53 @@ describe('Mentorships', () => {
         expect(emailService.sendLocalTemplate).toHaveBeenCalledTimes(1);
       });
     });
+  });
+
+  // TODO: [WIP] working on those e2e
+  describe('POST /mentorships/:mentorId/apply', () => {
+    describe('unauthenticated requests', () => {
+      it('returns a status code of 401', async () => {
+        return request(server).put('/mentorships/1234/apply').expect(401);
+      });
+    });
+
+    describe('bad requests', () => {
+      const mentorshipData = {
+        message: 'hello',
+        goals: ['a goal'],
+        expectation: 'an expectation',
+        background: 'a background',
+        reason: 'a reason',
+      };
+
+      it('returns a status code of 400 if the current mentee has already more than N open mentorship', async () => {
+        const [mentee, mentor] = await Promise.all([
+          createUser(),
+          createUser(),
+        ]);
+
+        for (let i = 0; i < Config.maximumOpenMentorships; i++) {
+          const mentorshipStatus = Status.NEW;
+          if (i % 2) {
+            status = Status.VIEWED;
+          }
+          await createMentorship({
+            mentor: faker.random.uuid(),
+            mentee: mentee._id,
+            status: mentorshipStatus,
+          });
+        }
+
+        const token = getToken(mentee);
+        const { body } = await request(server)
+          .post(`/mentorships/${mentor._id}/apply`)
+          .set('Authorization', `Bearer ${token}`)
+          .send(mentorshipData)
+          .expect(400);
+        // todo: assert over the error message?
+      });
+    });
+
+    // describe('successful requests', () => { });
   });
 });
