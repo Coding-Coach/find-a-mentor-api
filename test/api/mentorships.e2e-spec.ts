@@ -280,7 +280,7 @@ describe('Mentorships', () => {
             status = Status.VIEWED;
           }
           await createMentorship({
-            mentor: faker.random.uuid(),
+            mentor: createUser()._id,
             mentee: mentee._id,
             status: mentorshipStatus,
           });
