@@ -279,8 +279,9 @@ describe('Mentorships', () => {
           if (i % 2) {
             status = Status.VIEWED;
           }
+          const [aMentor] = await Promise.all([createUser()]);
           await createMentorship({
-            mentor: createUser()._id,
+            mentor: aMentor._id,
             mentee: mentee._id,
             status: mentorshipStatus,
           });
