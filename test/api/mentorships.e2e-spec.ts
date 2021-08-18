@@ -205,7 +205,7 @@ describe('Mentorships', () => {
           data: {
             menteeName: mentee.name,
             mentorName: mentor.name,
-            reason: reason,
+            reason,
           },
         });
         expect(body.mentorship.status).toBe(Status.CANCELLED);
@@ -279,7 +279,7 @@ describe('Mentorships', () => {
           if (i % 2) {
             mentorshipStatus = Status.VIEWED;
           }
-          const [aMentor] = await Promise.all([createUser()]);
+          const aMentor = await createUser();
           await createMentorship({
             mentor: aMentor._id,
             mentee: mentee._id,
@@ -293,9 +293,30 @@ describe('Mentorships', () => {
           .set('Authorization', `Bearer ${token}`)
           .send(mentorshipData)
           .expect(400);
-        // todo: assert over the error message?
-        expect(response.body).toEqual('');
-        expect(response.text).toEqual('');
+        expect(response.body).toEqual({
+          error: 'Bad Request',
+          message: `mentees pending/open mentorships request are limited to ${Config.maximumOpenMentorships}`,
+          statusCode: 400,
+        });
+      });
+
+      it('returns a status code of 400 if the mentor to which requesting the mentorship is not found in the DB', async () => {
+        const [mentee, mentor] = await Promise.all([
+          createUser(),
+          createUser(),
+        ]);
+
+        const token = getToken(mentee);
+        const response = await request(server)
+          .post(`/mentorships/${faker.random.uuid()}/apply`)
+          .set('Authorization', `Bearer ${token}`)
+          .send(mentorshipData)
+          .expect(400);
+        expect(response.body).toEqual({
+          error: 'Bad Request',
+          message: 'Mentor not found',
+          statusCode: 400,
+        });
       });
     });
 
@@ -311,7 +332,7 @@ describe('Mentorships', () => {
           if (i % 2) {
             mentorshipStatus = Status.VIEWED;
           }
-          const [aMentor] = await Promise.all([createUser()]);
+          const aMentor = await createUser();
           await createMentorship({
             mentor: aMentor._id,
             mentee: mentee._id,
@@ -327,7 +348,6 @@ describe('Mentorships', () => {
           .expect(200);
         // todo: assert over the success message?
         expect(response.body).toEqual('');
-        expect(response.text).toEqual('');
       });
 
       it('returns a status code of 200 if the current mentee has never requested a mentorship', async () => {
