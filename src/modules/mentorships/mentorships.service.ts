@@ -47,7 +47,6 @@ export class MentorshipsService {
   /**
    * Returns all mentorship by mentee by Mentorship status
    */
-  // todo need to test this!
   async getMenteeMentorshipsByStatus(
     menteeId: string,
     statuses: Status[],
