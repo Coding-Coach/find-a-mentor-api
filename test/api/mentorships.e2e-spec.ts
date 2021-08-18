@@ -275,9 +275,9 @@ describe('Mentorships', () => {
         ]);
 
         for (let i = 0; i < Config.maximumOpenMentorships; i++) {
-          const mentorshipStatus = Status.NEW;
+          let mentorshipStatus = Status.NEW;
           if (i % 2) {
-            status = Status.VIEWED;
+            mentorshipStatus = Status.VIEWED;
           }
           const [aMentor] = await Promise.all([createUser()]);
           await createMentorship({
