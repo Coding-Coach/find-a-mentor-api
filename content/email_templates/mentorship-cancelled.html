@@ -12,7 +12,7 @@
       </tr>
     </tbody>
   </table>
-  <h2 style="font-size: 26px; font-weight: normal">Hello, {{mentorName}}!</h2>
+  <h2 style="font-size: 26px; font-weight: normal">Hello, <%= mentorName %>!</h2>
   <h1
     style="
       font-size: 32px;
@@ -25,11 +25,11 @@
   </h1>
 
   <p>
-    Thank you for considering mentoring {{menteeName}}. Now they asked to
+    Thank you for considering mentoring <b><%= menteeName %></b>. Now they asked to
     withdraw the request because
   </p>
 
-  <pre>{{reason}}</pre>
+  <pre><%= reason %></pre>
 
   <p>
     Although this one didn't work out, we're sure you'll get more requests soon.

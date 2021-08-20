@@ -5,6 +5,7 @@ import { EmailParams, SendData } from './interfaces/email.interface';
 import { Injectable } from '@nestjs/common';
 import { User } from '../common/interfaces/user.interface';
 import { promises } from 'fs';
+import { compile } from 'ejs';
 
 const isProduction = process.env.NODE_ENV === 'production';
 const defaults = {
@@ -86,8 +87,8 @@ export class EmailService {
 
   private async injectData(name: string, data: Record<string, string>) {
     const template = await this.getTemplateContent(name);
-    return (await this.layout)
-      .replace('$$$Content$$$', template)
-      .replace(/{{(.*?)}}/gm, (_, prop) => data[prop]);
+    const layout = await this.layout;
+    const content = compile(template)(data);
+    return compile(layout)({ content });
   }
 }
