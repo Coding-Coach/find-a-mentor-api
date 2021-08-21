@@ -13,7 +13,7 @@
     </tbody>
   </table>
   <h2 style="font-size: 26px; font-weight: normal;">
-    Hello, {{menteeName}}!
+    Hello, <%= menteeName %>!
   </h2>
   <h1
     style="font-size: 32px; line-height: 42px; font-weight: normal; color: #69d5b1"
@@ -23,7 +23,7 @@
 
   <p>
     Unfortunately, your request for mentorship with
-    <span style="font-weight: bold; font-style: italic;">{{mentorName}}</span>
+    <span style="font-weight: bold; font-style: italic;"><%= mentorName %></span>
     was not accepted.
   </p>
   <p>
@@ -31,7 +31,7 @@
     mentor:
   </p>
 
-  <pre>{{reason}}</pre>
+  <pre><%= reason %></pre>
 
   <p>
     Although this one didn't work out, there are many other mentors at

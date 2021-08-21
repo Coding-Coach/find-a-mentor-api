@@ -54,9 +54,9 @@ export class UsersService {
     });
   }
 
-  addRecord(userRecordDto: UserRecord): Promise<UserRecord> {
+  async addRecord(userRecordDto: UserRecord): Promise<UserRecord> {
     const userRecord = new this.userRecordModel(userRecordDto);
-    return userRecord.save();
+    return await userRecord.save();
   }
 
   getRecords(user: string): Promise<UserRecord[]> {

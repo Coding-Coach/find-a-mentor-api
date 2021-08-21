@@ -13,7 +13,7 @@
     </tbody>
   </table>
   <h2 style="font-size: 26px; font-weight: normal;">
-    Congratulations, {{menteeName}}!
+    Congratulations, <%= menteeName %>!
   </h2>
   <h1
     style="font-size: 32px; line-height: 42px; font-weight: normal; color: #69d5b1"
@@ -22,11 +22,22 @@
   </h1>
   <p>
     Your request for mentorship with
-    <span style="font-style: italic; font-weight: bold;">{{mentorName}}</span>
+    <span style="font-style: italic; font-weight: bold;"><%= mentorName %></span>
     has been approved.
   </p>
   <p>
-    {{mentorName}} asks that you contact them at
-    <a href="{{contactURL}}">{{contactURL}}</a> in order to get started.
+    <%= mentorName %> asks that you contact them at
+    <a href="<%= contactURL %>"><%= contactURL %></a> in order to get started.
   </p>
+  <% if (openRequests) { %>
+    <p>
+      👉 Note that you have <%= openRequests %> open mentorship requests.
+      Once the mentorship is actually started, please cancel your other similar requests via your <a
+      href="https://mentors.codingcoach.io/me/requests"
+      target="_blank"
+      rel="noreferrer nofllow"
+      >Backoffice</a
+    >.
+    </p>
+  <% } %>
 </div>

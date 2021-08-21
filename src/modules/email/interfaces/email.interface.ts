@@ -25,6 +25,7 @@ type MentorshipAccepted = {
     menteeName: string;
     mentorName: string;
     contactURL: string;
+    openRequests?: number;
   };
 };
 
