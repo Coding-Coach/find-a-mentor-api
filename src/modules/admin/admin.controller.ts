@@ -10,11 +10,16 @@ import { Request } from 'express';
 import { MentorsService } from '../common/mentors.service';
 import { MentorshipsService } from '../mentorships/mentorships.service';
 import { EmailService } from '../email/email.service';
-import { Status } from '../mentorships/interfaces/mentorship.interface';
+import {
+  Mentorship,
+  Status,
+} from '../mentorships/interfaces/mentorship.interface';
 import { UsersService } from '../common/users.service';
 import { UserRecordType } from '../common/interfaces/user-record.interface';
 import { UserRecordDto } from '../common/dto/user-record.dto';
 import { UserDto } from '../common/dto/user.dto';
+
+const MONTH = 2.628e9;
 
 @ApiUseTags('/admin')
 @Controller('admin')
@@ -25,6 +30,14 @@ export class AdminController {
     private readonly emailService: EmailService,
     private readonly mentorshipsService: MentorshipsService,
   ) {}
+
+  private respondedRecently(requestsAsMentor: Mentorship[]) {
+    return requestsAsMentor.some(
+      ({ status, updatedAt }) =>
+        [Status.APPROVED, Status.REJECTED].includes(status) &&
+        Date.now() - updatedAt.getTime() <= MONTH,
+    );
+  }
 
   @Put('mentor/:id/notActive')
   @ApiOperation({
@@ -40,11 +53,7 @@ export class AdminController {
       await this.mentorshipsService.findMentorshipsByUser(mentor._id)
     ).filter(({ mentor }) => mentor._id.equals(id));
 
-    if (
-      requestsAsMentor.some(({ status }) =>
-        [Status.APPROVED, Status.REJECTED].includes(status),
-      )
-    ) {
+    if (this.respondedRecently(requestsAsMentor)) {
       throw new MethodNotAllowedException('Mentor responded to some requests');
     }
 
@@ -86,11 +95,7 @@ export class AdminController {
       await this.mentorshipsService.findMentorshipsByUser(mentor._id)
     ).filter(({ mentor }) => mentor._id.equals(id));
 
-    if (
-      requestsAsMentor.some(({ status }) =>
-        [Status.APPROVED, Status.REJECTED].includes(status),
-      )
-    ) {
+    if (this.respondedRecently(requestsAsMentor)) {
       throw new MethodNotAllowedException('Mentor responded to some requests');
     }
 
