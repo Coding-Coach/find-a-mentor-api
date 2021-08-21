@@ -255,7 +255,6 @@ export class MentorshipsController {
           data: {
             menteeName: menteeFirstName,
             mentorName: currentUser.name,
-            // TODO: https://github.com/Coding-Coach/find-a-mentor-api/issues/211
             openRequests,
             contactURL,
           },
