@@ -8,10 +8,6 @@ const layout = fs.readFileSync('content/email_templates/layout.html', {
   encoding: 'utf8',
 });
 
-// function injectData(template, data) {
-//   return template.replace(/{{(.*?)}}/gm, (_,prop) => data[prop] || `{{${prop}}}`);
-// }
-
 function injectData(template, data) {
   const content = compile(template)(data);
   return compile(layout)({
@@ -28,7 +24,6 @@ app.get('/:templateName', function (req, res) {
     { encoding: 'utf8' },
   );
   const content = injectData(
-    // layout.replace('$$$Content$$$', template),
     template,
     JSON.parse(data || '{}'),
   );
