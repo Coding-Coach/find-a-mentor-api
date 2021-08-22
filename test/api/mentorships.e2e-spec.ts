@@ -194,7 +194,7 @@ describe('Mentorships', () => {
         expect(emailService.sendLocalTemplate).toHaveBeenCalledTimes(1);
       });
 
-      it('should ask mentee to cancel other request when the mentor approve', async () => {
+      it('should ask mentee to cancel other request when the mentor approves', async () => {
         const mentor2 = await createUser();
         await createMentorship({
           mentor: mentor2._id,
