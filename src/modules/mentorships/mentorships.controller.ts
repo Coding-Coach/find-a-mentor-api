@@ -244,6 +244,10 @@ export class MentorshipsController {
           ? `https://coding-coach.slack.com/team/${slack.id}`
           : `mailto:${currentUser.email}`;
 
+        const openRequests = await this.mentorshipsService.getOpenRequests(
+          mentee._id,
+        );
+
         await this.emailService.sendLocalTemplate({
           to: mentee.email,
           name: 'mentorship-accepted',
@@ -251,8 +255,7 @@ export class MentorshipsController {
           data: {
             menteeName: menteeFirstName,
             mentorName: currentUser.name,
-            // TODO: https://github.com/Coding-Coach/find-a-mentor-api/issues/211
-            openRequests: undefined,
+            openRequests,
             contactURL,
           },
         });

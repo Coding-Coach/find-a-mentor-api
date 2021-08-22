@@ -6,8 +6,11 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env.test' });
 import { AppModule } from '../../src/app.module';
 import { EmailService } from '../../src/modules/email/email.service';
-import { Role } from '../../src/modules/common/interfaces/user.interface';
-import { Status } from '../../src/modules/mentorships/interfaces/mentorship.interface';
+import { Role, User } from '../../src/modules/common/interfaces/user.interface';
+import {
+  Mentorship,
+  Status,
+} from '../../src/modules/mentorships/interfaces/mentorship.interface';
 import { createUser, createMentorship } from '../utils/seeder';
 import { getToken } from '../utils/jwt';
 
@@ -143,16 +146,17 @@ describe('Mentorships', () => {
     });
 
     describe('successful requests', () => {
-      it('allows a mentor in the mentorship to approve/reject', async () => {
-        const [mentee, mentor] = await Promise.all([
-          createUser(),
-          createUser(),
-        ]);
-        const mentorship = await createMentorship({
+      let mentor: User, mentee: User, mentorship: Mentorship;
+
+      beforeEach(async () => {
+        [mentee, mentor] = await Promise.all([createUser(), createUser()]);
+        mentorship = await createMentorship({
           mentor: mentor._id,
           mentee: mentee._id,
         });
+      });
 
+      it('allows a mentor in the mentorship to approve/reject', async () => {
         const token = getToken(mentor);
         const { body } = await request(server)
           .put(`/mentorships/${mentor._id}/requests/${mentorship._id}`)
@@ -160,6 +164,18 @@ describe('Mentorships', () => {
           .send({ status: Status.APPROVED })
           .expect(200);
         expect(emailService.sendLocalTemplate).toHaveBeenCalledTimes(1);
+        expect(emailService.sendLocalTemplate).toHaveBeenCalledWith({
+          data: {
+            contactURL: `mailto:${mentor.email}`,
+            menteeName: mentee.name.split(' ')[0],
+            mentorName: mentor.name,
+            openRequests: 0,
+          },
+          name: 'mentorship-accepted',
+          subject: 'Mentorship Approved 👏',
+          to: mentee.email,
+        });
+
         expect(body.mentorship.status).toBe(Status.APPROVED);
 
         emailService.sendLocalTemplate.mockClear();
@@ -176,6 +192,29 @@ describe('Mentorships', () => {
         expect(status).toBe(Status.REJECTED);
         expect(reason).toBe('Other commitments');
         expect(emailService.sendLocalTemplate).toHaveBeenCalledTimes(1);
+      });
+
+      it('should ask mentee to cancel other request when the mentor approves', async () => {
+        const mentor2 = await createUser();
+        await createMentorship({
+          mentor: mentor2._id,
+          mentee: mentee._id,
+        });
+
+        const token = getToken(mentor);
+        const { body } = await request(server)
+          .put(`/mentorships/${mentor._id}/requests/${mentorship._id}`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ status: Status.APPROVED })
+          .expect(200);
+        expect(emailService.sendLocalTemplate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: expect.objectContaining({
+              openRequests: 1,
+            }),
+          }),
+        );
+        expect(body.mentorship.status).toBe(Status.APPROVED);
       });
 
       it('allows a mentee in the mentorship to cancel', async () => {

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Query, Model, Types } from 'mongoose';
-import { Mentorship } from './interfaces/mentorship.interface';
+import { Mentorship, Status } from './interfaces/mentorship.interface';
 import { MentorshipDto } from './dto/mentorship.dto';
 import { isObjectId } from '../../utils/objectid';
 
@@ -88,5 +88,30 @@ export class MentorshipsService {
     }
 
     return Promise.resolve([]);
+  }
+
+  /**
+   * Count open mentorship requests of a user
+   * @param userId
+   */
+  getOpenRequests(userId: string): Promise<number> {
+    if (isObjectId(userId)) {
+      return this.mentorshipModel
+        .countDocuments({
+          $and: [
+            {
+              mentee: userId,
+            },
+            {
+              status: {
+                $in: [Status.NEW, Status.VIEWED],
+              },
+            },
+          ],
+        })
+        .exec();
+    }
+
+    return Promise.resolve(0);
   }
 }
