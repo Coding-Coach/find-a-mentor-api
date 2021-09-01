@@ -53,6 +53,8 @@ type MentorshipRequested = {
     menteeName: string;
     mentorName: string;
     message: string;
+    background: string;
+    expectation: string;
   };
 };
 

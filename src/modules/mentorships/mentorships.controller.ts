@@ -93,14 +93,6 @@ export class MentorshipsController {
     });
 
     try {
-      const emailData = {
-        to: mentor.email,
-        templateId: Template.MENTORSHIP_REQUEST,
-        dynamic_template_data: {
-          name: current.name,
-          message: data.message,
-        },
-      };
       await this.emailService.sendLocalTemplate({
         name: 'mentorship-requested',
         to: mentor.email,
@@ -109,6 +101,8 @@ export class MentorshipsController {
           mentorName: mentor.name,
           menteeName: current.name,
           message: data.message,
+          background: data.background,
+          expectation: data.expectation,
         },
       });
     } catch (error) {
