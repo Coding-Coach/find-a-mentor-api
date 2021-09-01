@@ -51,6 +51,7 @@ type MentorshipRequested = {
   name: 'mentorship-requested';
   data: {
     menteeName: string;
+    menteeEmail: string;
     mentorName: string;
     message: string;
     background: string;
