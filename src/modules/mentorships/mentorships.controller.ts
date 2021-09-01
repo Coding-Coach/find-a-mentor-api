@@ -108,6 +108,7 @@ export class MentorshipsController {
         data: {
           mentorName: mentor.name,
           menteeName: current.name,
+          menteeEmail: current.email,
           message: data.message,
         },
       });
