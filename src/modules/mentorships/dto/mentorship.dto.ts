@@ -24,7 +24,7 @@ export class MentorshipDto {
   @ApiModelProperty()
   @IsDefined()
   @IsString()
-  @Length(3, 5000)
+  @Length(30, 5000)
   readonly message: string;
 
   @ApiModelPropertyOptional()
@@ -33,15 +33,15 @@ export class MentorshipDto {
   readonly goals: string[];
 
   @ApiModelPropertyOptional()
-  @IsOptional()
+  @IsDefined()
   @IsString()
-  @Length(3, 5000)
+  @Length(30, 5000)
   readonly expectation: string;
 
   @ApiModelPropertyOptional()
-  @IsOptional()
+  @IsDefined()
   @IsString()
-  @Length(3, 5000)
+  @Length(30, 5000)
   readonly background: string;
 
   @ApiModelPropertyOptional()
