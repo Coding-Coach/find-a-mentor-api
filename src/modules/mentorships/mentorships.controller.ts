@@ -312,7 +312,9 @@ export class MentorshipsController {
         );
       }
 
-      const requests = await this.mentorshipsService.getAllMentorships();
+      const requests = await this.mentorshipsService.getAllMentorships({
+        from: request.query.from,
+      });
       const mentorshipRequests = mentorshipsToDtos(requests, currentUser);
       return {
         success: true,
