@@ -40,8 +40,15 @@ export class MentorshipsService {
   /**
    * Retruns all the mentorship reqeusts
    */
-  async getAllMentorships() {
-    return this.mentorshipModel.find({}).populate('mentee').populate('mentor');
+  async getAllMentorships({ from }: { from?: Date }) {
+    return this.mentorshipModel
+      .find({
+        createdAt: {
+          $gte: from || -1,
+        },
+      })
+      .populate('mentee')
+      .populate('mentor');
   }
 
   /**
