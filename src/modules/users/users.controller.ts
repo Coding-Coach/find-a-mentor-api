@@ -37,6 +37,7 @@ import { ListDto } from '../lists/dto/list.dto';
 import { ListsService } from '../lists/lists.service';
 import { filterImages } from '../../utils/mimes';
 import { MentorshipsService } from '../mentorships/mentorships.service';
+import { Status } from '../mentorships/interfaces/mentorship.interface';
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -168,8 +169,9 @@ export class UsersController {
       user._id,
     );
     return mentorships.some(
-      ({ mentee, mentor }) =>
-        mentor?._id.equals(user._id) || mentee?._id.equals(user._id),
+      ({ mentee, mentor, status }) =>
+        status === Status.APPROVED &&
+        (mentor?._id.equals(user._id) || mentee?._id.equals(user._id)),
     );
   }
 

@@ -44,7 +44,7 @@ export class UserDto {
   readonly title: string;
 
   @ApiModelPropertyOptional()
-  @Length(3, 140)
+  @Length(3, 400)
   @IsString()
   @IsOptional()
   readonly description: string;
@@ -74,7 +74,7 @@ export class UserDto {
   @ApiModelPropertyOptional()
   @IsOptional()
   @ArrayMinSize(1)
-  @ArrayMaxSize(5)
+  @ArrayMaxSize(10)
   @IsString({
     each: true,
   })
