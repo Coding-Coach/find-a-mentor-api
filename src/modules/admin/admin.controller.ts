@@ -131,7 +131,7 @@ export class AdminController {
       this.emailService.sendLocalTemplate({
         to: mentorship.mentee.email,
         name: 'mentorship-declined',
-        subject: 'Mentorship Automatic Declined',
+        subject: 'Mentorship Declined – Mentor no longer available',
         data: {
           mentorName: mentorship.mentor.name,
           menteeName: mentorship.mentee.name,
