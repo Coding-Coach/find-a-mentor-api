@@ -115,6 +115,32 @@ export class AdminController {
       },
     });
 
+    const mentorships = (
+      await this.mentorshipsService.findMentorshipsByUser(id)
+    ).filter(
+      (mentorship) =>
+        mentorship.mentor.id === id &&
+        [Status.NEW, Status.VIEWED].includes(mentorship.status),
+    );
+
+    mentorships.forEach((mentorship) => {
+      mentorship.status = Status.REJECTED;
+      mentorship.reason = 'Automatic decline - Mentor is no longer available';
+      (mentorship as any).save();
+
+      this.emailService.sendLocalTemplate({
+        to: mentorship.mentee.email,
+        name: 'mentorship-declined',
+        subject: 'Mentorship Declined – Mentor no longer available',
+        data: {
+          mentorName: mentorship.mentor.name,
+          menteeName: mentorship.mentee.name,
+          reason: mentorship.reason,
+          bySystem: true,
+        },
+      });
+    });
+
     return {
       success: true,
     };

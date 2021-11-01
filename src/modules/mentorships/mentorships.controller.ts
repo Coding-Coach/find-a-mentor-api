@@ -265,6 +265,7 @@ export class MentorshipsController {
             menteeName: menteeFirstName,
             mentorName: currentUser.name,
             reason: reason || '',
+            bySystem: false,
           },
         });
       }

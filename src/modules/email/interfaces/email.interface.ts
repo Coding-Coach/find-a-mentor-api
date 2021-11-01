@@ -44,6 +44,7 @@ type MentorshipDeclined = {
     menteeName: string;
     mentorName: string;
     reason: string;
+    bySystem: boolean;
   };
 };
 
