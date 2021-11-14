@@ -101,7 +101,7 @@ export class MentorshipsService {
    * Count open mentorship requests of a user
    * @param userId
    */
-  getOpenRequests(userId: string): Promise<number> {
+  getOpenRequestsCount(userId: string): Promise<number> {
     if (isObjectId(userId)) {
       return this.mentorshipModel
         .countDocuments({
