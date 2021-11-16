@@ -125,7 +125,24 @@ describe('modules/mentorships/MentorshipsController', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
+    it('should return a 400 error if the user exceeded the allowed open requests', async () => {
+      mentorshipsService.getOpenRequestsCount = jest.fn(() =>
+        Promise.resolve(5),
+      );
+
+      await expect(
+        mentorshipsController.applyForMentorship(
+          <Request>request,
+          mentorId,
+          mentorship,
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+
     it('should return a successful response', async () => {
+      mentorshipsService.getOpenRequestsCount = jest.fn(() =>
+        Promise.resolve(3),
+      );
       const data = await mentorshipsController.applyForMentorship(
         <Request>request,
         mentorId,
