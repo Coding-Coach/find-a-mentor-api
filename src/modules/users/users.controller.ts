@@ -158,20 +158,26 @@ export class UsersController {
     return response;
   }
 
-  private async shouldIncludeChannels(user?: User) {
-    if (!user) {
+  private async shouldIncludeChannels(
+    currentUser?: User,
+    requestedUser?: User,
+  ) {
+    if (!currentUser) {
       return false;
     }
-    if (user.roles.includes(Role.ADMIN)) {
+    if (currentUser.roles.includes(Role.ADMIN)) {
       return true;
     }
     const mentorships = await this.mentorshipsService.findMentorshipsByUser(
-      user._id,
+      currentUser._id,
     );
     return mentorships.some(
       ({ mentee, mentor, status }) =>
         status === Status.APPROVED &&
-        (mentor?._id.equals(user._id) || mentee?._id.equals(user._id)),
+        ((mentor?._id.equals(currentUser._id) &&
+          mentee?._id.equals(requestedUser)) ||
+          (mentee?._id.equals(currentUser._id) &&
+            mentor?._id.equals(requestedUser))),
     );
   }
 
@@ -190,7 +196,10 @@ export class UsersController {
       throw new BadRequestException('User not found');
     }
     const { channels, email, ...user } = requestedUser;
-    const showChannels = await this.shouldIncludeChannels(current);
+    const showChannels = await this.shouldIncludeChannels(
+      current,
+      requestedUser,
+    );
     const data = {
       ...user,
       email: current?.roles?.includes(Role.ADMIN) ? email : undefined,
