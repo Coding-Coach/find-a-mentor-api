@@ -287,4 +287,47 @@ describe('Mentorships', () => {
       });
     });
   });
+
+  describe('POST /mentorships/:mentorId/apply', () => {
+    it('returns a status code of 400 if user has reached the maximum of allowed open requests', async () => {
+      const sendMentorshipRequest = (mentor, mentee) => {
+        const token = getToken(mentee);
+        const field = '1'.repeat(31);
+
+        return request(server)
+          .post(`/mentorships/${mentor._id}/apply`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({
+            expectation: field,
+            message: field,
+            background: field,
+          });
+      };
+
+      const roles = [Role.MENTOR];
+      const [mentee, ...mentors] = await Promise.all([
+        createUser(),
+        createUser({ roles }),
+        createUser({ roles }),
+        createUser({ roles }),
+        createUser({ roles }),
+        createUser({ roles }),
+        createUser({ roles }),
+      ]);
+
+      const [lastMentor] = mentors.splice(-1);
+      await Promise.all(
+        mentors.map((mentor) =>
+          sendMentorshipRequest(mentor, mentee).expect({ success: true }),
+        ),
+      );
+      const {
+        body: { message },
+      } = await sendMentorshipRequest(lastMentor, mentee).expect(400);
+
+      expect(message).toBe(
+        'You reached the maximum of open requests. Please wait a little longer for responses or cancel some of the requests',
+      );
+    });
+  });
 });

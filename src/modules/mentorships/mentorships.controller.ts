@@ -38,6 +38,8 @@ import { FindOneParams } from '../common/dto/findOneParams.dto';
 import { MentorshipUpdatePayload } from './dto/mentorshipUpdatePayload.dto';
 import { mentorshipsToDtos } from './mentorshipsToDto';
 
+const ALLOWED_OPEN_MENTORSHIPS = 5;
+
 @ApiUseTags('/mentorships')
 @Controller('mentorships')
 export class MentorshipsController {
@@ -83,6 +85,15 @@ export class MentorshipsController {
 
     if (mentorship) {
       throw new BadRequestException('A mentorship request already exists');
+    }
+
+    const openMentorships = await this.mentorshipsService.getOpenRequestsCount(
+      current._id,
+    );
+    if (openMentorships >= ALLOWED_OPEN_MENTORSHIPS) {
+      throw new BadRequestException(
+        'You reached the maximum of open requests. Please wait a little longer for responses or cancel some of the requests',
+      );
     }
 
     await this.mentorshipsService.createMentorship({
@@ -239,7 +250,7 @@ export class MentorshipsController {
           ? `https://coding-coach.slack.com/team/${slack.id}`
           : `mailto:${currentUser.email}`;
 
-        const openRequests = await this.mentorshipsService.getOpenRequests(
+        const openRequests = await this.mentorshipsService.getOpenRequestsCount(
           mentee._id,
         );
 
