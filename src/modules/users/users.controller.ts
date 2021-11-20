@@ -198,7 +198,6 @@ export class UsersController {
       current,
       requestedUser,
     );
-    console.log(333333, showChannels);
     const data = {
       ...user,
       email: current?.roles?.includes(Role.ADMIN) ? email : undefined,
