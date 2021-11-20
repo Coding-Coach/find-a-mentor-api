@@ -174,10 +174,8 @@ export class UsersController {
     return mentorships.some(
       ({ mentee, mentor, status }) =>
         status === Status.APPROVED &&
-        ((mentor?._id.equals(currentUser._id) &&
-          mentee?._id.equals(requestedUser)) ||
-          (mentee?._id.equals(currentUser._id) &&
-            mentor?._id.equals(requestedUser))),
+        (mentor?._id.equals(requestedUser._id) ||
+          mentee?._id.equals(requestedUser._id)),
     );
   }
 
@@ -200,6 +198,7 @@ export class UsersController {
       current,
       requestedUser,
     );
+    console.log(3333333, showChannels);
     const data = {
       ...user,
       email: current?.roles?.includes(Role.ADMIN) ? email : undefined,
