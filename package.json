@@ -106,6 +106,7 @@
   "lint-staged": {
     "*.ts": [
       "prettier --write",
+      "tslint -c tslint.json 'src/**/*.ts' --fix",
       "git add"
     ]
   }

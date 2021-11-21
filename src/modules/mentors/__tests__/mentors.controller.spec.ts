@@ -88,8 +88,8 @@ describe('modules/mentors/MentorsController', () => {
       };
       mentorsService.findAll = jest.fn(() => Promise.resolve(testMentorsData));
       const data = await mentorsController.index(
-        <Request>req,
-        <MentorFiltersDto>testFilters,
+        req as Request,
+        testFilters as MentorFiltersDto,
       );
       expect(data.data).toMatchObject(testMentorsData.mentors);
       expect(data.success).toBe(true);
@@ -106,12 +106,12 @@ describe('modules/mentors/MentorsController', () => {
     };
     it('should return a single random mentor', async () => {
       mentorsService.findRandomMentor = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(testMentor.id),
           auth0Id: 'abcd',
-        }),
+        } as User),
       );
-      const data = await mentorsController.featured(<Request>req);
+      const data = await mentorsController.featured(req as Request);
       expect(data.success).toBe(true);
       expect(data.data.auth0Id).toBe('abcd');
     });
@@ -124,13 +124,13 @@ describe('modules/mentors/MentorsController', () => {
 
     it('should throw an error if user is not admin', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       await expect(
-        mentorsController.applications(<Request>req, ''),
+        mentorsController.applications(req as Request, ''),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -152,15 +152,15 @@ describe('modules/mentors/MentorsController', () => {
         },
       ];
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: ['Admin'],
-        }),
+        } as User),
       );
       mentorsService.findApplications = jest.fn(() =>
-        Promise.resolve(<Application[]>testApplication),
+        Promise.resolve(testApplication as Application[]),
       );
-      const data = await mentorsController.applications(<Request>req, '');
+      const data = await mentorsController.applications(req as Request, '');
       expect(data.success).toBe(true);
       expect(data.data.length).toBe(2);
     });
@@ -176,16 +176,16 @@ describe('modules/mentors/MentorsController', () => {
         },
       ];
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: ['Admin'],
-        }),
+        } as User),
       );
       mentorsService.findApplications = jest.fn(() =>
-        Promise.resolve(<Application[]>testApplication),
+        Promise.resolve(testApplication as Application[]),
       );
       const data = await mentorsController.applications(
-        <Request>req,
+        req as Request,
         'Pending',
       );
       expect(data.success).toBe(true);
@@ -199,10 +199,10 @@ describe('modules/mentors/MentorsController', () => {
     };
     it('should throw an error if user is not found', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() => undefined);
       await expect(
@@ -212,13 +212,13 @@ describe('modules/mentors/MentorsController', () => {
 
     it('should throw an error if user is not current user or admin', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock('123') }),
+        Promise.resolve({ _id: new ObjectIdMock('123') } as User),
       );
       await expect(
         mentorsController.myApplications(req, '123', ''),
@@ -236,16 +236,16 @@ describe('modules/mentors/MentorsController', () => {
         },
       ];
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock('1234') }),
+        Promise.resolve({ _id: new ObjectIdMock('1234') } as User),
       );
       mentorsService.findApplications = jest.fn(() =>
-        Promise.resolve(<Application[]>testApplication),
+        Promise.resolve(testApplication as Application[]),
       );
       const data = await mentorsController.myApplications(
         req,
@@ -267,16 +267,16 @@ describe('modules/mentors/MentorsController', () => {
         },
       ];
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock('1234') }),
+        Promise.resolve({ _id: new ObjectIdMock('1234') } as User),
       );
       mentorsService.findApplications = jest.fn(() =>
-        Promise.resolve(<Application[]>testApplication),
+        Promise.resolve(testApplication as Application[]),
       );
       const data = await mentorsController.myApplications(req, '1234', '');
       expect(data.success).toBe(true);
@@ -297,18 +297,18 @@ describe('modules/mentors/MentorsController', () => {
         user: 'test user',
       };
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       mentorsService.findActiveApplicationByUser = jest.fn(() =>
-        Promise.resolve(<Application>testApplication),
+        Promise.resolve(testApplication as Application),
       );
       await expect(
         mentorsController.applyToBecomeMentor(
           req,
-          <ApplicationDto>testApplication,
+          testApplication as ApplicationDto,
         ),
       ).rejects.toThrow(BadRequestException);
     });
@@ -322,18 +322,18 @@ describe('modules/mentors/MentorsController', () => {
         user: 'test user',
       };
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       mentorsService.findActiveApplicationByUser = jest.fn(() =>
-        Promise.resolve(<Application>testApplication),
+        Promise.resolve(testApplication as Application),
       );
       await expect(
         mentorsController.applyToBecomeMentor(
           req,
-          <ApplicationDto>testApplication,
+          testApplication as ApplicationDto,
         ),
       ).rejects.toThrow(BadRequestException);
     });
@@ -347,19 +347,19 @@ describe('modules/mentors/MentorsController', () => {
         user: 'test user',
       };
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       mentorsService.findActiveApplicationByUser = jest.fn(() => undefined);
       mentorsService.createApplication = jest.fn(() =>
-        Promise.resolve(<ApplicationDto>testApplication),
+        Promise.resolve(testApplication as ApplicationDto),
       );
       emailService.sendLocalTemplate = jest.fn();
       const data = await mentorsController.applyToBecomeMentor(
         req,
-        <ApplicationDto>testApplication,
+        testApplication as ApplicationDto,
       );
       expect(emailService.sendLocalTemplate).toBeCalledTimes(1);
       expect(data.success).toBe(true);
@@ -379,16 +379,16 @@ describe('modules/mentors/MentorsController', () => {
         user: 'test user',
       };
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       await expect(
         mentorsController.reviewApplication(
           req,
           '1234',
-          <ApplicationDto>testApplication,
+          testApplication as ApplicationDto,
         ),
       ).rejects.toThrow(UnauthorizedException);
     });
@@ -402,17 +402,17 @@ describe('modules/mentors/MentorsController', () => {
         user: 'test user',
       };
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: ['Admin'],
-        }),
+        } as User),
       );
       mentorsService.findApplicationById = jest.fn(() => undefined);
       await expect(
         mentorsController.reviewApplication(
           req,
           '1234',
-          <ApplicationDto>testApplication,
+          testApplication as ApplicationDto,
         ),
       ).rejects.toThrow(BadRequestException);
     });
@@ -426,19 +426,19 @@ describe('modules/mentors/MentorsController', () => {
         user: 'test user',
       };
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: ['Admin'],
-        }),
+        } as User),
       );
       mentorsService.findApplicationById = jest.fn(() =>
-        Promise.resolve(<Application>testApplication),
+        Promise.resolve(testApplication as Application),
       );
       await expect(
         mentorsController.reviewApplication(
           req,
           '1234',
-          <ApplicationDto>testApplication,
+          testApplication as ApplicationDto,
         ),
       ).rejects.toThrow(BadRequestException);
     });
@@ -452,19 +452,19 @@ describe('modules/mentors/MentorsController', () => {
         user: 'test user',
       };
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: ['Admin'],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('123'),
           roles: ['Member'],
-        }),
+        } as User),
       );
       mentorsService.findApplicationById = jest.fn(() =>
-        Promise.resolve(<Application>testApplication),
+        Promise.resolve(testApplication as Application),
       );
       usersService.update = jest.fn();
       emailService.sendLocalTemplate = jest.fn();
@@ -475,7 +475,7 @@ describe('modules/mentors/MentorsController', () => {
       const data = await mentorsController.reviewApplication(
         req,
         '1234',
-        <ApplicationDto>testApplication,
+        testApplication as ApplicationDto,
       );
       expect(emailService.sendLocalTemplate).toBeCalledTimes(1);
       expect(emailService.addMentor).toBeCalledTimes(1);
@@ -492,19 +492,19 @@ describe('modules/mentors/MentorsController', () => {
         user: 'test user',
       };
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(req.user.auth0Id),
           roles: ['Admin'],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('123'),
           roles: ['Member'],
-        }),
+        } as User),
       );
       mentorsService.findApplicationById = jest.fn(() =>
-        Promise.resolve(<Application>testApplication),
+        Promise.resolve(testApplication as Application),
       );
       usersService.update = jest.fn();
       emailService.sendLocalTemplate = jest.fn();
@@ -515,7 +515,7 @@ describe('modules/mentors/MentorsController', () => {
       const data = await mentorsController.reviewApplication(
         req,
         '1234',
-        <ApplicationDto>testApplication,
+        testApplication as ApplicationDto,
       );
       expect(emailService.sendLocalTemplate).toBeCalledTimes(1);
       expect(emailService.addMentor).toBeCalledTimes(1);

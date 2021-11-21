@@ -73,21 +73,21 @@ describe('modules/mentorships/MentorshipsController', () => {
       mentorId = '5678';
       menteeId = '91011';
       request = { user: { auth0Id: '1234' } };
-      mentorship = <MentorshipDto>{
+      mentorship = {
         message: `Hi there! I'd like to learn from you!`,
-      };
+      } as MentorshipDto;
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(request.user.auth0Id),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       mentorsService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(mentorId),
           available: true,
           roles: [Role.MENTOR],
-        }),
+        } as User),
       );
       mentorshipsService.findMentorship = jest.fn(() => Promise.resolve(null));
       mentorshipsService.createMentorship = jest.fn(() =>
@@ -105,11 +105,11 @@ describe('modules/mentorships/MentorshipsController', () => {
 
     it('should return a 400 error if mentor is not available', async () => {
       mentorsService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(mentorId),
           available: false,
           roles: [Role.MENTOR],
-        }),
+        } as User),
       );
       await expect(
         mentorshipsController.applyForMentorship(request, mentorId, mentorship),
@@ -118,7 +118,7 @@ describe('modules/mentorships/MentorshipsController', () => {
 
     it('should return a 400 error if a request already exist', async () => {
       mentorshipsService.findMentorship = jest.fn(() =>
-        Promise.resolve(<Mentorship>{}),
+        Promise.resolve({} as Mentorship),
       );
       await expect(
         mentorshipsController.applyForMentorship(request, '123', mentorship),
@@ -144,7 +144,7 @@ describe('modules/mentorships/MentorshipsController', () => {
         Promise.resolve(3),
       );
       const data = await mentorshipsController.applyForMentorship(
-        <Request>request,
+        request as Request,
         mentorId,
         mentorship,
       );
@@ -155,22 +155,22 @@ describe('modules/mentorships/MentorshipsController', () => {
       request = { user: { _id: mentorId, auth0Id: '1234' } };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(mentorId),
           roles: [Role.MENTOR],
-        }),
+        } as User),
       );
 
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(mentorId),
           roles: [Role.MENTOR],
-        }),
+        } as User),
       );
 
       mentorshipsService.findMentorshipsByUser = jest.fn(() =>
         Promise.resolve([
-          <Mentorship>{
+          {
             _id: new ObjectIdMock('1'),
             mentor: new ObjectIdMock(mentorId),
             mentee: new ObjectIdMock('ANYMENTEEID'),
@@ -182,12 +182,12 @@ describe('modules/mentorships/MentorshipsController', () => {
             reason: 'REASON',
             updatedAt: new Date(),
             createdAt: new Date(),
-          },
+          } as Mentorship,
         ]),
       );
 
       const response = await mentorshipsController.getMentorshipRequests(
-        <Request>request,
+        request as Request,
         mentorId,
       );
 
@@ -198,22 +198,22 @@ describe('modules/mentorships/MentorshipsController', () => {
 
     it('should filter out requests of deleted users', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(mentorId),
           roles: [Role.MENTOR],
-        }),
+        } as User),
       );
 
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(mentorId),
           roles: [Role.MENTOR],
-        }),
+        } as User),
       );
 
       mentorshipsService.findMentorshipsByUser = jest.fn(() =>
         Promise.resolve([
-          <Mentorship>{
+          {
             _id: new ObjectIdMock('1'),
             mentor: new ObjectIdMock('ANYMENTORID'),
             mentee: null,
@@ -225,12 +225,12 @@ describe('modules/mentorships/MentorshipsController', () => {
             reason: 'REASON',
             updatedAt: new Date(),
             createdAt: new Date(),
-          },
+          } as Mentorship,
         ]),
       );
 
       const response = await mentorshipsController.getMentorshipRequests(
-        <Request>request,
+        request as Request,
         mentorId,
       );
 
@@ -242,22 +242,22 @@ describe('modules/mentorships/MentorshipsController', () => {
       request = { user: { _id: menteeId, auth0Id: '1234' } };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(menteeId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
 
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(menteeId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
 
       mentorshipsService.findMentorshipsByUser = jest.fn(() =>
         Promise.resolve([
-          <Mentorship>{
+          {
             _id: new ObjectIdMock('1'),
             mentor: new ObjectIdMock('ANYMENTORID'),
             mentee: new ObjectIdMock(menteeId),
@@ -269,12 +269,12 @@ describe('modules/mentorships/MentorshipsController', () => {
             reason: 'REASON',
             updatedAt: new Date(),
             createdAt: new Date(),
-          },
+          } as Mentorship,
         ]),
       );
 
       const response = await mentorshipsController.getMentorshipRequests(
-        <Request>request,
+        request as Request,
         menteeId,
       );
 
@@ -283,25 +283,28 @@ describe('modules/mentorships/MentorshipsController', () => {
       expect(response.data[0].isMine).toBe(true);
     });
 
-    it("should return unauthorised if user is not admin and requesting another user's applications", async () => {
+    it('should return unauthorised if user is not admin and requesting another user\'s applications', async () => {
       request = { user: { _id: menteeId, auth0Id: '1234' } };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(menteeId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
 
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(mentorId),
           roles: [Role.MENTOR],
-        }),
+        } as User),
       );
 
       await expect(
-        mentorshipsController.getMentorshipRequests(<Request>request, mentorId),
+        mentorshipsController.getMentorshipRequests(
+          request as Request,
+          mentorId,
+        ),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -310,22 +313,22 @@ describe('modules/mentorships/MentorshipsController', () => {
       request = { user: { _id: adminId, auth0Id: '1234' } };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(adminId),
           roles: [Role.ADMIN],
-        }),
+        } as User),
       );
 
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(mentorId),
           roles: [Role.MENTOR],
-        }),
+        } as User),
       );
 
       mentorshipsService.findMentorshipsByUser = jest.fn(() =>
         Promise.resolve([
-          <Mentorship>{
+          {
             _id: new ObjectIdMock('1'),
             mentor: new ObjectIdMock(mentorId),
             mentee: new ObjectIdMock(menteeId),
@@ -337,12 +340,12 @@ describe('modules/mentorships/MentorshipsController', () => {
             reason: 'REASON',
             updatedAt: new Date(),
             createdAt: new Date(),
-          },
+          } as Mentorship,
         ]),
       );
 
       const response = await mentorshipsController.getMentorshipRequests(
-        <Request>request,
+        request as Request,
         mentorId,
       );
 

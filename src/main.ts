@@ -34,6 +34,7 @@ async function bootstrap() {
 
     SwaggerModule.setup('/docs', app, document);
   }
+  // tslint:disable-next-line:no-console
   console.log(`Server is up on port: ${process.env.PORT || 3000}`);
   await app.listen(process.env.PORT || 3000);
 }
