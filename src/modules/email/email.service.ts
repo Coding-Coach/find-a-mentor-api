@@ -57,6 +57,7 @@ export class EmailService {
         from: Config.email.FROM,
       });
     } catch (error) {
+      // tslint:disable-next-line:no-console
       console.log('Send email error', params, JSON.stringify(error, null, 2));
     }
   }

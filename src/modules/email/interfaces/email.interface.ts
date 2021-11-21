@@ -12,14 +12,14 @@ export enum Template {
   MENTORSHIP_REQUEST_REJECTED = 'd-8521ac50737f4b0384a95552dc02db9f',
 }
 
-type WelcomePayload = {
+interface WelcomePayload {
   name: 'welcome';
   data: {
     name: string;
   };
-};
+}
 
-type MentorshipAccepted = {
+interface MentorshipAccepted {
   name: 'mentorship-accepted';
   data: {
     menteeName: string;
@@ -27,18 +27,18 @@ type MentorshipAccepted = {
     contactURL: string;
     openRequests: number;
   };
-};
+}
 
-type MentorshipCancelled = {
+interface MentorshipCancelled {
   name: 'mentorship-cancelled';
   data: {
     mentorName: string;
     menteeName: string;
     reason: string;
   };
-};
+}
 
-type MentorshipDeclined = {
+interface MentorshipDeclined {
   name: 'mentorship-declined';
   data: {
     menteeName: string;
@@ -46,9 +46,9 @@ type MentorshipDeclined = {
     reason: string;
     bySystem: boolean;
   };
-};
+}
 
-type MentorshipRequested = {
+interface MentorshipRequested {
   name: 'mentorship-requested';
   data: {
     menteeName: string;
@@ -58,53 +58,53 @@ type MentorshipRequested = {
     background: string;
     expectation: string;
   };
-};
+}
 
-type MentorshipReminder = {
+interface MentorshipReminder {
   name: 'mentorship-reminder';
   data: {
     menteeName: string;
     mentorName: string;
     message: string;
   };
-};
+}
 
-type MentorApplicationReceived = {
+interface MentorApplicationReceived {
   name: 'mentor-application-received';
   data: {
     name: string;
   };
-};
+}
 
-type MentorApplicationDeclined = {
+interface MentorApplicationDeclined {
   name: 'mentor-application-declined';
   data: {
     name: string;
     reason: string;
   };
-};
+}
 
-type MentorApplicationApproved = {
+interface MentorApplicationApproved {
   name: 'mentor-application-approved';
   data: {
     name: string;
   };
-};
+}
 
-type MentorNotActive = {
+interface MentorNotActive {
   name: 'mentor-not-active';
   data: {
     mentorName: string;
     numOfMentorshipRequests: number;
   };
-};
+}
 
-type MentorFreeze = {
+interface MentorFreeze {
   name: 'mentor-freeze';
   data: {
     mentorName: string;
   };
-};
+}
 
 export type EmailParams = Required<Pick<MailData, 'to' | 'subject'>> &
   (

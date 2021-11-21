@@ -10,8 +10,9 @@ export class MyLogger extends Logger {
       Trace: ${trace}\n\n
       ====================================
     `,
-      err => {
+      (err) => {
         if (err) {
+          // tslint:disable-next-line:no-console
           console.log(err.message);
         }
       },

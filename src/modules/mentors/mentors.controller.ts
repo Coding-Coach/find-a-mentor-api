@@ -238,7 +238,6 @@ export class MentorsController {
       throw new BadRequestException('This Application is already approved');
     }
 
-    let templateId = null;
     const user: User = await this.usersService.findById(application.user);
     const applicationDto: ApplicationDto = new ApplicationDto({
       _id: application._id,

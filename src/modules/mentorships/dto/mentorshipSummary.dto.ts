@@ -8,7 +8,7 @@ export class MentorshipSummaryDto {
   readonly background: string;
   readonly expectation: string;
   readonly date: Date;
-  readonly isMine: Boolean;
+  readonly isMine: boolean;
   readonly mentor: UserDto;
   readonly mentee: UserDto;
 
