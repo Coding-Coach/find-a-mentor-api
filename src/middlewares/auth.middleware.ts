@@ -25,6 +25,7 @@ const publicUrls: RegExp[] = [
   /^\/mentors\/featured$/,
   /^\/users\/[^\/]*$/,
   /^\/avatars\/[^\/]*$/,
+  /^\/user-activity$/,
 ];
 
 const isPublicUrl = (req: Request) =>

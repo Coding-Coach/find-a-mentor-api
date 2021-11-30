@@ -1,0 +1,27 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('codingcoach');
+
+// db.mentorships.insertMany([
+//   {
+//     mentor: ObjectId("61974a794d5a052e51e60eb3"),
+//     mentee: ObjectId("619971bd29d5ad0eb411a25e"),
+//     status: "New",
+//     background: "I am a new mentor",
+//     message: "I am a new mentor",
+//     expectation: "I am a new mentor",
+//     createdAt: new Date("2021-11-24T22:22:22.540Z"),
+//   },
+// ]);
+
+db.mentorships.updateOne({
+  _id: ObjectId("61a69baf8dd04a3c49b47f37"),
+}, {
+  $set: {
+    status: "New",
+  }
+});

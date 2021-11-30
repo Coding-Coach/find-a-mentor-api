@@ -11,6 +11,7 @@ import { ListsModule } from './modules/lists/lists.module';
 import { UsersModule } from './modules/users/users.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { UserActivityModule } from './user-activity/user-activity.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AdminModule } from './modules/admin/admin.module';
     UsersModule,
     ReportsModule,
     AdminModule,
+    UserActivityModule,
   ],
 })
 export class AppModule implements NestModule {
