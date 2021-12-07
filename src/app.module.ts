@@ -11,7 +11,7 @@ import { ListsModule } from './modules/lists/lists.module';
 import { UsersModule } from './modules/users/users.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { AdminModule } from './modules/admin/admin.module';
-import { UserActivityModule } from './user-activity/user-activity.module';
+import { UserActivityModule } from './modules/user-activity/user-activity.module';
 
 @Module({
   imports: [

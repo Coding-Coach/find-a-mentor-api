@@ -31,6 +31,7 @@ export const createMentorship = ({
   mentee,
   message = faker.lorem.sentence(),
   status = Status.NEW,
+  createdAt = new Date(),
 }) => {
   const Mentorship = mongoose.connection.model('Mentorship', MentorshipSchema);
   return new Mentorship({
@@ -38,6 +39,7 @@ export const createMentorship = ({
     mentee,
     message,
     status,
+    createdAt,
   }).save();
 };
 

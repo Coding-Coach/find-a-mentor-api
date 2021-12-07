@@ -4,7 +4,6 @@ import { CommonModule } from '../common/common.module';
 import { MentorsService } from '../common/mentors.service';
 import { UsersService } from '../common/users.service';
 import { DatabaseModule } from '../../database/database.module';
-import { EmailService } from '../email/email.service';
 import { MentorshipsService } from './mentorships.service';
 import { mentorshipsProviders } from './mentorships.providers';
 
@@ -15,11 +14,10 @@ import { mentorshipsProviders } from './mentorships.providers';
  * allow a successfull mentorship.
  */
 @Module({
-  imports: [DatabaseModule, CommonModule, EmailService],
+  imports: [DatabaseModule, CommonModule],
   controllers: [MentorshipsController],
   providers: [
     MentorsService,
-    EmailService,
     UsersService,
     MentorshipsService,
     ...mentorshipsProviders,

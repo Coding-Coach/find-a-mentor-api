@@ -3,10 +3,12 @@ import { Query, Model, Types } from 'mongoose';
 import { Mentorship, Status } from './interfaces/mentorship.interface';
 import { MentorshipDto } from './dto/mentorship.dto';
 import { isObjectId } from '../../utils/objectid';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class MentorshipsService {
   constructor(
+    private readonly emailService: EmailService,
     @Inject('MENTORSHIP_MODEL')
     private readonly mentorshipModel: Model<Mentorship>,
   ) {}
@@ -120,5 +122,23 @@ export class MentorshipsService {
     }
 
     return Promise.resolve(0);
+  }
+
+  async sendMentorshipRequestReminder(mentorshipId: string) {
+    const mentorshipRequest = await this.findMentorshipById(mentorshipId, true);
+
+    const { mentor, mentee, message } = mentorshipRequest;
+    mentorshipRequest.reminderSentAt = new Date();
+    this.emailService.sendLocalTemplate({
+      name: 'mentorship-reminder',
+      to: mentor.email,
+      subject: `Reminder - Mentorship requested`,
+      data: {
+        menteeName: mentee.name,
+        mentorName: mentor.name,
+        message,
+      },
+    });
+    await mentorshipRequest.save();
   }
 }

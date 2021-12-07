@@ -5,6 +5,7 @@ import { commonProviders } from './common.providers';
 import { DatabaseModule } from '../../database/database.module';
 import { MentorsService } from './mentors.service';
 import { FileService } from './file.service';
+import { EmailService } from '../email/email.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -13,6 +14,7 @@ import { FileService } from './file.service';
     UsersService,
     Auth0Service,
     FileService,
+    EmailService,
     ...commonProviders,
   ],
   exports: [
@@ -20,6 +22,7 @@ import { FileService } from './file.service';
     UsersService,
     Auth0Service,
     FileService,
+    EmailService,
     ...commonProviders,
   ],
 })

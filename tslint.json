@@ -8,6 +8,7 @@
     "quotemark": [true, "single"],
     "member-access": [false],
     "no-console": [true],
+    "no-empty": false,
     "no-shadowed-variable": [false],
     "max-classes-per-file": [false],
     "ordered-imports": [false],
