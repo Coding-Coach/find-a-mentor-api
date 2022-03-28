@@ -295,7 +295,15 @@ export class UsersController {
             reason: params.reason,
           },
         };
-        this.emailService.send(emailData);
+
+        await this.emailService.send(emailData);
+      }
+
+      // Delete user email from SendGrid
+      const response = await this.emailService.getContactId(user.email);
+
+      if (response != null && response.result.length > 0) {
+        await this.emailService.deleteContact(response.result[0].id);
       }
 
       return {

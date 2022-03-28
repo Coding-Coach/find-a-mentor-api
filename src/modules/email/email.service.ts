@@ -86,6 +86,38 @@ export class EmailService {
     return await sgClient.request(request);
   }
 
+  async getContactId(email: string): Promise<SendgridSearchResult> {
+    const request = {
+      json: undefined,
+      method: 'POST',
+      url: '/v3/marketing/contacts/search',
+      body: JSON.stringify({
+        query: `email = '${email}'`,
+      }),
+    };
+
+    const response: [ClientResponse, any] = await sgClient.request(request);
+
+    if (response[0].statusCode == 200) {
+      const sendgridResponse: SendgridSearchResult = JSON.parse(
+        response[0].body,
+      );
+      return sendgridResponse;
+    }
+
+    Promise.resolve(null);
+  }
+
+  async deleteContact(contactId: string) {
+    const request = {
+      json: undefined,
+      method: 'DELETE',
+      url: '/v3/marketing/contacts?ids=' + contactId,
+    };
+
+    const response: [ClientResponse, any] = await sgClient.request(request);
+  }
+
   private async injectData(name: string, data: Record<string, string>) {
     const template = await this.getTemplateContent(name);
     const layout = await this.layout;
