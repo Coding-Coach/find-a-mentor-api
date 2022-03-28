@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Query, Model } from 'mongoose';
-import { Mentorship } from './interfaces/mentorship.interface';
+import { Query, Model, Types } from 'mongoose';
+import { Mentorship, Status } from './interfaces/mentorship.interface';
 import { MentorshipDto } from './dto/mentorship.dto';
 import { isObjectId } from '../../utils/objectid';
 
@@ -18,6 +18,37 @@ export class MentorshipsService {
   async createMentorship(mentorshipDto: MentorshipDto): Promise<Query<any>> {
     const mentorship = new this.mentorshipModel(mentorshipDto);
     return mentorship.save();
+  }
+
+  /**
+   * Finds a mentorship by id
+   * @param id
+   */
+  async findMentorshipById(id: string, full = false) {
+    const { ObjectId } = Types;
+
+    if (!ObjectId.isValid(id)) {
+      return null;
+    }
+    let mentorship = this.mentorshipModel.findById(id);
+    if (full) {
+      mentorship = mentorship.populate('mentee').populate('mentor');
+    }
+    return mentorship;
+  }
+
+  /**
+   * Retruns all the mentorship reqeusts
+   */
+  async getAllMentorships({ from }: { from?: Date }) {
+    return this.mentorshipModel
+      .find({
+        createdAt: {
+          $gte: from || -1,
+        },
+      })
+      .populate('mentee')
+      .populate('mentor');
   }
 
   /**
@@ -39,5 +70,55 @@ export class MentorshipsService {
     }
 
     return Promise.resolve(null);
+  }
+
+  /**
+   * Finds mentorship requests from or to a user
+   * @param userId
+   */
+  async findMentorshipsByUser(userId: string): Promise<Mentorship[]> {
+    if (isObjectId(userId)) {
+      return this.mentorshipModel
+        .find({
+          $or: [
+            {
+              mentor: userId,
+            },
+            {
+              mentee: userId,
+            },
+          ],
+        })
+        .populate('mentee')
+        .populate('mentor')
+        .exec();
+    }
+
+    return Promise.resolve([]);
+  }
+
+  /**
+   * Count open mentorship requests of a user
+   * @param userId
+   */
+  getOpenRequestsCount(userId: string): Promise<number> {
+    if (isObjectId(userId)) {
+      return this.mentorshipModel
+        .countDocuments({
+          $and: [
+            {
+              mentee: userId,
+            },
+            {
+              status: {
+                $in: [Status.NEW, Status.VIEWED],
+              },
+            },
+          ],
+        })
+        .exec();
+    }
+
+    return Promise.resolve(0);
   }
 }

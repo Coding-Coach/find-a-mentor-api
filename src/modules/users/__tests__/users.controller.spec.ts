@@ -9,6 +9,7 @@ import { Auth0Service } from '../../common/auth0.service';
 import { FileService } from '../../common/file.service';
 import { UserDto } from '../../common/dto/user.dto';
 import { User, Role } from '../../common/interfaces/user.interface';
+import { MentorshipsService } from '../../mentorships/mentorships.service';
 
 class ServiceMock {}
 
@@ -31,6 +32,7 @@ describe('modules/users/UsersController', () => {
   let auth0Service: Auth0Service;
   let listService: ListsService;
   let fileService: FileService;
+  let mentorshipsService: MentorshipsService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -60,6 +62,10 @@ describe('modules/users/UsersController', () => {
           provide: FileService,
           useValue: new ServiceMock(),
         },
+        {
+          provide: MentorshipsService,
+          useValue: new ServiceMock(),
+        },
       ],
     }).compile();
 
@@ -70,6 +76,7 @@ describe('modules/users/UsersController', () => {
     emailService = module.get<EmailService>(EmailService);
     listService = module.get<ListsService>(ListsService);
     fileService = module.get<FileService>(FileService);
+    mentorshipsService = module.get<MentorshipsService>(MentorshipsService);
   });
 
   describe('index', () => {
@@ -77,7 +84,7 @@ describe('modules/users/UsersController', () => {
       const request = { user: { auth0Id: '123' } };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock('123'), roles: [] }),
+        Promise.resolve({ _id: new ObjectIdMock('123'), roles: [] } as User),
       );
       usersService.findAll = jest.fn(() => Promise.resolve([]));
 
@@ -88,14 +95,14 @@ describe('modules/users/UsersController', () => {
 
     it('should return all registered users', async () => {
       const request = { user: { auth0Id: '123' } };
-      const data: User[] = [<User>{ _id: 123, name: 'Crysfel Villa' }];
+      const data: User[] = [{ _id: 123, name: 'Crysfel Villa' } as User];
       const response = { success: true, data };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('123'),
           roles: [Role.ADMIN],
-        }),
+        } as User),
       );
       usersService.findAll = jest.fn(() => Promise.resolve(data));
 
@@ -110,7 +117,7 @@ describe('modules/users/UsersController', () => {
 
     beforeEach(() => {
       request = { user: { auth0Id: '123' } };
-      data = <User>{ _id: 123, name: 'Crysfel Villa' };
+      data = { _id: 123, name: 'Crysfel Villa' } as User;
       response = { success: true, data };
     });
 
@@ -124,7 +131,7 @@ describe('modules/users/UsersController', () => {
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(undefined));
       usersService.findByEmail = jest.fn(() => Promise.resolve(undefined));
       usersService.create = jest.fn(() => Promise.resolve(data));
-      emailService.send = jest.fn();
+      emailService.sendLocalTemplate = jest.fn();
       listService.createList = jest.fn();
       auth0Service.getAdminAccessToken = jest.fn(() =>
         Promise.resolve({ access_token: 'abc' }),
@@ -135,7 +142,7 @@ describe('modules/users/UsersController', () => {
 
       expect(await usersController.currentUser(request)).toEqual(response);
       expect(usersService.create).toHaveBeenCalledTimes(1);
-      expect(emailService.send).toHaveBeenCalledTimes(1);
+      expect(emailService.sendLocalTemplate).toHaveBeenCalledTimes(1);
       expect(listService.createList).toHaveBeenCalledTimes(1);
     });
 
@@ -159,21 +166,25 @@ describe('modules/users/UsersController', () => {
   describe('show', () => {
     it('should return a user', async () => {
       const params = { id: 123 };
-      const data: User = <User>{
+      const data: User = {
         _id: 123,
         name: 'Crysfel Villa',
         email: 'test@testing.com',
-      };
+        channels: [],
+      } as User;
       const response = { success: true, data };
       const request = { user: { auth0Id: '456' } };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('456'),
           roles: [Role.ADMIN],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() => Promise.resolve(data));
+      mentorshipsService.findMentorshipsByUser = jest.fn(() =>
+        Promise.resolve([]),
+      );
 
       expect(await usersController.show(request, params)).toEqual(response);
       expect(usersService.findById).toHaveBeenCalledTimes(1);
@@ -182,24 +193,32 @@ describe('modules/users/UsersController', () => {
 
     it('should hide email if not admin or own user', async () => {
       const params = { id: 123 };
-      const data: User = <User>{
+      const data: User = {
         _id: 123,
         name: 'Crysfel Villa',
         email: 'test@testing.com',
-      };
+      } as User;
       const request = { user: { auth0Id: '456' } };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('456'),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() => Promise.resolve(data));
+      mentorshipsService.findMentorshipsByUser = jest.fn(() =>
+        Promise.resolve([]),
+      );
 
       expect(await usersController.show(request, params)).toEqual({
         success: true,
-        data: { _id: 123, name: 'Crysfel Villa' },
+        data: {
+          _id: 123,
+          name: 'Crysfel Villa',
+          channels: [],
+          email: undefined,
+        },
       });
       expect(usersService.findById).toHaveBeenCalledTimes(1);
       expect(usersService.findById).toHaveBeenCalledWith(params.id);
@@ -210,10 +229,10 @@ describe('modules/users/UsersController', () => {
       const request = { user: { auth0Id: '123' } };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('123'),
           roles: [Role.ADMIN],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() => Promise.resolve(undefined));
 
@@ -249,10 +268,10 @@ describe('modules/users/UsersController', () => {
 
     it('should throw error if updating other user as a non Admin', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock('456'), roles: [] }),
+        Promise.resolve({ _id: new ObjectIdMock('456'), roles: [] } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock('123') }),
+        Promise.resolve({ _id: new ObjectIdMock('123') } as User),
       );
 
       await expect(
@@ -261,21 +280,21 @@ describe('modules/users/UsersController', () => {
     });
 
     it('should not update roles if not an Admin', async () => {
-      const original = <User>{
+      const original = {
         _id: new ObjectIdMock('123'),
         roles: ['Member'],
-      };
+      } as User;
       const data = new UserDto({
         name: 'Crysfel Villa',
         avatar: 'test.jpg',
-        roles: ['Admin', 'SomethingElse'],
+        roles: [Role.ADMIN, Role.MENTOR],
       });
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('123'),
           roles: ['Member'],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() => Promise.resolve(original));
       usersService.update = jest.fn(() => Promise.resolve({ ok: 1 }));
@@ -295,21 +314,21 @@ describe('modules/users/UsersController', () => {
       const request = { user: { auth0Id: '123' } };
       const response = { success: true };
       const params = { id: 123 };
-      const original = <User>{
+      const original = {
         _id: new ObjectIdMock('123'),
         roles: ['Member'],
-      };
+      } as User;
       const data = new UserDto({
         name: 'Crysfel Villa',
         avatar: 'test.jpg',
-        roles: ['Member', 'Admin'],
+        roles: [Role.MEMBER, Role.ADMIN],
       });
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('123'),
           roles: ['Admin'],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() => Promise.resolve(original));
       usersService.update = jest.fn(() => Promise.resolve({ ok: 1 }));
@@ -327,23 +346,23 @@ describe('modules/users/UsersController', () => {
     });
 
     it('should not update the email', async () => {
-      const original = <User>{
+      const original = {
         _id: new ObjectIdMock('123'),
         email: 'test@test.com',
         roles: ['Member'],
-      };
+      } as User;
       const data = new UserDto({
         name: 'Crysfel Villa',
         email: 'should@ignore.com',
         avatar: 'test.jpg',
-        roles: ['Member', 'Admin'],
+        roles: [Role.MEMBER, Role.ADMIN],
       });
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('123'),
           roles: ['Admin'],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() => Promise.resolve(original));
       usersService.update = jest.fn(() => Promise.resolve({ ok: 1 }));
@@ -376,13 +395,13 @@ describe('modules/users/UsersController', () => {
 
     it('should return success when removing a valid user', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(request.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
+        Promise.resolve({ _id: new ObjectIdMock(params.id) } as User),
       );
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
       mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
@@ -396,10 +415,10 @@ describe('modules/users/UsersController', () => {
 
     it('should throw an error when user not found', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(request.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() => undefined);
 
@@ -412,13 +431,13 @@ describe('modules/users/UsersController', () => {
       const params = { id: '5678' };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(request.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
+        Promise.resolve({ _id: new ObjectIdMock(params.id) } as User),
       );
 
       await expect(usersController.remove(request, params)).rejects.toThrow(
@@ -430,13 +449,13 @@ describe('modules/users/UsersController', () => {
       const params = { id: '5678' };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(request.user.auth0Id),
           roles: ['Admin'],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
+        Promise.resolve({ _id: new ObjectIdMock(params.id) } as User),
       );
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
       emailService.send = jest.fn();
@@ -451,13 +470,13 @@ describe('modules/users/UsersController', () => {
 
     it('should remove all previous applications', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(request.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
+        Promise.resolve({ _id: new ObjectIdMock(params.id) } as User),
       );
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
       mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
@@ -478,13 +497,13 @@ describe('modules/users/UsersController', () => {
 
     it('should remove user from database', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(request.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
+        Promise.resolve({ _id: new ObjectIdMock(params.id) } as User),
       );
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
       mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
@@ -501,16 +520,16 @@ describe('modules/users/UsersController', () => {
 
     it('should remove user from auth0', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(request.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(params.id),
           auth0Id: 'abcd',
-        }),
+        } as User),
       );
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
       mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
@@ -532,16 +551,16 @@ describe('modules/users/UsersController', () => {
       const response = { success: false, error: 'Something failed' };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(request.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(params.id),
           auth0Id: 'abcd',
-        }),
+        } as User),
       );
       usersService.remove = jest.fn(() => Promise.resolve({ ok: 1 }));
       mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
@@ -573,13 +592,13 @@ describe('modules/users/UsersController', () => {
       image = { filename: 'image.png' };
 
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(request.user.auth0Id),
           roles: [],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id) }),
+        Promise.resolve({ _id: new ObjectIdMock(params.id) } as User),
       );
       fileService.createThumbnail = jest.fn(() => Promise.resolve(true));
     });
@@ -600,7 +619,7 @@ describe('modules/users/UsersController', () => {
 
     it('should throw an error if updating other member and NOT an admin', async () => {
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock('432534') }),
+        Promise.resolve({ _id: new ObjectIdMock('432534') } as User),
       );
 
       await expect(
@@ -620,7 +639,10 @@ describe('modules/users/UsersController', () => {
 
     it('should remove previous image', async () => {
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id: new ObjectIdMock(params.id), image: {} }),
+        Promise.resolve({
+          _id: new ObjectIdMock(params.id),
+          image: {},
+        } as User),
       );
       fileService.removeFile = jest.fn(() => Promise.resolve(true));
       usersService.update = jest.fn(() => Promise.resolve({ ok: 1 }));

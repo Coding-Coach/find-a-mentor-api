@@ -1,5 +1,7 @@
+import 'source-map-support/register';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
+import { MyLogger } from './logger';
 dotenv.config();
 
 import Config from './config';
@@ -11,12 +13,15 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new MyLogger(),
+  });
   app.enableCors({ origin: process.env.CORS_ORIGIN || /codingcoach\.io$/ });
+
   const options = new DocumentBuilder()
     .setTitle('Coding Coach')
     .setDescription('A REST API for the coding coach platform')
-    .setVersion('1.0')
+    .setVersion(process.env.DOCS_VERSION || '1.0')
     .addBearerAuth()
     .build();
 
@@ -29,7 +34,8 @@ async function bootstrap() {
 
     SwaggerModule.setup('/docs', app, document);
   }
-
+  // tslint:disable-next-line:no-console
+  console.log(`Server is up on port: ${process.env.PORT || 3000}`);
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

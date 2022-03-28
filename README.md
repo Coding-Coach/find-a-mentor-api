@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.org/Coding-Coach/find-a-mentor-api.svg?branch=master)](https://travis-ci.org/Coding-Coach/find-a-mentor-api)
+[![Tests](https://github.com/Coding-Coach/find-a-mentor-api/actions/workflows/main.yml/badge.svg)](https://github.com/Coding-Coach/find-a-mentor-api/actions/workflows/main.yml)
 
 ## Description
 
@@ -10,3 +10,21 @@ If you would like to contribute to this project, just follow the [contributing g
 
 ### Endpoints
 We are using swagger to document the endpoints, you can find the current spec at https://api-staging.codingcoach.io/
+
+### e2e Testing
+
+#### Running the e2e suite of tests
+
+If you'd like to run the entire suite of e2e tests locally you can use the command below:
+
+```
+yarn test:e2e
+```
+
+#### Running tests in a single e2e file
+
+To run the tests for a specific e2e file, use the command below as a starting point:
+
+```
+yarn test:e2e ./test/api/mentors.e2e-spec.ts
+```

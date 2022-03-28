@@ -58,19 +58,19 @@ describe('modules/lists/ListsController', () => {
       request = { user: { auth0Id: '1234' } };
       response = { success: true, list: { _id: '12345' } };
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER, Role.ADMIN],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       listsService.createList = jest.fn(() =>
-        Promise.resolve(<List>{ _id: '12345' }),
+        Promise.resolve({ _id: '12345' } as List),
       );
     });
 
@@ -78,33 +78,33 @@ describe('modules/lists/ListsController', () => {
       usersService.findById = jest.fn(() => Promise.resolve(undefined));
 
       await expect(
-        listsController.store(<Request>request, userId, listDto),
+        listsController.store(request as Request, userId, listDto),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw an error when creating a list for other user', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('1234'),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('5678'),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
 
       await expect(
-        listsController.store(<Request>request, userId, listDto),
+        listsController.store(request as Request, userId, listDto),
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should add a list for other users if current user is the Admin', async () => {
       const _id = new ObjectIdMock('5678');
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{ _id, roles: [Role.MEMBER] }),
+        Promise.resolve({ _id, roles: [Role.MEMBER] } as User),
       );
 
       expect(await listsController.store(request, userId, listDto)).toEqual(
@@ -163,37 +163,37 @@ describe('modules/lists/ListsController', () => {
     it('should throw an error when user is not found', async () => {
       usersService.findById = jest.fn(() => Promise.resolve(undefined));
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       listsService.findByUserId = jest.fn(() =>
-        Promise.resolve(<List[]>testUserList),
+        Promise.resolve(testUserList as List[]),
       );
 
       await expect(
-        listsController.myList(<Request>request, userId),
+        listsController.myList(request as Request, userId),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should show all lists for a user both public and private if user is current user', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       listsService.findByUserId = jest.fn(() =>
-        Promise.resolve(<List[]>testUserList),
+        Promise.resolve(testUserList as List[]),
       );
-      const response = await listsController.myList(<Request>request, userId);
+      const response = await listsController.myList(request as Request, userId);
       expect(response.success).toBe(true);
       expect(response.lists.length).toBe(2);
       expect(response.lists).toMatchObject(testUserList);
@@ -201,21 +201,21 @@ describe('modules/lists/ListsController', () => {
 
     it('should show all lists for a user both public and private if user is current admin', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('54367'),
           roles: [Role.ADMIN],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       listsService.findByUserId = jest.fn(() =>
-        Promise.resolve(<List[]>testUserList),
+        Promise.resolve(testUserList as List[]),
       );
-      const response = await listsController.myList(<Request>request, userId);
+      const response = await listsController.myList(request as Request, userId);
       expect(response.success).toBe(true);
       expect(response.lists.length).toBe(2);
       expect(response.lists).toMatchObject(testUserList);
@@ -223,21 +223,21 @@ describe('modules/lists/ListsController', () => {
 
     it('should show only public lists if user is not current user or admin', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('54367'),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       listsService.findByUserId = jest.fn(() =>
-        Promise.resolve(<List[]>[testUserList[0]]),
+        Promise.resolve([testUserList[0]] as List[]),
       );
-      const response = await listsController.myList(<Request>request, userId);
+      const response = await listsController.myList(request as Request, userId);
       expect(response.success).toBe(true);
       expect(response.lists.length).toBe(1);
       expect(response.lists).toMatchObject([testUserList[0]]);
@@ -280,96 +280,108 @@ describe('modules/lists/ListsController', () => {
     it('should throw an error when user is not found', async () => {
       usersService.findById = jest.fn(() => Promise.resolve(undefined));
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
-      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[]));
+      listsService.findByUserId = jest.fn(() => Promise.resolve([] as List[]));
       const data = {
         name: 'some random name',
         public: true,
       };
       await expect(
-        listsController.updateList(<Request>request, userId, listId, <ListDto>(
-          data
-        )),
+        listsController.updateList(
+          request as Request,
+          userId,
+          listId,
+          data as ListDto,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw an error when updating a list for other user', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('1234'),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('5678'),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       const data = {
         name: 'some random name',
         public: true,
       };
       await expect(
-        listsController.updateList(<Request>request, userId, listId, <ListDto>(
-          data
-        )),
+        listsController.updateList(
+          request as Request,
+          userId,
+          listId,
+          data as ListDto,
+        ),
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw an error if list is not found', async () => {
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
-      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[]));
+      listsService.findByUserId = jest.fn(() => Promise.resolve([] as List[]));
       const data = {
         name: 'some random name',
         public: true,
       };
       await expect(
-        listsController.updateList(<Request>request, userId, listId, <ListDto>(
-          data
-        )),
+        listsController.updateList(
+          request as Request,
+          userId,
+          listId,
+          data as ListDto,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should update a list succesfully', async () => {
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       listsService.findByUserId = jest.fn(() =>
-        Promise.resolve(<List[]>[testUserList[1]]),
+        Promise.resolve([testUserList[1]] as List[]),
       );
       listsService.update = jest.fn(() => Promise.resolve());
       const data = {
         name: 'some random name',
         public: true,
       };
-      await listsController.updateList(<Request>request, userId, listId, <
-        ListDto
-      >data);
+      await listsController.updateList(
+        request as Request,
+        userId,
+        listId,
+        data as ListDto,
+      );
       expect(listsService.update).toBeCalledTimes(1);
       expect(listsService.update).toHaveBeenCalledWith({
         _id: listId,
@@ -390,36 +402,36 @@ describe('modules/lists/ListsController', () => {
 
       listsService.delete = jest.fn(() => Promise.resolve({ ok: 1 }));
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
     });
 
     it('should throw error when delete if user is not current user or admin', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('54367'),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
 
       await expect(
-        listsController.deleteList(<Request>request, userId, listId),
+        listsController.deleteList(request as Request, userId, listId),
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should return success if user is admin', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('54367'),
           roles: [Role.ADMIN],
-        }),
+        } as User),
       );
 
       const res = await listsController.deleteList(
-        <Request>request,
+        request as Request,
         userId,
         listId,
       );
@@ -429,14 +441,14 @@ describe('modules/lists/ListsController', () => {
 
     it('should return success if user is current user', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('1234'),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
 
       const res = await listsController.deleteList(
-        <Request>request,
+        request as Request,
         userId,
         listId,
       );
@@ -446,15 +458,15 @@ describe('modules/lists/ListsController', () => {
 
     it('should throw an error when user is not found', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('54367'),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() => Promise.resolve(undefined));
 
       await expect(
-        listsController.deleteList(<Request>request, userId, listId),
+        listsController.deleteList(request as Request, userId, listId),
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -485,92 +497,104 @@ describe('modules/lists/ListsController', () => {
     it('should throw an error when user is not found', async () => {
       usersService.findById = jest.fn(() => Promise.resolve(undefined));
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
-      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[]));
+      listsService.findByUserId = jest.fn(() => Promise.resolve([] as List[]));
       const data = {
         mentors: [{ _id: '123456' }],
       };
       await expect(
-        listsController.addMentorToList(<Request>request, userId, listId, <
-          ListDto
-        >data),
+        listsController.addMentorToList(
+          request as Request,
+          userId,
+          listId,
+          data as ListDto,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw an error when updating a list for other user', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('1234'),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('5678'),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       const data = {
         mentors: [{ _id: '123456' }],
       };
       await expect(
-        listsController.addMentorToList(<Request>request, userId, listId, <
-          ListDto
-        >data),
+        listsController.addMentorToList(
+          request as Request,
+          userId,
+          listId,
+          data as ListDto,
+        ),
       ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw an error if list is not found', async () => {
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
-      listsService.findByUserId = jest.fn(() => Promise.resolve(<List[]>[]));
+      listsService.findByUserId = jest.fn(() => Promise.resolve([] as List[]));
       const data = {
         mentors: [{ _id: '123456' }],
       };
       await expect(
-        listsController.addMentorToList(<Request>request, userId, listId, <
-          ListDto
-        >data),
+        listsController.addMentorToList(
+          request as Request,
+          userId,
+          listId,
+          data as ListDto,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should add a mentor to a list successfully', async () => {
       usersService.findById = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock(userId),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
       listsService.findByUserId = jest.fn(() =>
-        Promise.resolve(<List[]>[testUserList[0]]),
+        Promise.resolve([testUserList[0]] as List[]),
       );
       listsService.update = jest.fn(() => Promise.resolve());
       const data = {
         mentors: [{ _id: '123456' }],
       };
-      await listsController.addMentorToList(<Request>request, userId, listId, <
-        ListDto
-      >data);
+      await listsController.addMentorToList(
+        request as Request,
+        userId,
+        listId,
+        data as ListDto,
+      );
       expect(listsService.update).toBeCalledTimes(1);
       expect(listsService.update).toHaveBeenCalledWith({
         _id: listId,

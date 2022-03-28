@@ -50,19 +50,19 @@ describe('modules/reports/ReportsController', () => {
     beforeEach(() => {
       request = { user: { auth0Id: '123' } };
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('123'),
           roles: [Role.MEMBER, Role.ADMIN],
-        }),
+        } as User),
       );
     });
 
     it('should throw an error if is not an admin', async () => {
       usersService.findByAuth0Id = jest.fn(() =>
-        Promise.resolve(<User>{
+        Promise.resolve({
           _id: new ObjectIdMock('123'),
           roles: [Role.MEMBER],
-        }),
+        } as User),
       );
 
       await expect(reportsController.users(request, '', '')).rejects.toThrow(

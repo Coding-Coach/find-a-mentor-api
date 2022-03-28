@@ -25,10 +25,7 @@ import {
 } from '../common/interfaces/application.interface';
 import { UserDto } from '../common/dto/user.dto';
 import { EmailService } from '../email/email.service';
-import {
-  Template,
-  SendDataRejectParams,
-} from '../email/interfaces/email.interface';
+import { EmailParams } from '../email/interfaces/email.interface';
 import { PaginationPipe } from '../common/pipes/pagination.pipe';
 
 @ApiUseTags('/mentors')
@@ -44,9 +41,13 @@ export class MentorsController {
     title: 'Return all mentors in the platform by the given filters',
   })
   @Get()
-  @UsePipes(new PaginationPipe())
+  @UsePipes(
+    new PaginationPipe(),
+    new ValidationPipe({ transform: true, whitelist: true }),
+  )
   async index(@Req() request: Request, @Query() filters: MentorFiltersDto) {
-    const data = await this.mentorsService.findAll(filters, !!request.user);
+    const userId: string = request.user?.auth0Id;
+    const data = await this.mentorsService.findAll(filters, userId);
 
     return {
       success: true,
@@ -109,10 +110,10 @@ export class MentorsController {
     @Param('userId') userId: string,
     @Query('status') status: string,
   ) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(userId);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(userId),
+    ]);
 
     if (!user) {
       throw new BadRequestException('User not found');
@@ -166,9 +167,8 @@ export class MentorsController {
     const user: User = await this.usersService.findByAuth0Id(
       request.user.auth0Id,
     );
-    const application: Application = await this.mentorsService.findActiveApplicationByUser(
-      user,
-    );
+    const application: Application =
+      await this.mentorsService.findActiveApplicationByUser(user);
     const applicationDto = new ApplicationDto({
       description: data.description,
       status: Status.PENDING,
@@ -190,12 +190,14 @@ export class MentorsController {
 
     await this.mentorsService.createApplication(applicationDto);
 
-    const emailData = {
+    this.emailService.sendLocalTemplate({
       to: user.email,
-      templateId: Template.MENTOR_APPLICATION_RECEIVED,
-    };
-
-    this.emailService.send(emailData);
+      subject: 'Mentor Application Received',
+      name: 'mentor-application-received',
+      data: {
+        name: user.name,
+      },
+    });
 
     return {
       success: true,
@@ -225,9 +227,8 @@ export class MentorsController {
       throw new UnauthorizedException('Access denied');
     }
 
-    const application: Application = await this.mentorsService.findApplicationById(
-      applicationId,
-    );
+    const application: Application =
+      await this.mentorsService.findApplicationById(applicationId);
 
     if (!application) {
       throw new BadRequestException('Application not found');
@@ -237,7 +238,6 @@ export class MentorsController {
       throw new BadRequestException('This Application is already approved');
     }
 
-    let templateId = null;
     const user: User = await this.usersService.findById(application.user);
     const applicationDto: ApplicationDto = new ApplicationDto({
       _id: application._id,
@@ -250,26 +250,35 @@ export class MentorsController {
       roles: [...user.roles, Role.MENTOR],
     });
 
+    let sendEmailParams: EmailParams;
+
     if (applicationDto.status === Status.REJECTED) {
-      templateId = Template.MENTOR_APPLICATION_REJECTED;
+      sendEmailParams = {
+        to: user.email,
+        name: 'mentor-application-declined',
+        subject: 'Mentor Application Denied',
+        data: {
+          name: user.name,
+          reason: data.reason,
+        },
+      };
     } else {
       await this.usersService.update(userDto);
-      templateId = Template.MENTOR_APPLICATION_APPROVED;
+      sendEmailParams = {
+        to: user.email,
+        name: 'mentor-application-approved',
+        subject: 'Mentor Application Approved 🏅',
+        data: {
+          name: user.name,
+        },
+      };
     }
-
-    const emailData = {
-      to: user.email,
-      templateId,
-      dynamic_template_data: {
-        reason: data.reason,
-      },
-    };
 
     const res: any = await this.mentorsService.updateApplication(
       applicationDto,
     );
     try {
-      await this.emailService.send<SendDataRejectParams>(emailData);
+      await this.emailService.sendLocalTemplate(sendEmailParams);
       await this.emailService.addMentor(user);
     } catch (error) {
       console.error(error); // tslint:disable-line no-console

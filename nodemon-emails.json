@@ -1,0 +1,5 @@
+{
+  "watch": ["content/email_templates"],
+  "ext": "html,js",
+  "exec": "node content/email_templates/show.js"
+}

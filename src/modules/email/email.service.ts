@@ -1,9 +1,11 @@
 import Config from '../../config';
 import * as sgMail from '@sendgrid/mail';
 import * as sgClient from '@sendgrid/client';
-import { SendData } from './interfaces/email.interface';
+import { EmailParams, SendData } from './interfaces/email.interface';
 import { Injectable } from '@nestjs/common';
 import { User } from '../common/interfaces/user.interface';
+import { promises } from 'fs';
+import { compile } from 'ejs';
 
 const isProduction = process.env.NODE_ENV === 'production';
 const defaults = {
@@ -29,9 +31,35 @@ export class EmailService {
       : DEV_TESTING_LIST,
   };
 
+  private getTemplateContent(name: string) {
+    return promises.readFile(`content/email_templates/${name}.html`, {
+      encoding: 'utf8',
+    });
+  }
+
+  get layout() {
+    return this.getTemplateContent('layout');
+  }
+
   async send<TemplateParams>(data: SendData<TemplateParams>) {
     const newData = Object.assign({}, defaults, data);
     return await sgMail.send(newData);
+  }
+
+  async sendLocalTemplate(params: EmailParams) {
+    const { to, subject, data = {}, name } = params;
+    const content = await this.injectData(name, data);
+    try {
+      await sgMail.send({
+        to,
+        subject,
+        html: content,
+        from: Config.email.FROM,
+      });
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.log('Send email error', params, JSON.stringify(error, null, 2));
+    }
   }
 
   async addMentor(contact: User) {
@@ -88,5 +116,12 @@ export class EmailService {
     };
 
     const response: [ClientResponse, any] = await sgClient.request(request);
+  }
+
+  private async injectData(name: string, data: Record<string, string>) {
+    const template = await this.getTemplateContent(name);
+    const layout = await this.layout;
+    const content = compile(template)(data);
+    return compile(layout)({ content });
   }
 }

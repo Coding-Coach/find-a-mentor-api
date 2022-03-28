@@ -25,6 +25,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import Config from '../../config';
 import { UserDto } from '../common/dto/user.dto';
+import { UserRecordDto } from '../common/dto/user-record.dto';
 import { UsersService } from '../common/users.service';
 import { Auth0Service } from '../common/auth0.service';
 import { FileService } from '../common/file.service';
@@ -35,6 +36,8 @@ import { Template } from '../email/interfaces/email.interface';
 import { ListDto } from '../lists/dto/list.dto';
 import { ListsService } from '../lists/lists.service';
 import { filterImages } from '../../utils/mimes';
+import { MentorshipsService } from '../mentorships/mentorships.service';
+import { Status } from '../mentorships/interfaces/mentorship.interface';
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -47,6 +50,7 @@ export class UsersController {
     private readonly auth0Service: Auth0Service,
     private readonly listsService: ListsService,
     private readonly fileService: FileService,
+    private readonly mentorshipsService: MentorshipsService,
   ) {}
 
   @ApiOperation({ title: 'Return all registered users' })
@@ -124,12 +128,14 @@ export class UsersController {
 
           await this.listsService.createList(favorites);
 
-          const emailData = {
+          this.emailService.sendLocalTemplate({
             to: userDto.email,
-            templateId: Template.WELCOME_MESSAGE,
-          };
-
-          this.emailService.send(emailData);
+            name: 'welcome',
+            subject: 'Welcome to Coding Coach! 🥳',
+            data: {
+              name: userDto.name,
+            },
+          });
 
           response.data = newUser;
         }
@@ -141,7 +147,7 @@ export class UsersController {
       }
     }
 
-    Sentry.configureScope(scope => {
+    Sentry.configureScope((scope) => {
       scope.setUser({
         id: response.data._id,
         email: response.data.email,
@@ -152,32 +158,55 @@ export class UsersController {
     return response;
   }
 
+  private async shouldIncludeChannels(
+    currentUser?: User,
+    requestedUser?: User,
+  ) {
+    if (!currentUser) {
+      return false;
+    }
+    if (currentUser.roles.includes(Role.ADMIN)) {
+      return true;
+    }
+    const mentorships = await this.mentorshipsService.findMentorshipsByUser(
+      currentUser._id,
+    );
+    return mentorships.some(
+      ({ mentee, mentor, status }) =>
+        status === Status.APPROVED &&
+        (mentor?._id.equals(requestedUser._id) ||
+          mentee?._id.equals(requestedUser._id)),
+    );
+  }
+
   @ApiOperation({ title: 'Returns a single user by ID' })
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Get(':id')
   async show(@Req() request, @Param() params) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(params.id);
+    const [current, requestedUser]: [User, User] = await Promise.all([
+      request.user
+        ? this.usersService.findByAuth0Id(request.user.auth0Id)
+        : Promise.resolve(null),
+      this.usersService.findById(params.id),
+    ]);
 
-    if (!user) {
+    if (!requestedUser) {
       throw new BadRequestException('User not found');
     }
-
-    // Only admins can see the email
-    if (!current._id.equals(user._id) && !current.roles.includes(Role.ADMIN)) {
-      const usr = { ...user };
-      delete usr.email;
-      return {
-        success: true,
-        data: usr,
-      };
-    }
+    const { channels, email, ...user } = requestedUser;
+    const showChannels = await this.shouldIncludeChannels(
+      current,
+      requestedUser,
+    );
+    const data = {
+      ...user,
+      email: current?.roles?.includes(Role.ADMIN) ? email : undefined,
+      channels: showChannels ? channels : [],
+    };
 
     return {
       success: true,
-      data: user,
+      data,
     };
   }
 
@@ -192,10 +221,10 @@ export class UsersController {
     }),
   )
   async update(@Req() request, @Param() params, @Body() data: UserDto) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(params.id);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      await this.usersService.findById(params.id),
+    ]);
 
     // Users should only update their own data
     if (!user) {
@@ -232,10 +261,10 @@ export class UsersController {
   @ApiImplicitParam({ name: 'id', description: 'The user _id' })
   @Delete(':id')
   async remove(@Req() request, @Param() params) {
-    const current: User = await this.usersService.findByAuth0Id(
-      request.user.auth0Id,
-    );
-    const user: User = await this.usersService.findById(params.id);
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      this.usersService.findById(params.id),
+    ]);
 
     if (!user) {
       throw new BadRequestException('User not found');
@@ -298,8 +327,9 @@ export class UsersController {
     }),
   )
   async uploadAvatar(@Req() request, @Param() params, @UploadedFile() image) {
-    const imagePath = `${Config.files.public}/${Config.files.avatars}/${image &&
-      image.filename}`;
+    const imagePath = `${Config.files.public}/${Config.files.avatars}/${
+      image && image.filename
+    }`;
     const current: User = await this.usersService.findByAuth0Id(
       request.user.auth0Id,
     );
@@ -326,9 +356,7 @@ export class UsersController {
         `${Config.files.public}/${Config.files.avatars}/${user.image.filename}`,
       );
       await this.fileService.removeFile(
-        `${Config.files.public}/${Config.files.avatars}/tns/${
-          user.image.filename
-        }`,
+        `${Config.files.public}/${Config.files.avatars}/tns/${user.image.filename}`,
       );
     }
 
@@ -359,4 +387,78 @@ export class UsersController {
       success: res.ok === 1,
     };
   }
+
+  //#region admin
+  @ApiOperation({ title: 'Add a record to user' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
+  @Post(':id/records')
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      skipMissingProperties: true,
+      whitelist: true,
+    }),
+  )
+  async addRecord(
+    @Req() request,
+    @Param() _params,
+    @Body() data: UserRecordDto,
+  ) {
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      await this.usersService.findById(data.user),
+    ]);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (!current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
+    }
+
+    const res = await this.usersService.addRecord(data);
+
+    return {
+      success: true,
+      data: res,
+    };
+  }
+
+  @ApiOperation({ title: 'Get user records' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
+  @Get(':id/records')
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      skipMissingProperties: true,
+      whitelist: true,
+    }),
+  )
+  async getRecords(@Req() request, @Param() params) {
+    const [current, user]: [User, User] = await Promise.all([
+      this.usersService.findByAuth0Id(request.user.auth0Id),
+      await this.usersService.findById(params.id),
+    ]);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (!current.roles.includes(Role.ADMIN)) {
+      throw new UnauthorizedException(
+        'Not authorized to perform this operation',
+      );
+    }
+
+    const res = await this.usersService.getRecords(params.id);
+
+    return {
+      success: true,
+      data: res,
+    };
+  }
+  //#endregion
 }
