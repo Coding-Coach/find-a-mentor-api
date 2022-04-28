@@ -42,6 +42,12 @@ export class AuthMiddleware implements NestMiddleware {
         next();
         return;
       }
+      if (!req.user.email_verified) {
+        return res.status(401).send({
+          success: false,
+          errors: ['Email not verified'],
+        });
+      }
       if (error) {
         const status = error.status || 401;
         const message =
