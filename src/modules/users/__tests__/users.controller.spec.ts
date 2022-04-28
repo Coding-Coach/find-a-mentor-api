@@ -117,7 +117,7 @@ describe('modules/users/UsersController', () => {
 
     beforeEach(() => {
       request = { user: { auth0Id: '123' } };
-      data = { _id: 123, name: 'Crysfel Villa' } as User;
+      data = { _id: 123, name: 'Crysfel Villa', email_verified: false } as User;
       response = { success: true, data };
     });
 
@@ -125,6 +125,21 @@ describe('modules/users/UsersController', () => {
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(data));
 
       expect(await usersController.currentUser(request)).toEqual(response);
+    });
+
+    it('should return if the user has verified email', async () => {
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(data));
+
+      expect(
+        await usersController.currentUser({
+          ...request,
+          user: { ...request.user, email_verified: true },
+        }),
+      ).toMatchObject({
+        data: {
+          email_verified: true,
+        },
+      });
     });
 
     it('should create a new user', async () => {

@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/node';
+import { Request } from 'express';
 
 import {
   Controller,
@@ -76,18 +77,18 @@ export class UsersController {
 
   @ApiOperation({ title: 'Returns the current user' })
   @Get('current')
-  async currentUser(@Req() request) {
+  async currentUser(@Req() request: Request) {
     const userId: string = request.user.auth0Id;
     const currentUser: User = await this.usersService.findByAuth0Id(userId);
     const response = {
       success: true,
-      data: currentUser,
+      data: this.enrichUserResponse(currentUser, request.user),
     };
 
     if (!currentUser) {
       try {
         const data: any = await this.auth0Service.getAdminAccessToken();
-        const user: any = await this.auth0Service.getUserProfile(
+        const user: User = await this.auth0Service.getUserProfile(
           data.access_token,
           userId,
         );
@@ -137,7 +138,7 @@ export class UsersController {
             },
           });
 
-          response.data = newUser;
+          response.data = this.enrichUserResponse(newUser, request.user);
         }
       } catch (error) {
         return {
@@ -156,6 +157,13 @@ export class UsersController {
     });
 
     return response;
+  }
+
+  private enrichUserResponse(user: User, auth0User: User): User {
+    return {
+      ...user,
+      email_verified: Boolean(auth0User.email_verified),
+    };
   }
 
   private async shouldIncludeChannels(

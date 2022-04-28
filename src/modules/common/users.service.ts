@@ -27,7 +27,7 @@ export class UsersService {
   }
 
   async findByAuth0Id(auth0Id: string): Promise<User> {
-    return await this.userModel.findOne({ auth0Id }).exec();
+    return await this.userModel.findOne({ auth0Id }).lean().exec();
   }
 
   async findByEmail(email: string): Promise<User> {
