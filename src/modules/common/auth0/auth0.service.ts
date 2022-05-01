@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import fetch from 'node-fetch';
-import Config from '../../config';
+import * as Sentry from '@sentry/node';
+import Config from '../../../config';
+import type { Auth0Response } from './auth0.types';
 
 @Injectable()
 export class Auth0Service {
   // Get an access token for the Auth0 Admin API
-  async getAdminAccessToken() {
+  async getAdminAccessToken(): Promise<{ access_token: string }> {
     const options = {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -27,7 +29,7 @@ export class Auth0Service {
   }
 
   // Get the user's profile from auth0
-  async getUserProfile(accessToken, userID) {
+  async getUserProfile(accessToken: string, userID: string) {
     const options = {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -58,5 +60,42 @@ export class Auth0Service {
     );
 
     return response;
+  }
+
+  async sendVerificationEmail(
+    accessToken: string,
+    auth0UserId: string,
+  ): Promise<Auth0Response> {
+    try {
+      const [provider, userId] = auth0UserId.split('|');
+      const payload = {
+        user_id: auth0UserId,
+        identity: { user_id: userId, provider },
+      };
+      const options = {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      };
+
+      const response: Auth0Response = await (
+        await fetch(
+          `https://${Config.auth0.backend.DOMAIN}/api/v2/jobs/verification-email`,
+          options,
+        )
+      ).json();
+
+      if ('statusCode' in response) {
+        throw new HttpException(response, response.statusCode);
+      }
+
+      return response;
+    } catch (error) {
+      Sentry.captureException(error);
+      throw error;
+    }
   }
 }

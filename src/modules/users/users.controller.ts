@@ -28,7 +28,7 @@ import Config from '../../config';
 import { UserDto } from '../common/dto/user.dto';
 import { UserRecordDto } from '../common/dto/user-record.dto';
 import { UsersService } from '../common/users.service';
-import { Auth0Service } from '../common/auth0.service';
+import { Auth0Service } from '../common/auth0/auth0.service';
 import { FileService } from '../common/file.service';
 import { MentorsService } from '../common/mentors.service';
 import { Role, User } from '../common/interfaces/user.interface';
@@ -87,7 +87,7 @@ export class UsersController {
 
     if (!currentUser) {
       try {
-        const data: any = await this.auth0Service.getAdminAccessToken();
+        const data = await this.auth0Service.getAdminAccessToken();
         const user: User = await this.auth0Service.getUserProfile(
           data.access_token,
           userId,
@@ -159,7 +159,7 @@ export class UsersController {
     return response;
   }
 
-  private enrichUserResponse(user: User, auth0User: User): User {
+  private enrichUserResponse(user: User, auth0User: AccessTokenUser): User {
     return {
       ...user,
       email_verified: Boolean(auth0User.email_verified),
@@ -385,6 +385,30 @@ export class UsersController {
 
     return {
       success: res.ok === 1,
+    };
+  }
+
+  @ApiOperation({ title: 'Send a verification email' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
+  @Post('verify')
+  async resendVerificationEmail(@Req() request: Request) {
+    const user: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const data = await this.auth0Service.getAdminAccessToken();
+    const response = await this.auth0Service.sendVerificationEmail(
+      data.access_token,
+      user.auth0Id,
+    );
+
+    return {
+      success: true,
+      data: response,
     };
   }
 
