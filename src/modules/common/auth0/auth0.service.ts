@@ -2,7 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import fetch from 'node-fetch';
 import * as Sentry from '@sentry/node';
 import Config from '../../../config';
-import type { Auth0Response } from './auth0.types';
+import type { Auth0Response, EmailVerificationTicket } from './auth0.types';
 
 @Injectable()
 export class Auth0Service {
@@ -62,28 +62,30 @@ export class Auth0Service {
     return response;
   }
 
-  async sendVerificationEmail(
+  async createVerificationEmailTicket(
     accessToken: string,
     auth0UserId: string,
   ): Promise<Auth0Response> {
     try {
       const [provider, userId] = auth0UserId.split('|');
       const payload = {
+        result_url: Config.urls.CLIENT_BASE_URL,
         user_id: auth0UserId,
         identity: { user_id: userId, provider },
       };
+
       const options = {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${accessToken}`,
           'content-type': 'application/json',
         },
         body: JSON.stringify(payload),
       };
 
-      const response: Auth0Response = await (
+      const response: Auth0Response<EmailVerificationTicket> = await (
         await fetch(
-          `https://${Config.auth0.backend.DOMAIN}/api/v2/jobs/verification-email`,
+          `https://${Config.auth0.backend.DOMAIN}/api/v2/tickets/email-verification`,
           options,
         )
       ).json();

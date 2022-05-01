@@ -1,4 +1,8 @@
-interface Auth0ResponseSuccess {} // tslint:disable-line
+type Auth0ResponseSuccess<T> = T;
+
+export interface EmailVerificationTicket {
+  ticket: string;
+}
 
 interface Auth0ResponseError {
   statusCode: number;
@@ -7,7 +11,9 @@ interface Auth0ResponseError {
   errorCode: string;
 }
 
-export type Auth0Response = Auth0ResponseSuccess | Auth0ResponseError;
+export type Auth0Response<T = any> =
+  | Auth0ResponseSuccess<T>
+  | Auth0ResponseError;
 
 interface Auth0UserIdentity {
   connection: string;

@@ -401,10 +401,18 @@ export class UsersController {
     }
 
     const data = await this.auth0Service.getAdminAccessToken();
-    const response = await this.auth0Service.sendVerificationEmail(
+    const response = await this.auth0Service.createVerificationEmailTicket(
       data.access_token,
       user.auth0Id,
     );
+
+    // TODO - create email verification template
+    this.emailService.sendLocalTemplate({
+      name: 'verification-email',
+      data: response,
+      to: user.email,
+      subject: 'Verify your email',
+    });
 
     return {
       success: true,
