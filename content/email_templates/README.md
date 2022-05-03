@@ -18,3 +18,5 @@ nodemon --config nodemon-emails.json
 |Mentor application received|http://localhost:3003/mentor-application-received?data={%22name%22:%22Brent%22}|
 |Mentorship application denied|http://localhost:3003/mentor-application-declined?data={%22name%22:%22Moshe%22,%22reason%22:%22your%20avatar%20is%20not%20you%22}|
 |Mentorship application approved|http://localhost:3003/mentor-application-approved?data={%22name%22:%22Moshe%22}|
+|Mentor freeze|http://localhost:3003/mentor-freeze?data={%22mentorName%22:%22Brent%22}}|
+|Email verification|http://localhost:3003/email-verification?data=%7B%22name%22:%22Moshe%22,%22link%22:%22http://localhost:3003%22%7D}|

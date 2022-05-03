@@ -31,5 +31,5 @@ app.get('/:templateName', function (req, res) {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Running on http://localhost:${port}. Grab a URL from the email_tempaltes/readme file`);
 });
