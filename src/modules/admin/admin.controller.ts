@@ -6,7 +6,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiOperation, ApiUseTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import { Request } from '🧙‍♂️/types/request';
 import { MentorsService } from '../common/mentors.service';
 import { MentorshipsService } from '../mentorships/mentorships.service';
 import { EmailService } from '../email/email.service';

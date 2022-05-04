@@ -1,3 +1,5 @@
+import { Request as ExpressReqeust } from 'express';
+
 interface AccessTokenUser {
   iss: string;
   sub: string;
@@ -10,8 +12,6 @@ interface AccessTokenUser {
   email_verified: boolean;
 }
 
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: AccessTokenUser;
-  }
+export interface Request extends ExpressReqeust {
+  user?: AccessTokenUser;
 }

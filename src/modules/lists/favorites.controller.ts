@@ -10,7 +10,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import { Request } from '🧙‍♂️/types/request';
 import { Role, User } from '../common/interfaces/user.interface';
 import { List } from './interfaces/list.interface';
 import { UsersService } from '../common/users.service';
@@ -101,11 +101,11 @@ export class FavoritesController {
     } else {
       let listDto: ListDto;
 
-      if (list.mentors.find(item => item._id.equals(mentor._id))) {
+      if (list.mentors.find((item) => item._id.equals(mentor._id))) {
         // If the mentor exist in the list we need to remove it
         listDto = new ListDto({
           _id: list._id,
-          mentors: list.mentors.filter(item => !item._id.equals(mentor._id)),
+          mentors: list.mentors.filter((item) => !item._id.equals(mentor._id)),
         });
       } else {
         // If the mentor doesn't exist in the list we need to add it

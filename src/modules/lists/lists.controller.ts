@@ -13,7 +13,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import { Request } from '🧙‍♂️/types/request';
 import { Role, User } from '../common/interfaces/user.interface';
 import { List } from './interfaces/list.interface';
 import { UsersService } from '../common/users.service';

@@ -1,6 +1,6 @@
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { Request } from 'express';
+import { Request } from '🧙‍♂️/types/request';
 import { ListsController } from '../lists.controller';
 import { ListsService } from '../lists.service';
 import { List } from '../interfaces/list.interface';

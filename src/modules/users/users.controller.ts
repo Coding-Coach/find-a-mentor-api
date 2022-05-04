@@ -39,6 +39,7 @@ import { ListsService } from '../lists/lists.service';
 import { filterImages } from '../../utils/mimes';
 import { MentorshipsService } from '../mentorships/mentorships.service';
 import { Status } from '../mentorships/interfaces/mentorship.interface';
+import { AccessTokenUser } from '🧙‍♂️/types/request';
 
 @ApiUseTags('/users')
 @ApiBearerAuth()

@@ -1,7 +1,8 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import * as jwt from 'express-jwt';
 import { expressJwtSecret } from 'jwks-rsa';
+import { Request } from '🧙‍♂️/types/request';
 import Config from '../config';
 
 const secret = expressJwtSecret({
