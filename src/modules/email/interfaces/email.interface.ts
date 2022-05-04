@@ -20,9 +20,10 @@ interface WelcomePayload {
 }
 
 interface VerificationEmailPayload {
-  name: 'verification-email';
+  name: 'email-verification';
   data: {
-    ticket: string;
+    name: string;
+    link: string;
   };
 }
 

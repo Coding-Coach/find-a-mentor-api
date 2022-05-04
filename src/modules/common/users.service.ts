@@ -15,7 +15,8 @@ export class UsersService {
 
   async create(userDto: UserDto): Promise<User> {
     const user = new this.userModel(userDto);
-    return await user.save();
+    const result = await user.save();
+    return result.toObject();
   }
 
   async findById(_id: string): Promise<User> {

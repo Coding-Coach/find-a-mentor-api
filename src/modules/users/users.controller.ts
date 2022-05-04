@@ -406,10 +406,12 @@ export class UsersController {
       user.auth0Id,
     );
 
-    // TODO - create email verification template
     this.emailService.sendLocalTemplate({
-      name: 'verification-email',
-      data: response,
+      name: 'email-verification',
+      data: {
+        name: user.name,
+        link: response.ticket,
+      },
       to: user.email,
       subject: 'Verify your email',
     });

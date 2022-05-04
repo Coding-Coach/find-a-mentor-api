@@ -65,7 +65,7 @@ export class Auth0Service {
   async createVerificationEmailTicket(
     accessToken: string,
     auth0UserId: string,
-  ): Promise<Auth0Response> {
+  ) {
     try {
       const [provider, userId] = auth0UserId.split('|');
       const payload = {
@@ -77,7 +77,8 @@ export class Auth0Service {
       const options = {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          /* tslint:disable-next-line */
+          Authorization: `Bearer ${accessToken}`,
           'content-type': 'application/json',
         },
         body: JSON.stringify(payload),
