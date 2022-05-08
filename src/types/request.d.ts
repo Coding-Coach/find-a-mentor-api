@@ -1,6 +1,6 @@
 import { Request as ExpressReqeust } from 'express';
 
-interface AccessTokenUser {
+export interface AccessTokenUser {
   iss: string;
   sub: string;
   aud: string;

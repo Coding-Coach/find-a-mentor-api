@@ -43,12 +43,7 @@ export class AuthMiddleware implements NestMiddleware {
         next();
         return;
       }
-      if (!req.user.email_verified) {
-        return res.status(401).send({
-          success: false,
-          errors: ['Please verify your email address'],
-        });
-      }
+
       if (error) {
         const status = error.status || 401;
         const message =
@@ -58,6 +53,12 @@ export class AuthMiddleware implements NestMiddleware {
         return res.status(status).send({
           success: false,
           errors: [message],
+        });
+      }
+      if (!req.user.email_verified) {
+        return res.status(401).send({
+          success: false,
+          errors: ['Please verify your email address'],
         });
       }
       next();

@@ -51,6 +51,7 @@ describe('Mentorships', () => {
       it('returns a status code of 401', async () => {
         return request(server)
           .put('/mentorships/1234/requests/abc')
+          .send({ status: Status.APPROVED, reason: '' })
           .expect(401);
       });
     });
@@ -66,8 +67,8 @@ describe('Mentorships', () => {
         .expect(404);
     });
 
-    describe('bad requests', () => {
-      it('returns a status code of 400 if the payload is invalid', () => {
+    describe('bad requests - returns a status code of 400', () => {
+      it('if the payload is invalid', () => {
         const id = mongoose.Types.ObjectId();
         const token = getToken();
         return request(server)
@@ -76,7 +77,7 @@ describe('Mentorships', () => {
           .expect(400);
       });
 
-      it('returns a status code of 400 if the mentorship id is invalid', () => {
+      it('if the mentorship id is invalid', () => {
         const token = getToken();
         return request(server)
           .put(`/mentorships/${mentorId}/requests/abc`)
@@ -85,7 +86,7 @@ describe('Mentorships', () => {
           .expect(400);
       });
 
-      it('returns a status code of 400 if the current user is a mentee in the mentorship and the status is not cancelled', async () => {
+      it('if the current user is a mentee in the mentorship and the status is not cancelled', async () => {
         const [mentee, mentor] = await Promise.all([
           createUser(),
           createUser(),
@@ -103,7 +104,7 @@ describe('Mentorships', () => {
           .expect(400);
       });
 
-      it('returns a status code of 400 if the current user is a mentor in the mentorship and the status is not allowed to be updated by a mentor', async () => {
+      it('if the current user is a mentor in the mentorship and the status is not allowed to be updated by a mentor', async () => {
         const [mentee, mentor] = await Promise.all([
           createUser(),
           createUser(),
@@ -122,8 +123,20 @@ describe('Mentorships', () => {
       });
     });
 
-    describe('unauthorized requests', () => {
-      it('returns a status code of 401 if the current user is neither a mentor nor a mentee in the mentorship', async () => {
+    describe('unauthorized requests - returns a status code of 401', () => {
+      it('if the current user has not verified their email', () => {
+        const token = getToken({ auth0Id: '1234' }, false);
+        return request(server)
+          .put(`/mentorships/1234/requests/5678`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ status: Status.APPROVED })
+          .expect(401, {
+            success: false,
+            errors: ['Please verify your email address'],
+          });
+      });
+
+      it('if the current user is neither a mentor nor a mentee in the mentorship', async () => {
         const [mentee1, mentee2, mentor] = await Promise.all([
           createUser(),
           createUser(),
@@ -146,7 +159,9 @@ describe('Mentorships', () => {
     });
 
     describe('successful requests', () => {
-      let mentor: User, mentee: User, mentorship: Mentorship;
+      let mentor: User;
+      let mentee: User;
+      let mentorship: Mentorship;
 
       beforeEach(async () => {
         [mentee, mentor] = await Promise.all([createUser(), createUser()]);
@@ -242,7 +257,7 @@ describe('Mentorships', () => {
           data: {
             menteeName: mentee.name,
             mentorName: mentor.name,
-            reason: reason,
+            reason,
           },
         });
         expect(body.mentorship.status).toBe(Status.CANCELLED);
