@@ -1,5 +1,6 @@
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { Request } from '🧙‍♂️/types/request';
 import { MentorsController } from '../../mentors/mentors.controller';
 import { UsersService } from '../../common/users.service';
 import { EmailService } from '../../email/email.service';
@@ -8,7 +9,6 @@ import { User } from '../../common/interfaces/user.interface';
 import { Application } from '../../common/interfaces/application.interface';
 import { MentorFiltersDto } from '../../common/dto/mentorfilters.dto';
 import { ApplicationDto } from '../../common/dto/application.dto';
-import { Request } from 'express';
 
 class ServiceMock {}
 

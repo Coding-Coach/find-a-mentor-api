@@ -18,6 +18,10 @@ export class UserDto {
   @ApiModelProperty()
   readonly _id: string;
 
+  // for mentorship mentor / mentee
+  @ApiModelProperty()
+  readonly id: string;
+
   @ApiModelProperty()
   @IsEmail()
   @IsString()
@@ -36,6 +40,15 @@ export class UserDto {
   @IsString()
   @IsUrl()
   readonly avatar: string;
+
+  @ApiModelPropertyOptional()
+  @IsString()
+  @IsUrl()
+  readonly image: string;
+
+  @ApiModelPropertyOptional()
+  @IsString()
+  readonly auth0Id: string;
 
   @ApiModelPropertyOptional()
   @Length(3, 50)
@@ -94,7 +107,7 @@ export class UserDto {
   @ArrayMaxSize(3)
   readonly channels: Channel[];
 
-  constructor(values) {
+  constructor(values: Partial<UserDto>) {
     Object.assign(this, values);
   }
 }

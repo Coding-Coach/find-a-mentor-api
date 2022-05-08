@@ -55,6 +55,7 @@
     "@types/express-jwt": "^0.0.42",
     "@types/jest": "^26.0.19",
     "@types/node": "^10.12.18",
+    "@types/node-fetch": "^2.6.1",
     "@types/supertest": "^2.0.7",
     "concurrently": "^4.1.0",
     "faker": "^5.1.0",

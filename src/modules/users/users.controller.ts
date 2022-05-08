@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/node';
+import { Request } from 'express';
 
 import {
   Controller,
@@ -27,7 +28,7 @@ import Config from '../../config';
 import { UserDto } from '../common/dto/user.dto';
 import { UserRecordDto } from '../common/dto/user-record.dto';
 import { UsersService } from '../common/users.service';
-import { Auth0Service } from '../common/auth0.service';
+import { Auth0Service } from '../common/auth0/auth0.service';
 import { FileService } from '../common/file.service';
 import { MentorsService } from '../common/mentors.service';
 import { Role, User } from '../common/interfaces/user.interface';
@@ -38,6 +39,7 @@ import { ListsService } from '../lists/lists.service';
 import { filterImages } from '../../utils/mimes';
 import { MentorshipsService } from '../mentorships/mentorships.service';
 import { Status } from '../mentorships/interfaces/mentorship.interface';
+import { AccessTokenUser } from '🧙‍♂️/types/request';
 
 @ApiUseTags('/users')
 @ApiBearerAuth()
@@ -76,18 +78,18 @@ export class UsersController {
 
   @ApiOperation({ title: 'Returns the current user' })
   @Get('current')
-  async currentUser(@Req() request) {
+  async currentUser(@Req() request: Request) {
     const userId: string = request.user.auth0Id;
     const currentUser: User = await this.usersService.findByAuth0Id(userId);
     const response = {
       success: true,
-      data: currentUser,
+      data: this.enrichUserResponse(currentUser, request.user),
     };
 
     if (!currentUser) {
       try {
-        const data: any = await this.auth0Service.getAdminAccessToken();
-        const user: any = await this.auth0Service.getUserProfile(
+        const data = await this.auth0Service.getAdminAccessToken();
+        const user: User = await this.auth0Service.getUserProfile(
           data.access_token,
           userId,
         );
@@ -137,7 +139,7 @@ export class UsersController {
             },
           });
 
-          response.data = newUser;
+          response.data = this.enrichUserResponse(newUser, request.user);
         }
       } catch (error) {
         return {
@@ -156,6 +158,13 @@ export class UsersController {
     });
 
     return response;
+  }
+
+  private enrichUserResponse(user: User, auth0User: AccessTokenUser): User {
+    return {
+      ...user,
+      email_verified: Boolean(auth0User.email_verified),
+    };
   }
 
   private async shouldIncludeChannels(
@@ -377,6 +386,40 @@ export class UsersController {
 
     return {
       success: res.ok === 1,
+    };
+  }
+
+  @ApiOperation({ title: 'Send a verification email' })
+  @ApiImplicitParam({ name: 'id', description: 'The user _id' })
+  @Post('verify')
+  async resendVerificationEmail(@Req() request: Request) {
+    const user: User = await this.usersService.findByAuth0Id(
+      request.user.auth0Id,
+    );
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const data = await this.auth0Service.getAdminAccessToken();
+    const response = await this.auth0Service.createVerificationEmailTicket(
+      data.access_token,
+      user.auth0Id,
+    );
+
+    this.emailService.sendLocalTemplate({
+      name: 'email-verification',
+      data: {
+        name: user.name,
+        link: response.ticket,
+      },
+      to: user.email,
+      subject: 'Verify your email',
+    });
+
+    return {
+      success: true,
+      data: response,
     };
   }
 

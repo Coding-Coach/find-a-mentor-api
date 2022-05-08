@@ -9,11 +9,18 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "paths": {
+      "🧙‍♂️/types/*": ["src/types/*"]
+    }
   },
+  "include": [
+    "src/**/*"
+  ],
   "files": [
     "src/main.ts",
-    "src/utils/request.d.ts"
+    "src/types/request.d.ts"
   ],
   "exclude": ["node_modules"]
 }

@@ -132,7 +132,7 @@ describe('modules/mentorships/MentorshipsController', () => {
 
       await expect(
         mentorshipsController.applyForMentorship(
-          <Request>request,
+          request as Request,
           mentorId,
           mentorship,
         ),

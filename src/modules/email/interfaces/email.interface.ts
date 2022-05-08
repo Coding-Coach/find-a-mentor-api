@@ -19,6 +19,14 @@ interface WelcomePayload {
   };
 }
 
+interface VerificationEmailPayload {
+  name: 'email-verification';
+  data: {
+    name: string;
+    link: string;
+  };
+}
+
 interface MentorshipAccepted {
   name: 'mentorship-accepted';
   data: {
@@ -109,6 +117,7 @@ interface MentorFreeze {
 export type EmailParams = Required<Pick<MailData, 'to' | 'subject'>> &
   (
     | WelcomePayload
+    | VerificationEmailPayload
     | MentorshipAccepted
     | MentorshipCancelled
     | MentorshipDeclined

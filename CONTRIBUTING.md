@@ -84,6 +84,7 @@ After that you will need to select the following scopes:
 - `read:users`
 - `read:roles`
 - `delete:users`
+- `create:user_tickets` (Sending email verification)
 
 These are the only scopes we need, but you can select all if you want.
 

@@ -5,11 +5,12 @@ import { UsersService } from '../../common/users.service';
 import { EmailService } from '../../email/email.service';
 import { MentorsService } from '../../common/mentors.service';
 import { ListsService } from '../../lists/lists.service';
-import { Auth0Service } from '../../common/auth0.service';
+import { Auth0Service } from '../../common/auth0/auth0.service';
 import { FileService } from '../../common/file.service';
 import { UserDto } from '../../common/dto/user.dto';
 import { User, Role } from '../../common/interfaces/user.interface';
 import { MentorshipsService } from '../../mentorships/mentorships.service';
+import { Response } from 'node-fetch';
 
 class ServiceMock {}
 
@@ -117,7 +118,7 @@ describe('modules/users/UsersController', () => {
 
     beforeEach(() => {
       request = { user: { auth0Id: '123' } };
-      data = { _id: 123, name: 'Crysfel Villa' } as User;
+      data = { _id: 123, name: 'Crysfel Villa', email_verified: false } as User;
       response = { success: true, data };
     });
 
@@ -125,6 +126,21 @@ describe('modules/users/UsersController', () => {
       usersService.findByAuth0Id = jest.fn(() => Promise.resolve(data));
 
       expect(await usersController.currentUser(request)).toEqual(response);
+    });
+
+    it('should return if the user has verified email', async () => {
+      usersService.findByAuth0Id = jest.fn(() => Promise.resolve(data));
+
+      expect(
+        await usersController.currentUser({
+          ...request,
+          user: { ...request.user, email_verified: true },
+        }),
+      ).toMatchObject({
+        data: {
+          email_verified: true,
+        },
+      });
     });
 
     it('should create a new user', async () => {
@@ -407,8 +423,10 @@ describe('modules/users/UsersController', () => {
       mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
         Promise.resolve(),
       );
-      auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({}));
-      auth0Service.deleteUser = jest.fn(() => Promise.resolve());
+      auth0Service.getAdminAccessToken = jest.fn(() =>
+        Promise.resolve({ access_token: '1' }),
+      );
+      auth0Service.deleteUser = jest.fn(() => Promise.resolve(new Response()));
 
       expect(await usersController.remove(request, params)).toEqual(response);
     });
@@ -462,8 +480,10 @@ describe('modules/users/UsersController', () => {
       mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
         Promise.resolve(),
       );
-      auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({}));
-      auth0Service.deleteUser = jest.fn(() => Promise.resolve());
+      auth0Service.getAdminAccessToken = jest.fn(() =>
+        Promise.resolve({ access_token: '1' }),
+      );
+      auth0Service.deleteUser = jest.fn(() => Promise.resolve(new Response()));
 
       expect(await usersController.remove(request, params)).toEqual(response);
     });
@@ -482,8 +502,10 @@ describe('modules/users/UsersController', () => {
       mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
         Promise.resolve(),
       );
-      auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({}));
-      auth0Service.deleteUser = jest.fn(() => Promise.resolve());
+      auth0Service.getAdminAccessToken = jest.fn(() =>
+        Promise.resolve({ access_token: '1' }),
+      );
+      auth0Service.deleteUser = jest.fn(() => Promise.resolve(new Response()));
 
       await usersController.remove(request, params);
 
@@ -509,8 +531,10 @@ describe('modules/users/UsersController', () => {
       mentorsService.removeAllApplicationsByUserId = jest.fn(() =>
         Promise.resolve(),
       );
-      auth0Service.getAdminAccessToken = jest.fn(() => Promise.resolve({}));
-      auth0Service.deleteUser = jest.fn(() => Promise.resolve());
+      auth0Service.getAdminAccessToken = jest.fn(() =>
+        Promise.resolve({ access_token: '1' }),
+      );
+      auth0Service.deleteUser = jest.fn(() => Promise.resolve(new Response()));
 
       await usersController.remove(request, params);
 
@@ -538,7 +562,7 @@ describe('modules/users/UsersController', () => {
       auth0Service.getAdminAccessToken = jest.fn(() =>
         Promise.resolve({ access_token: '159' }),
       );
-      auth0Service.deleteUser = jest.fn(() => Promise.resolve());
+      auth0Service.deleteUser = jest.fn(() => Promise.resolve(new Response()));
 
       await usersController.remove(request, params);
 

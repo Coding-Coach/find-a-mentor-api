@@ -1,7 +1,8 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import * as jwt from 'express-jwt';
 import { expressJwtSecret } from 'jwks-rsa';
+import { Request } from '🧙‍♂️/types/request';
 import Config from '../config';
 
 const secret = expressJwtSecret({
@@ -42,6 +43,7 @@ export class AuthMiddleware implements NestMiddleware {
         next();
         return;
       }
+
       if (error) {
         const status = error.status || 401;
         const message =
@@ -51,6 +53,12 @@ export class AuthMiddleware implements NestMiddleware {
         return res.status(status).send({
           success: false,
           errors: [message],
+        });
+      }
+      if (!req.user.email_verified) {
+        return res.status(401).send({
+          success: false,
+          errors: ['Please verify your email address'],
         });
       }
       next();

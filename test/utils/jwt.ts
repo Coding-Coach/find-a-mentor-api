@@ -3,6 +3,7 @@
 import * as jwt from 'jsonwebtoken';
 import * as nock from 'nock';
 import * as faker from 'faker';
+import { AccessTokenUser } from '../../src/types/request';
 
 const testPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEA3hcdO8Q55PC7zy9MLfpR2HrPmFf6GFMO/rQXUwtAI4JveIcT
@@ -38,8 +39,8 @@ const jwks = {
       alg: 'RS256',
       kty: 'RSA',
       use: 'sig',
-      n:
-        '3hcdO8Q55PC7zy9MLfpR2HrPmFf6GFMO_rQXUwtAI4JveIcTSuJ4h3AaXWzmmEjz_0WG_-kYwqiMH_aVAW6dG2iQ_Wz902RHNyH44RTek-flDvs3lwiW_zvUutDfLRoXguSaIdYaJTDurqnMjNyMOXGn9FDA14ArC98nFVTXB8YN04N-1PDNsILyEXxFtG9QIHcZelMgKErPSW7qnofc0VE-1_eJ7ohJQam0-53nCM1mt3VwLWXW-h4mM-s8qeITu6YP6jrhkXIm_nlkyfIUOOOWX4PFiaRvTGoLUYp0K0PinCd1Txp-jERGvkPXv7fHJ7mN8qGAOh9QocxKEz-H6Q',
+      /* tslint:disable-next-line */
+      n: '3hcdO8Q55PC7zy9MLfpR2HrPmFf6GFMO_rQXUwtAI4JveIcTSuJ4h3AaXWzmmEjz_0WG_-kYwqiMH_aVAW6dG2iQ_Wz902RHNyH44RTek-flDvs3lwiW_zvUutDfLRoXguSaIdYaJTDurqnMjNyMOXGn9FDA14ArC98nFVTXB8YN04N-1PDNsILyEXxFtG9QIHcZelMgKErPSW7qnofc0VE-1_eJ7ohJQam0-53nCM1mt3VwLWXW-h4mM-s8qeITu6YP6jrhkXIm_nlkyfIUOOOWX4PFiaRvTGoLUYp0K0PinCd1Txp-jERGvkPXv7fHJ7mN8qGAOh9QocxKEz-H6Q',
       e: 'AQAB',
       kid: '0',
     },
@@ -51,9 +52,13 @@ nock(`https://${process.env.AUTH0_DOMAIN}`)
   .get('/.well-known/jwks.json')
   .reply(200, jwks);
 
-export const getToken = (user = { auth0Id: faker.random.uuid() }) => {
-  const payload = {
+export const getToken = (
+  user = { auth0Id: faker.random.uuid() },
+  emailVerified = true,
+) => {
+  const payload: Partial<AccessTokenUser> = {
     sub: user.auth0Id,
+    email_verified: emailVerified,
   };
 
   const options = {
