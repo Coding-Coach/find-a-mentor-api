@@ -40,11 +40,15 @@
     <span style="font-weight: bold; font-style: italic"><%= mentorName %></span>
     was not accepted.
   </p>
-  <p>
-    They provided the reason below, which we hope will help you find your next
-    mentor:
-  </p>
-  <pre><%= reason %></pre>
+  
+    <% if (reason) { %>
+    <p>
+      They provided the reason below, which we hope will help you find your next
+      mentor:
+    </p>
+    <pre><%= reason %></pre>
+    <% } %>
+
   <% } %>
 
   <p>
