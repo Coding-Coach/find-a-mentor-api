@@ -60,7 +60,7 @@
     "faker": "^5.1.0",
     "husky": "2.7.0",
     "jest": "^26.6.3",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "lint-staged": "^9.4.3",
     "minimist": "^1.2.0",
     "mongodb-memory-server": "^6.9.2",
