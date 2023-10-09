@@ -31,11 +31,14 @@ export class AdminController {
     private readonly mentorshipsService: MentorshipsService,
   ) {}
 
-  private respondedRecently(requestsAsMentor: Mentorship[]) {
+  private respondedRecently(
+    requestsAsMentor: Mentorship[],
+    since: number = MONTH,
+  ) {
     return requestsAsMentor.some(
       ({ status, updatedAt }) =>
         [Status.APPROVED, Status.REJECTED].includes(status) &&
-        Date.now() - updatedAt.getTime() <= MONTH,
+        Date.now() - updatedAt.getTime() <= since,
     );
   }
 
